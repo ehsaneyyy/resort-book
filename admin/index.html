@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Coastal Haven Resort Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme: { extend: { colors: {
+      brand: { 50:'#fdf8f0',100:'#f5e6d0',200:'#e8cba0',300:'#d4a574',400:'#c9995a',500:'#b8863e',600:'#9a6f2f',700:'#7a5826',800:'#5c421d',900:'#3d2c14' },
+      dark: { 50:'#e8e8ea',100:'#c5c5c9',200:'#9e9ea5',300:'#767680',400:'#555562',500:'#353545',600:'#2a2a3a',700:'#1f1f30',800:'#151525',900:'#0a0a1a' },
+    }}}}
+  </script>
+</head>
+<body class="bg-dark-900 text-slate-200 antialiased">
+  <script src="js/admin-data.js"></script>
+  <script src="js/admin-layout.js"></script>
+  <script>
+    initAdminLayout("dashboard");
+    const content = document.getElementById("admin-content");
+    const bookings = getAdminBookings();
+    const rooms = getAdminRooms();
+    const guests = getAdminGuests();
+    const confirmed = bookings.filter(b => b.status === "Confirmed");
+    const pending = bookings.filter(b => b.status === "Pending");
+    const checkedOut = bookings.filter(b => b.status === "Checked Out");
+    const cancelled = bookings.filter(b => b.status === "Cancelled");
+    const todayStr = today();
+    const todayCheckins = bookings.filter(b => b.checkIn === todayStr && b.status === "Confirmed");
+    const todayCheckouts = bookings.filter(b => b.checkOut === todayStr && b.status === "Confirmed");
+    const occupiedRooms = confirmed.filter(b => todayStr >= b.checkIn && todayStr < b.checkOut).length;
+    const totalRevenue = confirmed.reduce((s, b) => s + b.total, 0) + checkedOut.reduce((s, b) => s + b.total, 0);
+    const occupancyRate = Math.round((occupiedRooms / rooms.length) * 100);
+    const recentBookings = [...bookings].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
+    const vipGuests = guests.filter(g => g.vip);
+
+    content.innerHTML = `
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="bg-dark-800/50 rounded-2xl border border-white/5 p-5 hover:border-brand-500/20 transition">
+          <p class="text-slate-500 text-xs uppercase tracking-wider mb-2">Total Bookings</p>
+          <p class="text-3xl font-bold text-white">${bookings.length}</p>
+          <p class="text-xs text-slate-500 mt-2">${confirmed.length} confirmed, ${pending.length} pending</p>
+        </div>
+        <div class="bg-dark-800/50 rounded-2xl border border-white/5 p-5 hover:border-emerald-500/20 transition">
+          <p class="text-slate-500 text-xs uppercase tracking-wider mb-2">Revenue</p>
+          <p class="text-3xl font-bold text-emerald-400">${formatCurrency(totalRevenue)}</p>
+          <p class="text-xs text-slate-500 mt-2">From ${confirmed.length + checkedOut.length} bookings</p>
+        </div>
+        <div class="bg-dark-800/50 rounded-2xl border border-white/5 p-5 hover:border-blue-500/20 transition">
+          <p class="text-slate-500 text-xs uppercase tracking-wider mb-2">Occupancy</p>
+          <p class="text-3xl font-bold text-blue-400">${occupancyRate}%</p>
+          <p class="text-xs text-slate-500 mt-2">${occupiedRooms} of ${rooms.length} rooms occupied</p>
+        </div>
+        <div class="bg-dark-800/50 rounded-2xl border border-white/5 p-5 hover:border-yellow-500/20 transition">
+          <p class="text-slate-500 text-xs uppercase tracking-wider mb-2">Pending</p>
+          <p class="text-3xl font-bold text-yellow-400">${pending.length}</p>
+          <p class="text-xs text-slate-500 mt-2">${todayCheckins.length} check-ins today</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div class="lg:col-span-2 bg-dark-800/50 rounded-2xl border border-white/5 p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-white">Recent Bookings</h3>
+            <a href="bookings.html" class="text-sm text-brand-400 hover:text-brand-300 transition">View All</a>
+          </div>
+          <div class="space-y-3">
+            ${recentBookings.map(b => {
+              const guest = getGuestById(b.guestId);
+              const room = getRoomById(b.roomId);
+              const statusColor = b.status === "Confirmed" ? "bg-emerald-500/20 text-emerald-400" : b.status === "Pending" ? "bg-yellow-500/20 text-yellow-400" : b.status === "Cancelled" ? "bg-red-500/20 text-red-400" : "bg-blue-500/20 text-blue-400";
+              return `
+                <div class="flex items-center gap-4 p-3 rounded-xl hover:bg-white/[0.02] transition">
+                  <div class="w-10 h-10 bg-brand-500/20 rounded-xl flex items-center justify-center text-brand-400 text-sm font-bold flex-shrink-0">${guest ? guest.name.charAt(0) : "?"}</div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-white text-sm font-medium truncate">${guest ? guest.name : "Unknown"}</p>
+                    <p class="text-slate-500 text-xs">${room ? room.name : b.roomId} &middot; ${formatDate(b.checkIn)}</p>
+                  </div>
+                  <div class="text-right flex-shrink-0">
+                    <p class="text-amber-400 text-sm font-medium">${formatCurrency(b.total)}</p>
+                    <span class="inline-block px-2 py-0.5 text-[10px] rounded-full font-medium ${statusColor}">${b.status}</span>
+                  </div>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        </div>
+
+        <div class="space-y-6">
+          <div class="bg-dark-800/50 rounded-2xl border border-white/5 p-6">
+            <h3 class="text-lg font-semibold text-white mb-4">Today's Activity</h3>
+            <div class="space-y-4">
+              <div class="flex items-center gap-3 p-3 bg-emerald-500/5 rounded-xl border border-emerald-500/10">
+                <div class="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center">
+                  <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+                </div>
+                <div>
+                  <p class="text-white text-sm font-medium">${todayCheckins.length} Check-ins</p>
+                  <p class="text-slate-500 text-xs">Expected today</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3 p-3 bg-blue-500/5 rounded-xl border border-blue-500/10">
+                <div class="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center">
+                  <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                </div>
+                <div>
+                  <p class="text-white text-sm font-medium">${todayCheckouts.length} Check-outs</p>
+                  <p class="text-slate-500 text-xs">Expected today</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-dark-800/50 rounded-2xl border border-white/5 p-6">
+            <h3 class="text-lg font-semibold text-white mb-4">Room Status</h3>
+            <div class="space-y-3">
+              ${rooms.map(r => {
+                const isOccupied = confirmed.some(b => b.roomId === r.id && todayStr >= b.checkIn && todayStr < b.checkOut);
+                const dotColor = isOccupied ? "bg-red-400" : "bg-emerald-400";
+                return `
+                  <div class="flex items-center justify-between py-2">
+                    <div class="flex items-center gap-2">
+                      <span class="w-2 h-2 ${dotColor} rounded-full"></span>
+                      <span class="text-sm text-slate-300">${r.name}</span>
+                    </div>
+                    <span class="text-xs ${isOccupied ? "text-red-400" : "text-emerald-400"}">${isOccupied ? "Occupied" : "Available"}</span>
+                  </div>
+                `;
+              }).join("")}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-dark-800/50 rounded-2xl border border-white/5 p-6">
+          <h3 class="text-lg font-semibold text-white mb-4">Revenue Breakdown</h3>
+          <div class="space-y-4">
+            <div class="flex justify-between items-center">
+              <span class="text-slate-400 text-sm">Confirmed Bookings</span>
+              <span class="text-emerald-400 font-medium">${formatCurrency(confirmed.reduce((s, b) => s + b.total, 0))}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-slate-400 text-sm">Checked Out (Paid)</span>
+              <span class="text-emerald-400 font-medium">${formatCurrency(checkedOut.reduce((s, b) => s + b.total, 0))}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-slate-400 text-sm">Pending Payment</span>
+              <span class="text-yellow-400 font-medium">${formatCurrency(pending.reduce((s, b) => s + b.total, 0))}</span>
+            </div>
+            <div class="border-t border-white/5 pt-4 flex justify-between items-center">
+              <span class="text-white font-semibold">Total Revenue</span>
+              <span class="text-xl font-bold text-brand-400">${formatCurrency(totalRevenue)}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-dark-800/50 rounded-2xl border border-white/5 p-6">
+          <h3 class="text-lg font-semibold text-white mb-4">VIP Guests</h3>
+          <div class="space-y-3">
+            ${vipGuests.map(g => `
+              <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-white/[0.02] transition">
+                <div class="w-10 h-10 bg-brand-500/20 rounded-xl flex items-center justify-center text-brand-400 text-sm font-bold">${g.name.charAt(0)}</div>
+                <div class="flex-1">
+                  <p class="text-white text-sm font-medium">${g.name}</p>
+                  <p class="text-slate-500 text-xs">${g.totalBookings} bookings &middot; ${formatCurrency(g.totalSpent)}</p>
+                </div>
+                <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      </div>
+    `;
+  </script>
+</body>
+</html>

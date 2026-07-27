@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bookings - Coastal Haven Resort Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{brand:{50:'#fdf8f0',100:'#f5e6d0',200:'#e8cba0',300:'#d4a574',400:'#c9995a',500:'#b8863e',600:'#9a6f2f'},dark:{700:'#1f1f30',800:'#151525',900:'#0a0a1a'}}}}}</script>
+</head>
+<body class="bg-dark-900 text-slate-200 antialiased">
+  <script src="js/admin-data.js"></script>
+  <script src="js/admin-layout.js"></script>
+  <script>
+    initAdminLayout("bookings");
+    const content = document.getElementById("admin-content");
+    let bookings = getAdminBookings();
+    let filter = "all";
+    let searchQuery = "";
+
+    function render() {
+      let filtered = filter === "all" ? bookings : bookings.filter(b => b.status === filter);
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        filtered = filtered.filter(b => {
+          const guest = getGuestById(b.guestId);
+          return (guest && guest.name.toLowerCase().includes(q)) || b.id.toLowerCase().includes(q);
+        });
+      }
+
+      const stats = {
+        total: bookings.length,
+        confirmed: bookings.filter(b => b.status === "Confirmed").length,
+        pending: bookings.filter(b => b.status === "Pending").length,
+        checkedOut: bookings.filter(b => b.status === "Checked Out").length,
+        cancelled: bookings.filter(b => b.status === "Cancelled").length,
+      };
+
+      content.innerHTML = `
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
+          ${[
+            { label: "Total", count: stats.total, color: "text-white" },
+            { label: "Confirmed", count: stats.confirmed, color: "text-emerald-400" },
+            { label: "Pending", count: stats.pending, color: "text-yellow-400" },
+            { label: "Checked Out", count: stats.checkedOut, color: "text-blue-400" },
+            { label: "Cancelled", count: stats.cancelled, color: "text-red-400" },
+          ].map(s => `
+            <button onclick="setFilter('${s.label === "Total" ? "all" : s.label === "Checked Out" ? "Checked Out" : s.label}')" class="p-3 rounded-xl text-center transition border ${filter === (s.label === "Total" ? "all" : s.label === "Checked Out" ? "Checked Out" : s.label) ? "bg-white/10 border-white/10" : "border-transparent hover:bg-white/5"}">
+              <p class="text-2xl font-bold ${s.color}">${s.count}</p>
+              <p class="text-xs text-slate-500">${s.label}</p>
+            </button>
+          `).join("")}
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-3 mb-6">
+          <div class="relative flex-1">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input oninput="searchQuery=this.value;render()" placeholder="Search by guest name or booking ID..." class="w-full pl-10 pr-4 py-2.5 bg-dark-700 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 placeholder-slate-500">
+          </div>
+          <select onchange="setFilter(this.value)" class="px-4 py-2.5 bg-dark-700 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+            <option value="all" ${filter==="all"?"selected":""}>All Status</option>
+            <option value="Confirmed" ${filter==="Confirmed"?"selected":""}>Confirmed</option>
+            <option value="Pending" ${filter==="Pending"?"selected":""}>Pending</option>
+            <option value="Checked Out" ${filter==="Checked Out"?"selected":""}>Checked Out</option>
+            <option value="Cancelled" ${filter==="Cancelled"?"selected":""}>Cancelled</option>
+          </select>
+        </div>
+
+        <div class="bg-dark-800/50 rounded-2xl border border-white/5 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="border-b border-white/5">
+                  <th class="text-left py-3 px-4 lg:px-5 text-xs font-medium text-slate-500 uppercase tracking-wider">Booking</th>
+                  <th class="text-left py-3 px-4 lg:px-5 text-xs font-medium text-slate-500 uppercase tracking-wider">Guest</th>
+                  <th class="text-left py-3 px-4 lg:px-5 text-xs font-medium text-slate-500 uppercase tracking-wider">Room</th>
+                  <th class="text-left py-3 px-4 lg:px-5 text-xs font-medium text-slate-500 uppercase tracking-wider">Dates</th>
+                  <th class="text-left py-3 px-4 lg:px-5 text-xs font-medium text-slate-500 uppercase tracking-wider">Amount</th>
+                  <th class="text-left py-3 px-4 lg:px-5 text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
+                  <th class="text-left py-3 px-4 lg:px-5 text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${filtered.length === 0 ? `
+                  <tr><td colspan="7" class="py-16 text-center text-slate-500">
+                    <svg class="w-12 h-12 mx-auto mb-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/></svg>
+                    No bookings found
+                  </td></tr>
+                ` : filtered.map(b => {
+                  const guest = getGuestById(b.guestId);
+                  const room = getRoomById(b.roomId);
+                  const sc = b.status==="Confirmed"?"bg-emerald-500/20 text-emerald-400":b.status==="Pending"?"bg-yellow-500/20 text-yellow-400":b.status==="Cancelled"?"bg-red-500/20 text-red-400":"bg-blue-500/20 text-blue-400";
+                  return `
+                    <tr class="border-b border-white/5 hover:bg-white/[0.02] transition">
+                      <td class="py-3 px-4 lg:px-5"><span class="text-sm font-mono text-brand-400">${b.id}</span></td>
+                      <td class="py-3 px-4 lg:px-5">
+                        <div class="flex items-center gap-3">
+                          <div class="w-8 h-8 bg-brand-500/20 rounded-lg flex items-center justify-center text-brand-400 text-xs font-bold">${guest ? guest.name.charAt(0) : "?"}</div>
+                          <div><p class="text-sm text-white font-medium">${guest?.name || "Unknown"}</p><p class="text-[10px] text-slate-500">${guest?.phone || ""}</p></div>
+                        </div>
+                      </td>
+                      <td class="py-3 px-4 lg:px-5 text-sm text-slate-300">${room?.name || b.roomId}</td>
+                      <td class="py-3 px-4 lg:px-5"><p class="text-sm text-slate-300">${formatDate(b.checkIn)}</p><p class="text-[10px] text-slate-500">${b.nights}N &middot; ${b.adults}A${b.children?`, ${b.children}C`:''}</p></td>
+                      <td class="py-3 px-4 lg:px-5"><p class="text-sm font-medium text-amber-400">${formatCurrency(b.total)}</p><p class="text-[10px] ${b.paymentStatus==='Paid'?'text-emerald-400':b.paymentStatus==='Refunded'?'text-red-400':'text-yellow-400'}">${b.paymentStatus}</p></td>
+                      <td class="py-3 px-4 lg:px-5"><span class="px-2 py-1 text-[10px] rounded-full font-medium ${sc}">${b.status}</span></td>
+                      <td class="py-3 px-4 lg:px-5">
+                        <div class="flex gap-1.5">
+                          <button onclick="viewBooking('${b.id}')" class="px-2.5 py-1.5 bg-white/5 hover:bg-white/10 text-slate-300 text-xs rounded-lg transition" title="View Details">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                          </button>
+                          ${b.status==="Pending"?`
+                            <button onclick="updateBooking('${b.id}','Confirmed')" class="px-2.5 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 text-xs rounded-lg transition" title="Confirm">
+                              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            </button>
+                            <button onclick="updateBooking('${b.id}','Cancelled')" class="px-2.5 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs rounded-lg transition" title="Cancel">
+                              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
+                          `:b.status==="Confirmed"?`
+                            <button onclick="updateBooking('${b.id}','Checked Out')" class="px-2.5 py-1.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 text-xs rounded-lg transition" title="Check Out">
+                              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                            </button>
+                            <button onclick="updateBooking('${b.id}','Cancelled')" class="px-2.5 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs rounded-lg transition" title="Cancel">
+                              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
+                          `:`
+                            <button onclick="deleteBooking('${b.id}')" class="px-2.5 py-1.5 bg-slate-500/10 hover:bg-slate-500/20 text-slate-400 text-xs rounded-lg transition" title="Delete">
+                              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            </button>
+                          `}
+                        </div>
+                      </td>
+                    </tr>
+                  `;
+                }).join("")}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="booking-detail-modal" class="fixed inset-0 z-50 hidden">
+          <div class="absolute inset-0 bg-dark-900/80 backdrop-blur-sm" onclick="closeBookingModal()"></div>
+          <div class="absolute inset-4 sm:inset-8 lg:inset-y-8 lg:left-1/2 lg:-translate-x-1/2 lg:w-full lg:max-w-lg bg-dark-800 rounded-2xl border border-white/10 overflow-y-auto">
+            <div class="sticky top-0 bg-dark-800 border-b border-white/5 px-6 py-4 flex items-center justify-between z-10">
+              <h3 class="text-lg font-semibold text-white">Booking Details</h3>
+              <button onclick="closeBookingModal()" class="p-2 hover:bg-white/10 rounded-lg transition text-slate-400 hover:text-white">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+            </div>
+            <div id="booking-detail-body" class="p-6"></div>
+          </div>
+        </div>
+      `;
+    }
+
+    function setFilter(f) { filter = f; render(); }
+
+    function updateBooking(id, newStatus) {
+      const b = bookings.find(x => x.id === id);
+      if (b) {
+        b.status = newStatus;
+        if (newStatus === "Checked Out") b.paymentStatus = "Paid";
+        saveAdminData("admin_bookings", bookings);
+        showToast(`Booking ${newStatus.toLowerCase()} successfully`, newStatus === "Checked Out" ? "success" : newStatus === "Cancelled" ? "warning" : "success");
+        render();
+      }
+    }
+
+    function deleteBooking(id) {
+      if (!confirm("Delete this booking permanently?")) return;
+      bookings = bookings.filter(b => b.id !== id);
+      saveAdminData("admin_bookings", bookings);
+      showToast("Booking deleted", "info");
+      render();
+    }
+
+    function viewBooking(id) {
+      const b = getBookingById(id);
+      if (!b) return;
+      const guest = getGuestById(b.guestId);
+      const room = getRoomById(b.roomId);
+      const sc = b.status==="Confirmed"?"bg-emerald-500/20 text-emerald-400":b.status==="Pending"?"bg-yellow-500/20 text-yellow-400":b.status==="Cancelled"?"bg-red-500/20 text-red-400":"bg-blue-500/20 text-blue-400";
+
+      document.getElementById("booking-detail-body").innerHTML = `
+        <div class="space-y-6">
+          <div class="flex items-center justify-between">
+            <span class="text-xl font-bold font-mono text-brand-400">${b.id}</span>
+            <span class="px-3 py-1 text-sm rounded-full font-medium ${sc}">${b.status}</span>
+          </div>
+
+          <div class="bg-dark-700/50 rounded-xl p-4 border border-white/5">
+            <h4 class="text-sm font-medium text-slate-400 mb-3">Guest Information</h4>
+            <div class="grid grid-cols-2 gap-3 text-sm">
+              <div><p class="text-slate-500">Name</p><p class="text-white">${guest?.name || "Unknown"}</p></div>
+              <div><p class="text-slate-500">Phone</p><p class="text-white">${guest?.phone || "N/A"}</p></div>
+              <div><p class="text-slate-500">Email</p><p class="text-white">${guest?.email || "N/A"}</p></div>
+              <div><p class="text-slate-500">City</p><p class="text-white">${guest?.city || "N/A"}</p></div>
+            </div>
+          </div>
+
+          <div class="bg-dark-700/50 rounded-xl p-4 border border-white/5">
+            <h4 class="text-sm font-medium text-slate-400 mb-3">Booking Details</h4>
+            <div class="grid grid-cols-2 gap-3 text-sm">
+              <div><p class="text-slate-500">Room</p><p class="text-white">${room?.name || b.roomId}</p></div>
+              <div><p class="text-slate-500">Source</p><p class="text-white">${b.source}</p></div>
+              <div><p class="text-slate-500">Check-in</p><p class="text-white">${formatDate(b.checkIn)}</p></div>
+              <div><p class="text-slate-500">Check-out</p><p class="text-white">${formatDate(b.checkOut)}</p></div>
+              <div><p class="text-slate-500">Duration</p><p class="text-white">${b.nights} nights</p></div>
+              <div><p class="text-slate-500">Guests</p><p class="text-white">${b.adults} adults${b.children ? `, ${b.children} children` : ""}</p></div>
+            </div>
+          </div>
+
+          <div class="bg-dark-700/50 rounded-xl p-4 border border-white/5">
+            <h4 class="text-sm font-medium text-slate-400 mb-3">Payment</h4>
+            <div class="grid grid-cols-2 gap-3 text-sm">
+              <div><p class="text-slate-500">Total</p><p class="text-xl font-bold text-amber-400">${formatCurrency(b.total)}</p></div>
+              <div><p class="text-slate-500">Status</p><p class="${b.paymentStatus==='Paid'?'text-emerald-400':b.paymentStatus==='Refunded'?'text-red-400':'text-yellow-400'}">${b.paymentStatus}</p></div>
+              <div><p class="text-slate-500">Method</p><p class="text-white">${b.paymentMethod}</p></div>
+              <div><p class="text-slate-500">Booked On</p><p class="text-white">${formatDate(b.createdAt)}</p></div>
+            </div>
+          </div>
+
+          ${b.specialRequests ? `
+            <div class="bg-blue-500/5 border border-blue-500/10 rounded-xl p-4">
+              <h4 class="text-sm font-medium text-blue-400 mb-2">Special Requests</h4>
+              <p class="text-sm text-slate-300">${b.specialRequests}</p>
+            </div>
+          ` : ""}
+
+          <div class="flex gap-3 pt-2">
+            ${b.status==="Pending"?`
+              <button onclick="updateBooking('${b.id}','Confirmed');closeBookingModal()" class="flex-1 py-3 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 font-semibold rounded-xl transition">Confirm Booking</button>
+              <button onclick="updateBooking('${b.id}','Cancelled');closeBookingModal()" class="py-3 px-6 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-semibold rounded-xl transition">Cancel</button>
+            `:b.status==="Confirmed"?`
+              <button onclick="updateBooking('${b.id}','Checked Out');closeBookingModal()" class="flex-1 py-3 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-semibold rounded-xl transition">Check Out Guest</button>
+            `:""}
+          </div>
+        </div>
+      `;
+      document.getElementById("booking-detail-modal").classList.remove("hidden");
+    }
+
+    function closeBookingModal() { document.getElementById("booking-detail-modal").classList.add("hidden"); }
+
+    render();
+  </script>
+</body>
+</html>

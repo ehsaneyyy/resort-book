@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendar - Coastal Haven Resort Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{brand:{50:'#fdf8f0',100:'#f5e6d0',200:'#e8cba0',300:'#d4a574',400:'#c9995a',500:'#b8863e',600:'#9a6f2f'},dark:{700:'#1f1f30',800:'#151525',900:'#0a0a1a'}}}}}</script>
+</head>
+<body class="bg-dark-900 text-slate-200 antialiased">
+  <script src="js/admin-data.js"></script>
+  <script src="js/admin-layout.js"></script>
+  <script>
+    initAdminLayout("calendar");
+    const content = document.getElementById("admin-content");
+    const bookings = getAdminBookings().filter(b => b.status !== "Cancelled");
+    const rooms = getAdminRooms();
+    let currentYear = new Date().getFullYear();
+    let currentMonth = new Date().getMonth();
+
+    function render() {
+      const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+      const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+      const todayStr = today();
+
+      let calendarDays = "";
+      for (let i = 0; i < firstDay; i++) calendarDays += `<div class="min-h-[80px] lg:min-h-[100px]"></div>`;
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const ds = `${currentYear}-${String(currentMonth+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+        const isToday = ds === todayStr;
+        const dayBookings = bookings.filter(b => ds >= b.checkIn && ds < b.checkOut);
+        const checkins = bookings.filter(b => b.checkIn === ds);
+        const checkouts = bookings.filter(b => b.checkOut === ds);
+
+        calendarDays += `
+          <div class="min-h-[80px] lg:min-h-[100px] border border-white/5 p-1.5 ${isToday ? 'bg-brand-500/5 border-brand-500/20' : 'hover:bg-white/[0.02]'} transition rounded-lg">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-sm font-medium ${isToday ? 'text-brand-400' : 'text-slate-400'}">${day}</span>
+              ${dayBookings.length > 0 ? `<span class="text-[10px] px-1.5 py-0.5 bg-white/10 rounded text-slate-400">${dayBookings.length}</span>` : ""}
+            </div>
+            <div class="space-y-0.5">
+              ${checkins.slice(0, 2).map(b => {
+                const guest = getGuestById(b.guestId);
+                const room = getRoomById(b.roomId);
+                return `<div class="px-1.5 py-0.5 bg-emerald-500/10 border-l-2 border-emerald-400 rounded text-[9px] text-emerald-400 truncate" title="IN: ${guest?.name || '?'} - ${room?.name || ''}">IN: ${guest?.name?.split(' ')[0] || '?'}</div>`;
+              }).join("")}
+              ${checkouts.slice(0, 2).map(b => {
+                const guest = getGuestById(b.guestId);
+                return `<div class="px-1.5 py-0.5 bg-blue-500/10 border-l-2 border-blue-400 rounded text-[9px] text-blue-400 truncate" title="OUT: ${guest?.name || '?'}">OUT: ${guest?.name?.split(' ')[0] || '?'}</div>`;
+              }).join("")}
+              ${dayBookings.length > 4 ? `<div class="text-[9px] text-slate-500 px-1.5">+${dayBookings.length - 4} more</div>` : ""}
+            </div>
+          </div>
+        `;
+      }
+
+      content.innerHTML = `
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div class="flex items-center gap-4">
+            <button onclick="changeMonth(-1)" class="p-2 bg-white/5 hover:bg-white/10 rounded-xl transition text-white">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <h2 class="text-2xl font-bold text-white min-w-[200px] text-center">${months[currentMonth]} ${currentYear}</h2>
+            <button onclick="changeMonth(1)" class="p-2 bg-white/5 hover:bg-white/10 rounded-xl transition text-white">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+          <button onclick="goToToday()" class="px-4 py-2 bg-brand-500/20 hover:bg-brand-500/30 text-brand-400 text-sm font-medium rounded-xl transition">Today</button>
+        </div>
+
+        <div class="flex gap-4 mb-4 text-xs text-slate-400">
+          <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-emerald-500/20 border-l-2 border-emerald-400 rounded"></span>Check-in</span>
+          <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-blue-500/20 border-l-2 border-blue-400 rounded"></span>Check-out</span>
+        </div>
+
+        <div class="bg-dark-800/50 rounded-2xl border border-white/5 p-4 overflow-hidden">
+          <div class="grid grid-cols-7 gap-1">
+            ${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(d => `<div class="text-center py-2 text-xs font-medium text-slate-500">${d}</div>`).join("")}
+            ${calendarDays}
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-6">
+          <div class="bg-dark-800/50 rounded-2xl border border-emerald-500/10 p-5">
+            <h3 class="text-sm font-medium text-emerald-400 mb-3">Upcoming Check-ins (This Week)</h3>
+            ${bookings.filter(b => {
+              const d = new Date(b.checkIn);
+              const now = new Date();
+              return d >= now && d <= new Date(now.getTime() + 7 * 864e5) && b.status === "Confirmed";
+            }).slice(0, 5).map(b => {
+              const guest = getGuestById(b.guestId);
+              const room = getRoomById(b.roomId);
+              return `<div class="flex items-center justify-between py-2 border-b border-white/5 last:border-0"><div><p class="text-sm text-white">${guest?.name || '?'}</p><p class="text-[10px] text-slate-500">${room?.name || ''}</p></div><p class="text-xs text-emerald-400">${formatDate(b.checkIn)}</p></div>`;
+            }).join("") || '<p class="text-sm text-slate-500">No upcoming check-ins</p>'}
+          </div>
+          <div class="bg-dark-800/50 rounded-2xl border border-blue-500/10 p-5">
+            <h3 class="text-sm font-medium text-blue-400 mb-3">Upcoming Check-outs (This Week)</h3>
+            ${bookings.filter(b => {
+              const d = new Date(b.checkOut);
+              const now = new Date();
+              return d >= now && d <= new Date(now.getTime() + 7 * 864e5) && b.status === "Confirmed";
+            }).slice(0, 5).map(b => {
+              const guest = getGuestById(b.guestId);
+              const room = getRoomById(b.roomId);
+              return `<div class="flex items-center justify-between py-2 border-b border-white/5 last:border-0"><div><p class="text-sm text-white">${guest?.name || '?'}</p><p class="text-[10px] text-slate-500">${room?.name || ''}</p></div><p class="text-xs text-blue-400">${formatDate(b.checkOut)}</p></div>`;
+            }).join("") || '<p class="text-sm text-slate-500">No upcoming check-outs</p>'}
+          </div>
+          <div class="bg-dark-800/50 rounded-2xl border border-white/5 p-5">
+            <h3 class="text-sm font-medium text-white mb-3">Room Availability</h3>
+            ${rooms.map(r => {
+              const occupied = bookings.some(b => b.roomId === r.id && todayStr >= b.checkIn && todayStr < b.checkOut);
+              return `<div class="flex items-center justify-between py-2 border-b border-white/5 last:border-0"><div class="flex items-center gap-2"><span class="w-2 h-2 ${occupied?'bg-red-400':'bg-emerald-400'} rounded-full"></span><span class="text-sm text-slate-300">${r.name}</span></div><span class="text-xs ${occupied?'text-red-400':'text-emerald-400'}">${occupied?'Occupied':'Free'}</span></div>`;
+            }).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function changeMonth(dir) { currentMonth += dir; if (currentMonth > 11) { currentMonth = 0; currentYear++; } else if (currentMonth < 0) { currentMonth = 11; currentYear--; } render(); }
+    function goToToday() { currentYear = new Date().getFullYear(); currentMonth = new Date().getMonth(); render(); }
+
+    render();
+  </script>
+</body>
+</html>
