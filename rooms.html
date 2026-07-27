@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Rooms - Coastal Haven Resort</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50: '#fdf8f0', 100: '#f5e6d0', 200: '#e8cba0', 300: '#d4a574', 400: '#c9995a', 500: '#b8863e', 600: '#9a6f2f', 700: '#7a5826', 800: '#5c421d', 900: '#3d2c14' },
+            dark: { 50: '#e8e8ea', 100: '#c5c5c9', 200: '#9e9ea5', 300: '#767680', 400: '#555562', 500: '#353545', 600: '#2a2a3a', 700: '#1f1f30', 800: '#151525', 900: '#0a0a1a' },
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="css/custom.css">
+</head>
+<body class="bg-dark-900 text-slate-200 antialiased">
+
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-dark-900/80 backdrop-blur-xl border-b border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 lg:h-20">
+        <a href="index.html" class="flex items-center gap-2">
+          <div class="w-9 h-9 bg-gradient-to-br from-brand-400 to-brand-600 rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+          </div>
+          <span class="text-xl font-bold text-white">Coastal Haven</span>
+        </a>
+        <div class="hidden md:flex items-center gap-8">
+          <a href="index.html" class="text-sm font-medium text-slate-400 hover:text-white transition">Home</a>
+          <a href="rooms.html" class="text-sm font-medium text-brand-400">Rooms</a>
+          <a href="index.html#contact" class="text-sm font-medium text-slate-400 hover:text-white transition">Contact</a>
+          <a href="admin.html" class="text-sm font-medium text-slate-400 hover:text-white transition">Admin</a>
+          <a href="rooms.html" class="px-5 py-2.5 bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-white text-sm font-semibold rounded-xl transition shadow-lg shadow-brand-500/25">Book Now</a>
+        </div>
+        <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="md:hidden p-2 text-slate-400 hover:text-white">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden bg-dark-800 border-t border-white/5">
+      <div class="px-4 py-4 space-y-3">
+        <a href="index.html" class="block py-2 text-slate-400 hover:text-white transition">Home</a>
+        <a href="rooms.html" class="block py-2 text-brand-400 font-medium">Rooms</a>
+        <a href="index.html#contact" class="block py-2 text-slate-400 hover:text-white transition">Contact</a>
+        <a href="admin.html" class="block py-2 text-slate-400 hover:text-white transition">Admin</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="pt-24 pb-12 lg:pt-32 lg:pb-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl sm:text-5xl font-bold text-white mb-4">Our Rooms & Suites</h1>
+      <p class="text-lg text-slate-400 max-w-2xl">Choose from our handcrafted collection of rooms, suites, and villas. Each designed for comfort, luxury, and unforgettable stays.</p>
+    </div>
+  </header>
+
+  <section class="pb-20 lg:pb-28">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      <div class="flex flex-wrap gap-3 mb-8">
+        <button onclick="filterRooms('all')" data-filter="all" class="filter-btn px-5 py-2.5 rounded-xl text-sm font-medium transition bg-white/10 text-white border border-white/10">All Rooms</button>
+        <button onclick="filterRooms('Standard')" data-filter="Standard" class="filter-btn px-5 py-2.5 rounded-xl text-sm font-medium transition text-slate-400 hover:text-white border border-transparent hover:border-white/10">Standard</button>
+        <button onclick="filterRooms('Deluxe')" data-filter="Deluxe" class="filter-btn px-5 py-2.5 rounded-xl text-sm font-medium transition text-slate-400 hover:text-white border border-transparent hover:border-white/10">Deluxe</button>
+        <button onclick="filterRooms('Suite')" data-filter="Suite" class="filter-btn px-5 py-2.5 rounded-xl text-sm font-medium transition text-slate-400 hover:text-white border border-transparent hover:border-white/10">Suite</button>
+        <button onclick="filterRooms('Premium Suite')" data-filter="Premium Suite" class="filter-btn px-5 py-2.5 rounded-xl text-sm font-medium transition text-slate-400 hover:text-white border border-transparent hover:border-white/10">Premium Suite</button>
+        <button onclick="filterRooms('Villa')" data-filter="Villa" class="filter-btn px-5 py-2.5 rounded-xl text-sm font-medium transition text-slate-400 hover:text-white border border-transparent hover:border-white/10">Villa</button>
+        <button onclick="filterRooms('Suite+')" data-filter="Suite+" class="filter-btn px-5 py-2.5 rounded-xl text-sm font-medium transition text-slate-400 hover:text-white border border-transparent hover:border-white/10">Suite+</button>
+      </div>
+
+      <p class="text-sm text-slate-500 mb-8" id="room-count">Showing 6 of 6 rooms</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="rooms-grid"></div>
+
+      <div id="empty-state" class="hidden text-center py-20">
+        <svg class="w-16 h-16 mx-auto text-slate-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+        <h3 class="text-xl font-semibold text-white mb-2">No rooms found</h3>
+        <p class="text-slate-400">Try selecting a different category.</p>
+      </div>
+    </div>
+  </section>
+
+  <div id="room-modal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-dark-900/80 backdrop-blur-sm" onclick="closeModal()"></div>
+    <div class="absolute inset-4 sm:inset-8 lg:inset-16 bg-dark-800 rounded-2xl border border-white/10 overflow-y-auto">
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <footer class="bg-dark-800/50 border-t border-white/5 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <p class="text-slate-500 text-sm">&copy; 2026 Coastal Haven Resort. All rights reserved.</p>
+      <div class="flex gap-6">
+        <a href="index.html" class="text-slate-500 hover:text-white text-sm transition">Home</a>
+        <a href="admin.html" class="text-slate-500 hover:text-white text-sm transition">Admin</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/booking.js"></script>
+  <script>
+    let currentFilter = "all";
+
+    function renderRooms(filter) {
+      const grid = document.getElementById("rooms-grid");
+      const empty = document.getElementById("empty-state");
+      const countEl = document.getElementById("room-count");
+      const filtered = filter === "all" ? ROOMS : ROOMS.filter(r => r.category === filter);
+
+      countEl.textContent = `Showing ${filtered.length} of ${ROOMS.length} rooms`;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = "";
+        empty.classList.remove("hidden");
+        return;
+      }
+
+      empty.classList.add("hidden");
+      grid.innerHTML = filtered.map(room => `
+        <div class="group bg-dark-800/50 rounded-2xl border border-white/5 overflow-hidden hover:border-brand-500/30 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-500/5">
+          <div class="relative h-56 overflow-hidden cursor-pointer" onclick="openModal('${room.id}')">
+            <img src="${room.imageUrl}" alt="${room.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+            <div class="absolute top-3 left-3 px-3 py-1 bg-dark-900/80 backdrop-blur-sm rounded-lg text-xs font-medium text-brand-400 border border-brand-500/20">${room.category}</div>
+            <div class="absolute top-3 right-3 px-3 py-1 bg-dark-900/80 backdrop-blur-sm rounded-lg text-xs text-slate-300">${room.capacity}</div>
+            <div class="absolute inset-0 bg-gradient-to-t from-dark-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-4">
+              <span class="text-sm text-white font-medium">Click to view details</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-xl font-semibold text-white mb-1">${room.name}</h3>
+            <p class="text-slate-500 text-sm mb-3">${room.beds} &middot; ${room.size}</p>
+            <p class="text-slate-400 text-sm mb-4 line-clamp-2">${room.description}</p>
+            <div class="flex flex-wrap gap-1.5 mb-5">
+              ${room.amenities.slice(0, 5).map(a => `<span class="px-2 py-0.5 bg-white/5 rounded text-xs text-slate-400">${a}</span>`).join("")}
+              ${room.amenities.length > 5 ? `<span class="px-2 py-0.5 bg-white/5 rounded text-xs text-slate-500">+${room.amenities.length - 5} more</span>` : ""}
+            </div>
+            <div class="flex items-center justify-between pt-4 border-t border-white/5">
+              <div>
+                <span class="text-2xl font-bold text-brand-400">${formatPrice(room.pricePerNight)}</span>
+                <span class="text-slate-500 text-sm">/night</span>
+              </div>
+              <a href="booking.html?room=${room.id}" class="px-5 py-2.5 bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-white text-sm font-semibold rounded-xl transition shadow-lg shadow-brand-500/20">Book Now</a>
+            </div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function filterRooms(category) {
+      currentFilter = category;
+      document.querySelectorAll(".filter-btn").forEach(btn => {
+        if (btn.dataset.filter === category) {
+          btn.classList.add("bg-white/10", "text-white", "border-white/10");
+          btn.classList.remove("text-slate-400", "border-transparent");
+        } else {
+          btn.classList.remove("bg-white/10", "text-white", "border-white/10");
+          btn.classList.add("text-slate-400", "border-transparent");
+        }
+      });
+      renderRooms(category);
+    }
+
+    function openModal(roomId) {
+      const room = getRoomById(roomId);
+      if (!room) return;
+      const modal = document.getElementById("room-modal");
+      const content = document.getElementById("modal-content");
+
+      content.innerHTML = `
+        <div class="relative">
+          <img src="${room.imageUrl}" alt="${room.name}" class="w-full h-64 sm:h-80 lg:h-96 object-cover">
+          <button onclick="closeModal()" class="absolute top-4 right-4 w-10 h-10 bg-dark-900/80 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-dark-900 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+          <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-dark-800 to-transparent">
+            <span class="px-3 py-1 bg-brand-500/20 text-brand-400 text-sm font-medium rounded-lg border border-brand-500/30">${room.category}</span>
+          </div>
+        </div>
+        <div class="p-6 sm:p-8">
+          <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
+            <div>
+              <h2 class="text-2xl sm:text-3xl font-bold text-white mb-2">${room.name}</h2>
+              <p class="text-slate-400">${room.beds} &middot; ${room.size} &middot; ${room.capacity}</p>
+            </div>
+            <div class="text-right">
+              <div class="text-3xl font-bold text-brand-400">${formatPrice(room.pricePerNight)}</div>
+              <div class="text-slate-500 text-sm">per night</div>
+            </div>
+          </div>
+          <p class="text-slate-300 leading-relaxed mb-8">${room.description}</p>
+          <h3 class="text-lg font-semibold text-white mb-4">Amenities</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
+            ${room.amenities.map(a => `
+              <div class="flex items-center gap-2 px-4 py-2.5 bg-white/5 rounded-xl">
+                <svg class="w-4 h-4 text-brand-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span class="text-sm text-slate-300">${a}</span>
+              </div>
+            `).join("")}
+          </div>
+          <a href="booking.html?room=${room.id}" class="block w-full py-4 bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-white font-semibold rounded-xl transition shadow-xl shadow-brand-500/25 text-center text-lg">Book This Room</a>
+        </div>
+      `;
+
+      modal.classList.remove("hidden");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeModal() {
+      document.getElementById("room-modal").classList.add("hidden");
+      document.body.style.overflow = "";
+    }
+
+    document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+
+    renderRooms("all");
+  </script>
+</body>
+</html>
