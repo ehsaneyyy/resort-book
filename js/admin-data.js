@@ -27,7 +27,7 @@ const ADMIN_ROOMS = [
     status: "available",
     amenities: ["AC", "WiFi", "TV", "Hot Water", "Desk"],
     description: "Cozy room with queen bed, perfect for couples seeking a comfortable and affordable stay.",
-    image: "https://images.unsplash.com/photo-1631049307038-da31ec3d517c?w=400&h=300&fit=crop",
+
   },
   {
     id: "DLX-001",
@@ -42,7 +42,7 @@ const ADMIN_ROOMS = [
     status: "available",
     amenities: ["AC", "WiFi", "TV", "Balcony", "Mini Bar", "Desk"],
     description: "Spacious deluxe room with king bed and private balcony overlooking the tropical gardens.",
-    image: "https://images.unsplash.com/photo-1582719471384-894fbb16e074?w=400&h=300&fit=crop",
+
   },
   {
     id: "DLX-002",
@@ -57,7 +57,7 @@ const ADMIN_ROOMS = [
     status: "available",
     amenities: ["AC", "WiFi", "TV", "Balcony", "Mini Bar", "Sea View"],
     description: "Deluxe room with stunning sea views and modern amenities.",
-    image: "https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=400&h=300&fit=crop",
+
   },
   {
     id: "SUT-001",
@@ -72,7 +72,7 @@ const ADMIN_ROOMS = [
     status: "available",
     amenities: ["AC", "WiFi", "TV", "Balcony", "Mini Bar", "Hot Tub", "Sitting Area"],
     description: "Luxurious suite with separate living area, premium furnishings, and stunning views.",
-    image: "https://images.unsplash.com/photo-1615874959375-5d0c180d9b1b?w=400&h=300&fit=crop",
+
   },
   {
     id: "SUT-002",
@@ -87,7 +87,7 @@ const ADMIN_ROOMS = [
     status: "available",
     amenities: ["AC", "WiFi", "TV", "Balcony", "Mini Bar", "Jacuzzi", "Sitting Area", "Dining"],
     description: "Ultra-luxurious suite with premium amenities, private jacuzzi, and panoramic views.",
-    image: "https://images.unsplash.com/photo-1578073366220-a0de08b4b553?w=400&h=300&fit=crop",
+
   },
   {
     id: "VIL-001",
@@ -102,7 +102,7 @@ const ADMIN_ROOMS = [
     status: "available",
     amenities: ["AC", "WiFi", "Pool Access", "Kitchen", "2 Bedrooms", "Living Room", "Patio"],
     description: "Spacious 2-bedroom villa with direct beachfront access and private patio.",
-    image: "https://images.unsplash.com/photo-1512207736139-c2d7c588f7d7?w=400&h=300&fit=crop",
+
   },
 ];
 
