@@ -6,7 +6,7 @@ import Modal from '../components/Modal';
 import { Search, Eye, Star, UserPlus } from 'lucide-react';
 
 export default function Guests() {
-  const { guests, bookings, getRoom } = useStore();
+  const { guests, bookings, getRoom, updateGuests } = useStore();
   const toast = useToast();
   const [search, setSearch] = useState('');
   const [detail, setDetail] = useState(null);
@@ -25,15 +25,19 @@ export default function Guests() {
 
   const save = (e) => {
     e.preventDefault();
+    const maxNum = guests.reduce((max, g) => {
+      const n = parseInt(g.id.replace(/\D/g, ''), 10);
+      return n > max ? n : max;
+    }, 0);
     const newGuest = {
       ...form,
-      id: 'GT' + String(guests.length + 1).padStart(3, '0'),
+      id: 'G' + String(maxNum + 1).padStart(3, '0'),
       totalBookings: 0,
       totalSpent: 0,
       lastStay: null,
       createdAt: new Date().toISOString(),
     };
-    useStore.setState(prev => ({ guests: [...prev.guests, newGuest] }));
+    updateGuests(prev => [...prev, newGuest]);
     toast('Guest added', 'success');
     setModal(null);
   };

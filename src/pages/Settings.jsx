@@ -7,17 +7,17 @@ import { Settings, Download, Upload, Trash2, RotateCcw, Bell } from 'lucide-reac
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 export default function SettingsPage() {
-  const { rooms, bookings, guests, seasonal, resetStore } = useStore();
+  const { rooms, bookings, guests, seasonal, resetAll } = useStore();
   const toast = useToast();
   const [formData, setFormData] = useState(RESORT);
 
   useEffect(() => {
-    const saved = localStorage.getItem('resortSettings');
+    const saved = localStorage.getItem('rh_resort');
     if (saved) setFormData(JSON.parse(saved));
   }, []);
 
   const saveSettings = () => {
-    localStorage.setItem('resortSettings', JSON.stringify(formData));
+    localStorage.setItem('rh_resort', JSON.stringify(formData));
     toast('Settings saved', 'success');
   };
 
@@ -38,25 +38,21 @@ export default function SettingsPage() {
     reader.onload = (ev) => {
       try {
         const data = JSON.parse(ev.target.result);
-        if (data.rooms) localStorage.setItem('resortRooms', JSON.stringify(data.rooms));
-        if (data.bookings) localStorage.setItem('resortBookings', JSON.stringify(data.bookings));
-        if (data.guests) localStorage.setItem('resortGuests', JSON.stringify(data.guests));
-        if (data.seasonal) localStorage.setItem('resortSeasonal', JSON.stringify(data.seasonal));
-        if (data.resort) { localStorage.setItem('resortSettings', JSON.stringify(data.resort)); setFormData(data.resort); }
+        if (data.rooms) localStorage.setItem('rh_rooms', JSON.stringify(data.rooms));
+        if (data.bookings) localStorage.setItem('rh_bookings', JSON.stringify(data.bookings));
+        if (data.guests) localStorage.setItem('rh_guests', JSON.stringify(data.guests));
+        if (data.seasonal) localStorage.setItem('rh_seasonal', JSON.stringify(data.seasonal));
+        if (data.resort) { localStorage.setItem('rh_resort', JSON.stringify(data.resort)); setFormData(data.resort); }
         window.location.reload();
       } catch (err) { toast('Import failed', 'error'); }
     };
     reader.readAsText(file);
   };
 
-  const resetAll = () => {
+  const handleReset = () => {
     if (confirm('This will delete all data and reload. Are you sure?')) {
-      localStorage.removeItem('resortRooms');
-      localStorage.removeItem('resortBookings');
-      localStorage.removeItem('resortGuests');
-      localStorage.removeItem('resortSeasonal');
-      localStorage.removeItem('resortSettings');
-      window.location.reload();
+      resetAll();
+      toast('Data reset to defaults', 'info');
     }
   };
 
@@ -129,7 +125,7 @@ export default function SettingsPage() {
               <Upload className="w-4 h-4" /> Import
               <input type="file" accept=".json" onChange={importData} className="hidden" />
             </label>
-            <button onClick={resetAll} className="py-3 px-4 bg-red-500/20 hover:bg-red-500/30 text-red-400 text-sm font-medium rounded-xl transition flex items-center justify-center gap-2"><Trash2 className="w-4 h-4" /> Reset</button>
+            <button onClick={handleReset} className="py-3 px-4 bg-red-500/20 hover:bg-red-500/30 text-red-400 text-sm font-medium rounded-xl transition flex items-center justify-center gap-2"><Trash2 className="w-4 h-4" /> Reset</button>
           </div>
         </div>
       </div>

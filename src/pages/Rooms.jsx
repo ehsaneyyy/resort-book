@@ -33,7 +33,11 @@ export default function Rooms() {
       updateRooms(prev => prev.map(r => r.id === form.id ? { ...r, ...data } : r));
       toast('Room updated', 'success');
     } else {
-      data.id = 'RM' + String(rooms.length + 1).padStart(3, '0');
+      const maxNum = rooms.reduce((max, r) => {
+        const n = parseInt(r.id.replace(/\D/g, ''), 10);
+        return n > max ? n : max;
+      }, 0);
+      data.id = 'RM' + String(maxNum + 1).padStart(3, '0');
       data.status = 'available';
       updateRooms(prev => [...prev, data]);
       toast('Room added', 'success');

@@ -8,14 +8,14 @@ const ROOMS = [
 ];
 
 const GUESTS = [
-  { id: "G001", name: "Rajesh Kumar", email: "rajesh.kumar@email.com", phone: "9876543210", city: "Mumbai", totalBookings: 3, totalSpent: 34650, lastVisit: "2026-08-15", vip: true, notes: "Prefers sea-facing rooms. Anniversary guest." },
-  { id: "G002", name: "Priya Sharma", email: "priya.sharma@email.com", phone: "9876543211", city: "Bangalore", totalBookings: 2, totalSpent: 15750, lastVisit: "2026-08-18", vip: false, notes: "" },
-  { id: "G003", name: "Amit Patel", email: "amit.patel@email.com", phone: "9876543212", city: "Delhi", totalBookings: 5, totalSpent: 89200, lastVisit: "2026-08-22", vip: true, notes: "Corporate guest. Always books villas." },
-  { id: "G004", name: "Neha Singh", email: "neha.singh@email.com", phone: "9876543213", city: "Pune", totalBookings: 1, totalSpent: 11550, lastVisit: "2026-08-28", vip: false, notes: "" },
-  { id: "G005", name: "Vikram Bhat", email: "vikram.bhat@email.com", phone: "9876543214", city: "Chennai", totalBookings: 4, totalSpent: 52800, lastVisit: "2026-09-01", vip: true, notes: "Loyal customer since 2024." },
-  { id: "G006", name: "Anjali Gupta", email: "anjali.gupta@email.com", phone: "9876543215", city: "Kolkata", totalBookings: 2, totalSpent: 29925, lastVisit: "2026-09-05", vip: false, notes: "Requested early check-in last time." },
-  { id: "G007", name: "Sarah Williams", email: "sarah.w@email.com", phone: "+44 7700 123456", city: "London, UK", totalBookings: 1, totalSpent: 15000, lastVisit: "2026-07-20", vip: false, notes: "International guest. Needs airport transfer." },
-  { id: "G008", name: "Deepa Menon", email: "deepa.m@email.com", phone: "9876543216", city: "Kochi", totalBookings: 6, totalSpent: 78400, lastVisit: "2026-07-15", vip: true, notes: "Longest staying guest." },
+  { id: "G001", name: "Rajesh Kumar", email: "rajesh.kumar@email.com", phone: "9876543210", city: "Mumbai", totalBookings: 3, totalSpent: 34650, lastStay: "2026-08-15", vip: true, notes: "Prefers sea-facing rooms. Anniversary guest." },
+  { id: "G002", name: "Priya Sharma", email: "priya.sharma@email.com", phone: "9876543211", city: "Bangalore", totalBookings: 2, totalSpent: 15750, lastStay: "2026-08-18", vip: false, notes: "" },
+  { id: "G003", name: "Amit Patel", email: "amit.patel@email.com", phone: "9876543212", city: "Delhi", totalBookings: 5, totalSpent: 89200, lastStay: "2026-08-22", vip: true, notes: "Corporate guest. Always books villas." },
+  { id: "G004", name: "Neha Singh", email: "neha.singh@email.com", phone: "9876543213", city: "Pune", totalBookings: 1, totalSpent: 11550, lastStay: "2026-08-28", vip: false, notes: "" },
+  { id: "G005", name: "Vikram Bhat", email: "vikram.bhat@email.com", phone: "9876543214", city: "Chennai", totalBookings: 4, totalSpent: 52800, lastStay: "2026-09-01", vip: true, notes: "Loyal customer since 2024." },
+  { id: "G006", name: "Anjali Gupta", email: "anjali.gupta@email.com", phone: "9876543215", city: "Kolkata", totalBookings: 2, totalSpent: 29925, lastStay: "2026-09-05", vip: false, notes: "Requested early check-in last time." },
+  { id: "G007", name: "Sarah Williams", email: "sarah.w@email.com", phone: "+44 7700 123456", city: "London, UK", totalBookings: 1, totalSpent: 15000, lastStay: "2026-07-20", vip: false, notes: "International guest. Needs airport transfer." },
+  { id: "G008", name: "Deepa Menon", email: "deepa.m@email.com", phone: "9876543216", city: "Kochi", totalBookings: 6, totalSpent: 78400, lastStay: "2026-07-15", vip: true, notes: "Longest staying guest." },
 ];
 
 const BOOKINGS = [
@@ -32,10 +32,10 @@ const BOOKINGS = [
 ];
 
 const SEASONAL = [
-  { id: "SP001", name: "Peak Season", months: ["Dec", "Jan"], multiplier: 1.5, active: true },
-  { id: "SP002", name: "Holiday Season", months: ["Nov"], multiplier: 1.3, active: true },
-  { id: "SP003", name: "Monsoon Offer", months: ["Jun", "Jul", "Aug", "Sep"], multiplier: 0.8, active: true },
-  { id: "SP004", name: "Weekend Premium", days: ["Fri", "Sat"], multiplier: 1.2, active: true },
+  { id: "SP001", name: "Peak Season", startDate: "2026-03-01", endDate: "2026-06-30", adjustment: 30, type: "percentage", roomTypes: [], isActive: true },
+  { id: "SP002", name: "Festive Season", startDate: "2026-10-15", endDate: "2026-12-31", adjustment: 20, type: "percentage", roomTypes: [], isActive: true },
+  { id: "SP003", name: "Monsoon Discount", startDate: "2026-06-15", endDate: "2026-09-30", adjustment: -15, type: "percentage", roomTypes: [], isActive: true },
+  { id: "SP004", name: "Weekend Premium", startDate: "2026-01-01", endDate: "2026-12-31", adjustment: 15, type: "percentage", roomTypes: [], isActive: true },
 ];
 
 const RESORT = {

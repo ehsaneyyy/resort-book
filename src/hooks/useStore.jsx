@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback } from 'react';
 import { ROOMS, GUESTS, BOOKINGS, SEASONAL, RESORT } from '../data/seed';
 
 function load(key, fallback) {
@@ -12,26 +12,27 @@ function save(key, data) {
   localStorage.setItem('rh_' + key, JSON.stringify(data));
 }
 
-export function useStore() {
+const StoreContext = createContext(null);
+
+export function StoreProvider({ children }) {
   const [rooms, setRooms] = useState(() => load('rooms', ROOMS));
   const [bookings, setBookings] = useState(() => load('bookings', BOOKINGS));
   const [guests, setGuests] = useState(() => load('guests', GUESTS));
   const [seasonal, setSeasonal] = useState(() => load('seasonal', SEASONAL));
   const [resort] = useState(() => load('resort', RESORT));
 
-  const persist = useCallback((setter) => (updater) => {
+  const persist = useCallback((setter, key) => (updater) => {
     setter(prev => {
       const next = typeof updater === 'function' ? updater(prev) : updater;
-      const key = setter === setRooms ? 'rooms' : setter === setBookings ? 'bookings' : setter === setGuests ? 'guests' : 'seasonal';
       save(key, next);
       return next;
     });
   }, []);
 
-  const updateRooms = persist(setRooms);
-  const updateBookings = persist(setBookings);
-  const updateGuests = persist(setGuests);
-  const updateSeasonal = persist(setSeasonal);
+  const updateRooms = persist(setRooms, 'rooms');
+  const updateBookings = persist(setBookings, 'bookings');
+  const updateGuests = persist(setGuests, 'guests');
+  const updateSeasonal = persist(setSeasonal, 'seasonal');
 
   const getGuest = (id) => guests.find(g => g.id === id);
   const getRoom = (id) => rooms.find(r => r.id === id);
@@ -45,5 +46,13 @@ export function useStore() {
     setSeasonal(JSON.parse(JSON.stringify(SEASONAL)));
   };
 
-  return { rooms, bookings, guests, seasonal, resort, getGuest, getRoom, getBooking, updateRooms, updateBookings, updateGuests, updateSeasonal, resetAll };
+  const value = { rooms, bookings, guests, seasonal, resort, getGuest, getRoom, getBooking, updateRooms, updateBookings, updateGuests, updateSeasonal, resetAll };
+
+  return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
+}
+
+export function useStore() {
+  const ctx = useContext(StoreContext);
+  if (!ctx) throw new Error('useStore must be used within StoreProvider');
+  return ctx;
 }
