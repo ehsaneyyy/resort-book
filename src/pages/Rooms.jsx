@@ -3,6 +3,7 @@ import { useStore } from '../hooks/useStore';
 import { formatCurrency, today } from '../data/utils';
 import { useToast } from '../components/Toast';
 import Modal from '../components/Modal';
+import ConfirmDialog from '../components/ConfirmDialog';
 import { Plus, Edit3, Trash2, BedDouble } from 'lucide-react';
 
 const gradients = [
@@ -20,6 +21,7 @@ export default function Rooms() {
   const [filter, setFilter] = useState('all');
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState({});
+  const [confirmId, setConfirmId] = useState(null);
   const types = ['all', ...new Set(rooms.map(r => r.type))];
   const filtered = filter === 'all' ? rooms : rooms.filter(r => r.type === filter);
   const occupied = bookings.filter(b => b.status === 'Confirmed' && today() >= b.checkIn && today() < b.checkOut).map(b => b.roomId);
@@ -44,7 +46,7 @@ export default function Rooms() {
     }
     setModal(null);
   };
-  const del = (id) => { if (confirm('Delete this room?')) { updateRooms(prev => prev.filter(r => r.id !== id)); toast('Room deleted', 'info'); } };
+  const del = (id) => setConfirmId(id);
 
   return (
     <div className="space-y-6">
@@ -129,6 +131,15 @@ export default function Rooms() {
             </div>
           </form>
         </Modal>
+      )}
+
+      {confirmId && (
+        <ConfirmDialog
+          title="Delete Room"
+          message="This will permanently remove this room. This action cannot be undone."
+          onConfirm={() => { updateRooms(prev => prev.filter(r => r.id !== confirmId)); toast('Room deleted', 'info'); setConfirmId(null); }}
+          onCancel={() => setConfirmId(null)}
+        />
       )}
     </div>
   );

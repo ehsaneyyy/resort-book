@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useStore } from '../hooks/useStore';
 import { useToast } from '../components/Toast';
 import Modal from '../components/Modal';
+import ConfirmDialog from '../components/ConfirmDialog';
 import { Calendar, Plus, Edit3, Trash2 } from 'lucide-react';
 
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -27,6 +28,7 @@ export default function Pricing() {
   const toast = useToast();
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState({});
+  const [confirmId, setConfirmId] = useState(null);
 
   const presets = [
     { name: 'Peak Season (Summer)', months: [2, 3, 4, 5, 6], adjustment: 30, icon: '☀️' },
@@ -64,12 +66,7 @@ export default function Pricing() {
     setModal(null);
   };
 
-  const del = (id) => {
-    if (confirm('Delete this rule?')) {
-      updateSeasonal(prev => prev.filter(r => r.id !== id));
-      toast('Rule deleted', 'info');
-    }
-  };
+  const del = (id) => setConfirmId(id);
 
   const toggle = (rule) => {
     updateSeasonal(prev => prev.map(r => r.id === rule.id ? { ...r, isActive: !r.isActive } : r));
@@ -167,6 +164,15 @@ export default function Pricing() {
             </div>
           </form>
         </Modal>
+      )}
+
+      {confirmId && (
+        <ConfirmDialog
+          title="Delete Pricing Rule"
+          message="This will remove this pricing rule. Rooms will no longer use this adjustment."
+          onConfirm={() => { updateSeasonal(prev => prev.filter(r => r.id !== confirmId)); toast('Rule deleted', 'info'); setConfirmId(null); }}
+          onCancel={() => setConfirmId(null)}
+        />
       )}
     </div>
   );

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useStore } from '../hooks/useStore';
 import { useToast } from '../components/Toast';
 import { RESORT } from '../data/seed';
+import ConfirmDialog from '../components/ConfirmDialog';
 import { Settings, Download, Upload, Trash2, RotateCcw, Bell } from 'lucide-react';
 
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -10,6 +11,7 @@ export default function SettingsPage() {
   const { rooms, bookings, guests, seasonal, resetAll } = useStore();
   const toast = useToast();
   const [formData, setFormData] = useState(RESORT);
+  const [showReset, setShowReset] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem('rh_resort');
@@ -49,12 +51,7 @@ export default function SettingsPage() {
     reader.readAsText(file);
   };
 
-  const handleReset = () => {
-    if (confirm('This will delete all data and reload. Are you sure?')) {
-      resetAll();
-      toast('Data reset to defaults', 'info');
-    }
-  };
+  const handleReset = () => setShowReset(true);
 
   const totalNights = bookings.filter(b => b.status !== 'Cancelled').reduce((s, b) => s + b.nights, 0);
   const maxStorage = 5 * 1024 * 1024;
@@ -138,6 +135,16 @@ export default function SettingsPage() {
           <div className="flex justify-between"><span className="text-slate-500">Storage</span><span className="text-white">Local</span></div>
         </div>
       </div>
+
+      {showReset && (
+        <ConfirmDialog
+          title="Reset All Data"
+          message="This will permanently delete all rooms, bookings, guests, and pricing rules. The app will reload with default demo data."
+          variant="danger"
+          onConfirm={() => { resetAll(); toast('Data reset to defaults', 'info'); setShowReset(false); }}
+          onCancel={() => setShowReset(false)}
+        />
+      )}
     </div>
   );
 }
