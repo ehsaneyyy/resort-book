@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useStore } from '../hooks/useStore';
-import { formatDate, statusColor } from '../data/utils';
+import { formatDate } from '../data/utils';
 import { useToast } from '../components/Toast';
 import Modal from '../components/Modal';
+import GuestTimeline from '../components/GuestTimeline';
 import { Search, Eye, Star, UserPlus } from 'lucide-react';
 
 export default function Guests() {
-  const { guests, bookings, getRoom, updateGuests } = useStore();
+  const { guests, updateGuests } = useStore();
   const toast = useToast();
   const [search, setSearch] = useState('');
   const [detail, setDetail] = useState(null);
@@ -15,8 +16,6 @@ export default function Guests() {
   const filtered = search
     ? guests.filter(g => g.name.toLowerCase().includes(search.toLowerCase()) || g.email.toLowerCase().includes(search.toLowerCase()) || g.phone.includes(search))
     : guests;
-
-  const getGuestBookings = (guestId) => bookings.filter(b => b.guestId === guestId);
 
   const openAdd = () => {
     setForm({ name: '', email: '', phone: '', city: '', idType: 'Aadhaar', idNumber: '', vip: false, notes: '' });
@@ -108,24 +107,7 @@ export default function Guests() {
             </div>
             <div className="bg-dark-700/50 rounded-xl p-4 border border-white/5">
               <h4 className="text-sm font-medium text-slate-400 mb-3">Stay History</h4>
-              {getGuestBookings(detail.id).length === 0 ? (
-                <p className="text-sm text-slate-500">No bookings yet</p>
-              ) : (
-                <div className="space-y-2">
-                  {getGuestBookings(detail.id).map(b => {
-                    const r = getRoom(b.roomId);
-                    return (
-                      <div key={b.id} className="flex items-center justify-between p-2 bg-dark-800/50 rounded-lg">
-                        <div>
-                          <p className="text-sm text-white font-medium">{r?.name || b.roomId}</p>
-                          <p className="text-[10px] text-slate-500">{formatDate(b.checkIn)} → {formatDate(b.checkOut)}</p>
-                        </div>
-                        <span className={`px-2 py-1 text-[10px] rounded-full font-medium border ${statusColor(b.status)}`}>{b.status}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+              <GuestTimeline guestId={detail.id} />
             </div>
             {detail.notes && <div className="bg-blue-500/5 border border-blue-500/10 rounded-xl p-4"><p className="text-sm text-slate-300">{detail.notes}</p></div>}
             <div className="grid grid-cols-3 gap-3">

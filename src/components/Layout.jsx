@@ -1,11 +1,13 @@
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
-import { RefreshCw } from 'lucide-react';
+import { useStore } from '../hooks/useStore';
 import { useState, useEffect } from 'react';
 
 export default function Layout() {
   const location = useLocation();
+  const { resort } = useStore();
   const [time, setTime] = useState(new Date().toLocaleTimeString());
+  const initials = resort.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
 
   useEffect(() => { setTime(new Date().toLocaleTimeString()); }, [location.pathname]);
 
@@ -26,7 +28,7 @@ export default function Layout() {
                 Online
               </span>
               <span className="text-xs text-slate-600">{time}</span>
-              <div className="w-9 h-9 bg-brand-500/20 rounded-xl flex items-center justify-center text-brand-400 text-sm font-bold">CH</div>
+              <div className="w-9 h-9 bg-brand-500/20 rounded-xl flex items-center justify-center text-brand-400 text-sm font-bold">{initials}</div>
             </div>
           </div>
         </header>

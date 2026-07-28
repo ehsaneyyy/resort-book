@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Your Stay — Coastal Haven Resort</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50:'#fdf8f0', 100:'#f5e6d0', 200:'#e8cba0', 300:'#d4a574', 400:'#c9995a', 500:'#b8863e', 600:'#9a6f2f', 700:'#7a5826', 800:'#5c421d', 900:'#3d2c14' },
+            dark: { 50:'#e8e8ea', 100:'#c5c5c9', 200:'#9e9ea5', 300:'#767680', 400:'#555562', 500:'#353545', 600:'#2a2a3a', 700:'#1f1f30', 800:'#151525', 900:'#0a0a1a' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #0a0a1a; color: #e2e8f0; -webkit-font-smoothing: antialiased; }
+  </style>
+</head>
+<body>
+  <nav class="fixed top-0 w-full z-50 bg-dark-900/80 backdrop-blur-xl border-b border-white/5">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 bg-gradient-to-br from-brand-400 to-brand-600 rounded-lg flex items-center justify-center">
+          <span class="text-white text-sm font-bold">CH</span>
+        </div>
+        <span class="text-white font-semibold text-sm">Coastal Haven</span>
+      </div>
+      <div class="flex items-center gap-6">
+        <a href="index.html" class="text-slate-400 hover:text-white text-sm transition">Home</a>
+        <a href="rooms.html" class="text-slate-400 hover:text-white text-sm transition">Rooms</a>
+        <a href="book.html" class="px-4 py-2 bg-gradient-to-r from-brand-500 to-brand-600 text-white text-sm font-semibold rounded-xl hover:from-brand-400 hover:to-brand-500 transition">Book Now</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="pt-24 pb-20 px-4 sm:px-6">
+    <div class="max-w-2xl mx-auto">
+      <div class="text-center mb-8">
+        <p class="text-brand-400 text-sm uppercase tracking-widest mb-2">Reservations</p>
+        <h1 class="text-3xl font-bold text-white mb-2">Book Your Stay</h1>
+        <p class="text-slate-400 text-sm">Fill in the details below to reserve your room.</p>
+      </div>
+
+      <form id="booking-form" class="bg-dark-800/50 rounded-2xl border border-white/5 p-6 sm:p-8 space-y-6">
+        <div>
+          <label class="block text-sm text-slate-300 mb-2">Select Room *</label>
+          <select id="room" required class="w-full px-4 py-3 bg-dark-700 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+            <option value="">Choose a room...</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm text-slate-300 mb-2">Check-in *</label>
+            <input type="date" id="checkin" required class="w-full px-4 py-3 bg-dark-700 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+          </div>
+          <div>
+            <label class="block text-sm text-slate-300 mb-2">Check-out *</label>
+            <input type="date" id="checkout" required class="w-full px-4 py-3 bg-dark-700 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm text-slate-300 mb-2">Adults *</label>
+            <select id="adults" required class="w-full px-4 py-3 bg-dark-700 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+              <option value="1">1 Adult</option>
+              <option value="2" selected>2 Adults</option>
+              <option value="3">3 Adults</option>
+              <option value="4">4 Adults</option>
+              <option value="5">5 Adults</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm text-slate-300 mb-2">Children</label>
+            <select id="children" class="w-full px-4 py-3 bg-dark-700 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+              <option value="0" selected>0 Children</option>
+              <option value="1">1 Child</option>
+              <option value="2">2 Children</option>
+              <option value="3">3 Children</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="border-t border-white/5 pt-6">
+          <p class="text-sm text-slate-400 mb-4">Guest Information</p>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm text-slate-300 mb-2">Full Name *</label>
+              <input type="text" id="name" required class="w-full px-4 py-3 bg-dark-700 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" placeholder="Enter your full name">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm text-slate-300 mb-2">Phone *</label>
+                <input type="tel" id="phone" required class="w-full px-4 py-3 bg-dark-700 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" placeholder="+91 98765 43210">
+              </div>
+              <div>
+                <label class="block text-sm text-slate-300 mb-2">Email</label>
+                <input type="email" id="email" class="w-full px-4 py-3 bg-dark-700 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" placeholder="you@email.com">
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm text-slate-300 mb-2">City</label>
+              <input type="text" id="city" class="w-full px-4 py-3 bg-dark-700 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" placeholder="Your city">
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm text-slate-300 mb-2">Special Requests</label>
+          <textarea id="requests" rows="3" class="w-full px-4 py-3 bg-dark-700 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none" placeholder="Early check-in, extra towels, etc."></textarea>
+        </div>
+
+        <div id="price-preview" class="bg-dark-700/50 rounded-xl p-4 border border-white/5 hidden">
+          <div class="space-y-2">
+            <div class="flex justify-between text-sm">
+              <span class="text-slate-400">Room</span>
+              <span id="preview-room" class="text-white"></span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-slate-400">Dates</span>
+              <span id="preview-dates" class="text-white"></span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-slate-400">Nights</span>
+              <span id="preview-nights" class="text-white"></span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-slate-400">Rate per night</span>
+              <span id="preview-rate" class="text-white"></span>
+            </div>
+            <div class="flex justify-between text-sm border-t border-white/5 pt-2 mt-2">
+              <span class="text-slate-400">Subtotal</span>
+              <span id="preview-subtotal" class="text-white"></span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-slate-400">Tax (5%)</span>
+              <span id="preview-tax" class="text-white"></span>
+            </div>
+            <div class="flex justify-between font-bold border-t border-white/5 pt-2 mt-2">
+              <span class="text-white">Total</span>
+              <span id="preview-total" class="text-brand-400 text-lg"></span>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="w-full py-4 bg-gradient-to-r from-brand-500 to-brand-600 text-white font-semibold rounded-xl hover:from-brand-400 hover:to-brand-500 transition shadow-lg shadow-brand-500/25 text-lg">
+          Confirm Booking
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <footer class="py-8 px-4 sm:px-6 border-t border-white/5">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p class="text-slate-500 text-xs">&copy; 2026 Coastal Haven Resort. All rights reserved.</p>
+      <div class="flex gap-4">
+        <a href="index.html" class="text-slate-500 text-xs hover:text-white transition">Home</a>
+        <a href="rooms.html" class="text-slate-500 text-xs hover:text-white transition">Rooms</a>
+        <a href="book.html" class="text-slate-500 text-xs hover:text-white transition">Book</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const rooms = [
+      { id: "STD-001", name: "Standard Double", price: 3500, weekendPrice: 4000, capacity: 2 },
+      { id: "DLX-001", name: "Deluxe Double", price: 5500, weekendPrice: 6500, capacity: 4 },
+      { id: "DLX-002", name: "Deluxe Sea View", price: 6500, weekendPrice: 7500, capacity: 3 },
+      { id: "SUT-001", name: "Premium Suite", price: 7500, weekendPrice: 9000, capacity: 4 },
+      { id: "SUT-002", name: "Executive Suite", price: 9500, weekendPrice: 11000, capacity: 4 },
+      { id: "VIL-001", name: "Beachfront Villa", price: 11000, weekendPrice: 13000, capacity: 6 }
+    ];
+
+    function formatCurrency(n) {
+      return '\u20B9' + n.toLocaleString('en-IN');
+    }
+
+    function formatDateShort(d) {
+      return new Date(d + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+    }
+
+    const roomSelect = document.getElementById('room');
+    rooms.forEach(r => {
+      const opt = document.createElement('option');
+      opt.value = r.id;
+      opt.textContent = r.name + ' — ' + formatCurrency(r.price) + '/night';
+      roomSelect.appendChild(opt);
+    });
+
+    const params = new URLSearchParams(window.location.search);
+    const preselected = params.get('room');
+    if (preselected && rooms.find(r => r.id === preselected)) {
+      roomSelect.value = preselected;
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('checkin').min = today;
+    document.getElementById('checkout').min = today;
+
+    function updatePreview() {
+      const roomId = document.getElementById('room').value;
+      const checkin = document.getElementById('checkin').value;
+      const checkout = document.getElementById('checkout').value;
+      const preview = document.getElementById('price-preview');
+
+      if (!roomId || !checkin || !checkout || checkout <= checkin) {
+        preview.classList.add('hidden');
+        return;
+      }
+
+      const room = rooms.find(r => r.id === roomId);
+      const nights = Math.ceil((new Date(checkout) - new Date(checkin)) / 864e5);
+      const isWeekend = new Date(checkin).getDay() === 0 || new Date(checkin).getDay() === 6;
+      const rate = isWeekend ? room.weekendPrice : room.price;
+      const subtotal = rate * nights;
+      const tax = Math.round(subtotal * 0.05);
+      const total = subtotal + tax;
+
+      document.getElementById('preview-room').textContent = room.name;
+      document.getElementById('preview-dates').textContent = formatDateShort(checkin) + ' → ' + formatDateShort(checkout);
+      document.getElementById('preview-nights').textContent = nights + ' night' + (nights > 1 ? 's' : '');
+      document.getElementById('preview-rate').textContent = formatCurrency(rate) + (isWeekend ? ' (weekend)' : '');
+      document.getElementById('preview-subtotal').textContent = formatCurrency(subtotal);
+      document.getElementById('preview-tax').textContent = formatCurrency(tax);
+      document.getElementById('preview-total').textContent = formatCurrency(total);
+      preview.classList.remove('hidden');
+    }
+
+    roomSelect.addEventListener('change', updatePreview);
+    document.getElementById('checkin').addEventListener('change', function() {
+      const next = new Date(this.value + 'T00:00:00');
+      next.setDate(next.getDate() + 1);
+      document.getElementById('checkout').min = next.toISOString().split('T')[0];
+      updatePreview();
+    });
+    document.getElementById('checkout').addEventListener('change', updatePreview);
+
+    document.getElementById('booking-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const roomId = document.getElementById('room').value;
+      const checkin = document.getElementById('checkin').value;
+      const checkout = document.getElementById('checkout').value;
+      const room = rooms.find(r => r.id === roomId);
+      const nights = Math.ceil((new Date(checkout) - new Date(checkin)) / 864e5);
+      const isWeekend = new Date(checkin).getDay() === 0 || new Date(checkin).getDay() === 6;
+      const rate = isWeekend ? room.weekendPrice : room.price;
+      const subtotal = rate * nights;
+      const tax = Math.round(subtotal * 0.05);
+      const total = subtotal + tax;
+
+      const guestId = 'G' + String(Math.floor(Math.random() * 900) + 100);
+      const bookingId = 'RB' + String(Math.floor(Math.random() * 9000) + 1000);
+
+      const guest = {
+        id: guestId,
+        name: document.getElementById('name').value,
+        phone: document.getElementById('phone').value,
+        email: document.getElementById('email').value,
+        city: document.getElementById('city').value,
+        totalBookings: 1,
+        totalSpent: total,
+        lastStay: checkin,
+        vip: false,
+        notes: ''
+      };
+
+      const booking = {
+        id: bookingId,
+        guestId: guestId,
+        roomId: roomId,
+        checkIn: checkin,
+        checkOut: checkout,
+        nights: nights,
+        adults: parseInt(document.getElementById('adults').value),
+        children: parseInt(document.getElementById('children').value),
+        total: total,
+        status: 'Pending',
+        paymentStatus: 'Pending',
+        paymentMethod: 'Pay at Hotel',
+        source: 'Website',
+        specialRequests: document.getElementById('requests').value,
+        createdAt: new Date().toISOString().split('T')[0]
+      };
+
+      let guests = [];
+      let bookings = [];
+      try {
+        guests = JSON.parse(localStorage.getItem('rh_guests') || '[]');
+        bookings = JSON.parse(localStorage.getItem('rh_bookings') || '[]');
+      } catch(e) {}
+
+      guests.push(guest);
+      bookings.push(booking);
+
+      localStorage.setItem('rh_guests', JSON.stringify(guests));
+      localStorage.setItem('rh_bookings', JSON.stringify(bookings));
+
+      const params = new URLSearchParams({
+        id: bookingId,
+        room: room.name,
+        guest: guest.name,
+        checkin: checkin,
+        checkout: checkout,
+        nights: nights,
+        adults: document.getElementById('adults').value,
+        children: document.getElementById('children').value,
+        total: total,
+        tax: tax
+      });
+
+      window.location.href = 'confirmation.html?' + params.toString();
+    });
+  </script>
+</body>
+</html>

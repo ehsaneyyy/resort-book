@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, BedDouble, CalendarDays, Users, BarChart3, DollarSign, Settings, CalendarCheck, Menu, X, Bell } from 'lucide-react';
+import { LayoutDashboard, BedDouble, CalendarDays, Users, BarChart3, DollarSign, Settings, CalendarCheck, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { useStore } from '../hooks/useStore';
 
@@ -17,8 +17,9 @@ const navItems = [
 export default function Sidebar() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
-  const { bookings } = useStore();
+  const { bookings, resort } = useStore();
   const pending = bookings.filter(b => b.status === 'Pending').length;
+  const initials = resort.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
 
   return (
     <>
@@ -31,10 +32,10 @@ export default function Sidebar() {
       <aside className={`fixed top-0 left-0 bottom-0 w-64 bg-dark-800 border-r border-white/5 z-50 transition-transform duration-200 ${open ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
         <div className="flex items-center gap-3 px-5 h-16 border-b border-white/5">
           <div className="w-9 h-9 bg-gradient-to-br from-brand-400 to-brand-600 rounded-lg flex items-center justify-center flex-shrink-0">
-            <span className="text-white text-sm font-bold">CH</span>
+            <span className="text-white text-sm font-bold">{initials}</span>
           </div>
           <div className="min-w-0">
-            <h1 className="text-sm font-bold text-white truncate">Coastal Haven</h1>
+            <h1 className="text-sm font-bold text-white truncate">{resort.name}</h1>
             <p className="text-[10px] text-slate-500 uppercase tracking-wider">Admin Panel</p>
           </div>
           <button onClick={() => setOpen(false)} className="lg:hidden ml-auto p-1 text-slate-400 hover:text-white">

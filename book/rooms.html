@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Rooms — Coastal Haven Resort</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50:'#fdf8f0', 100:'#f5e6d0', 200:'#e8cba0', 300:'#d4a574', 400:'#c9995a', 500:'#b8863e', 600:'#9a6f2f', 700:'#7a5826', 800:'#5c421d', 900:'#3d2c14' },
+            dark: { 50:'#e8e8ea', 100:'#c5c5c9', 200:'#9e9ea5', 300:'#767680', 400:'#555562', 500:'#353545', 600:'#2a2a3a', 700:'#1f1f30', 800:'#151525', 900:'#0a0a1a' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #0a0a1a; color: #e2e8f0; -webkit-font-smoothing: antialiased; }
+    .g1 { background: linear-gradient(135deg, rgba(201,153,90,0.15), #151525); }
+    .g2 { background: linear-gradient(135deg, rgba(16,185,129,0.1), #151525); }
+    .g3 { background: linear-gradient(135deg, rgba(59,130,246,0.1), #151525); }
+    .g4 { background: linear-gradient(135deg, rgba(168,85,247,0.1), #151525); }
+    .g5 { background: linear-gradient(135deg, rgba(244,63,94,0.1), #151525); }
+    .g6 { background: linear-gradient(135deg, rgba(245,158,11,0.1), #151525); }
+  </style>
+</head>
+<body>
+  <nav class="fixed top-0 w-full z-50 bg-dark-900/80 backdrop-blur-xl border-b border-white/5">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 bg-gradient-to-br from-brand-400 to-brand-600 rounded-lg flex items-center justify-center">
+          <span class="text-white text-sm font-bold">CH</span>
+        </div>
+        <span class="text-white font-semibold text-sm">Coastal Haven</span>
+      </div>
+      <div class="flex items-center gap-6">
+        <a href="index.html" class="text-slate-400 hover:text-white text-sm transition">Home</a>
+        <a href="rooms.html" class="text-brand-400 text-sm font-medium">Rooms</a>
+        <a href="book.html" class="px-4 py-2 bg-gradient-to-r from-brand-500 to-brand-600 text-white text-sm font-semibold rounded-xl hover:from-brand-400 hover:to-brand-500 transition">Book Now</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="pt-24 pb-20 px-4 sm:px-6">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-12">
+        <p class="text-brand-400 text-sm uppercase tracking-widest mb-2">Accommodations</p>
+        <h1 class="text-3xl sm:text-4xl font-bold text-white mb-4">Our Rooms & Villas</h1>
+        <p class="text-slate-400 max-w-xl mx-auto">From cozy doubles to luxurious beachfront villas, find your perfect escape.</p>
+      </div>
+
+      <div class="flex flex-wrap gap-2 mb-8 justify-center">
+        <button onclick="filterRooms('all')" data-filter="all" class="filter-btn px-4 py-2 rounded-xl text-sm font-medium transition border bg-white/10 text-white border-white/10">All</button>
+        <button onclick="filterRooms('Standard')" data-filter="Standard" class="filter-btn px-4 py-2 rounded-xl text-sm font-medium transition border text-slate-400 hover:text-white border-transparent">Standard</button>
+        <button onclick="filterRooms('Deluxe')" data-filter="Deluxe" class="filter-btn px-4 py-2 rounded-xl text-sm font-medium transition border text-slate-400 hover:text-white border-transparent">Deluxe</button>
+        <button onclick="filterRooms('Suite')" data-filter="Suite" class="filter-btn px-4 py-2 rounded-xl text-sm font-medium transition border text-slate-400 hover:text-white border-transparent">Suite</button>
+        <button onclick="filterRooms('Premium Suite')" data-filter="Premium Suite" class="filter-btn px-4 py-2 rounded-xl text-sm font-medium transition border text-slate-400 hover:text-white border-transparent">Premium Suite</button>
+        <button onclick="filterRooms('Villa')" data-filter="Villa" class="filter-btn px-4 py-2 rounded-xl text-sm font-medium transition border text-slate-400 hover:text-white border-transparent">Villa</button>
+      </div>
+
+      <div id="rooms-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
+    </div>
+  </div>
+
+  <footer class="py-8 px-4 sm:px-6 border-t border-white/5">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p class="text-slate-500 text-xs">&copy; 2026 Coastal Haven Resort. All rights reserved.</p>
+      <div class="flex gap-4">
+        <a href="index.html" class="text-slate-500 text-xs hover:text-white transition">Home</a>
+        <a href="rooms.html" class="text-slate-500 text-xs hover:text-white transition">Rooms</a>
+        <a href="book.html" class="text-slate-500 text-xs hover:text-white transition">Book</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const rooms = [
+      { id: "STD-001", name: "Standard Double", type: "Standard", floor: 1, price: 3500, weekendPrice: 4000, capacity: 2, beds: "1 Queen Bed", size: 280, amenities: ["AC", "WiFi", "TV", "Hot Water", "Desk"], description: "Cozy room with queen bed, perfect for couples.", gradient: "g1", iconColor: "text-brand-400", bgColor: "bg-brand-500/20" },
+      { id: "DLX-001", name: "Deluxe Double", type: "Deluxe", floor: 2, price: 5500, weekendPrice: 6500, capacity: 4, beds: "1 King Bed", size: 380, amenities: ["AC", "WiFi", "TV", "Balcony", "Mini Bar", "Desk"], description: "Spacious deluxe room with king bed and private balcony.", gradient: "g2", iconColor: "text-emerald-400", bgColor: "bg-emerald-500/20" },
+      { id: "DLX-002", name: "Deluxe Sea View", type: "Deluxe", floor: 2, price: 6500, weekendPrice: 7500, capacity: 3, beds: "1 King Bed", size: 400, amenities: ["AC", "WiFi", "TV", "Balcony", "Mini Bar", "Sea View"], description: "Deluxe room with stunning sea views.", gradient: "g3", iconColor: "text-blue-400", bgColor: "bg-blue-500/20" },
+      { id: "SUT-001", name: "Premium Suite", type: "Suite", floor: 3, price: 7500, weekendPrice: 9000, capacity: 4, beds: "1 King Bed", size: 520, amenities: ["AC", "WiFi", "TV", "Balcony", "Mini Bar", "Hot Tub", "Sitting Area"], description: "Luxurious suite with separate living area.", gradient: "g4", iconColor: "text-purple-400", bgColor: "bg-purple-500/20" },
+      { id: "SUT-002", name: "Executive Suite", type: "Premium Suite", floor: 3, price: 9500, weekendPrice: 11000, capacity: 4, beds: "1 King Bed", size: 650, amenities: ["AC", "WiFi", "TV", "Balcony", "Mini Bar", "Jacuzzi", "Sitting Area", "Dining"], description: "Ultra-luxurious suite with private jacuzzi.", gradient: "g5", iconColor: "text-rose-400", bgColor: "bg-rose-500/20" },
+      { id: "VIL-001", name: "Beachfront Villa", type: "Villa", floor: 0, price: 11000, weekendPrice: 13000, capacity: 6, beds: "2 King Beds", size: 900, amenities: ["AC", "WiFi", "Pool Access", "Kitchen", "2 Bedrooms", "Living Room", "Patio"], description: "Spacious 2-bedroom villa with beachfront access.", gradient: "g6", iconColor: "text-amber-400", bgColor: "bg-amber-500/20" }
+    ];
+
+    function formatCurrency(n) {
+      return '\u20B9' + n.toLocaleString('en-IN');
+    }
+
+    function renderRooms(filter) {
+      const grid = document.getElementById('rooms-grid');
+      const filtered = filter === 'all' ? rooms : rooms.filter(r => r.type === filter);
+      grid.innerHTML = filtered.map(r => `
+        <div class="bg-dark-800/50 rounded-2xl border border-white/5 overflow-hidden hover:border-brand-500/20 transition">
+          <div class="h-40 ${r.gradient} flex items-center justify-center">
+            <div class="text-center">
+              <div class="w-14 h-14 ${r.bgColor} rounded-2xl flex items-center justify-center mx-auto mb-2">
+                <svg class="w-7 h-7 ${r.iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 7v11a2 2 0 002 2h14a2 2 0 002-2V7M3 7l9-4 9 4M3 7l9 4 9-4"/></svg>
+              </div>
+              <p class="text-xs text-slate-400">${r.name}</p>
+            </div>
+          </div>
+          <div class="p-5">
+            <div class="flex items-start justify-between mb-3">
+              <div>
+                <div class="flex items-center gap-2 mb-1">
+                  <h3 class="text-white font-semibold">${r.name}</h3>
+                  <span class="px-2 py-0.5 bg-dark-900/80 rounded-lg text-[10px] font-medium text-brand-400 border border-brand-500/20">${r.type}</span>
+                </div>
+                <p class="text-slate-500 text-xs">${r.beds} &middot; ${r.size} sq ft &middot; Floor ${r.floor}</p>
+              </div>
+              <div class="text-right">
+                <p class="text-brand-400 font-bold">${formatCurrency(r.price)}</p>
+                <p class="text-slate-500 text-[10px]">/night</p>
+              </div>
+            </div>
+            <p class="text-slate-400 text-sm mb-3">${r.description}</p>
+            <div class="flex flex-wrap gap-1 mb-4">
+              ${r.amenities.map(a => `<span class="px-2 py-0.5 bg-white/5 rounded text-[10px] text-slate-400">${a}</span>`).join('')}
+            </div>
+            <div class="flex items-center justify-between pt-3 border-t border-white/5">
+              <span class="text-xs text-slate-500">Up to ${r.capacity} guests</span>
+              <a href="book.html?room=${r.id}" class="px-4 py-2 bg-gradient-to-r from-brand-500 to-brand-600 text-white text-sm font-semibold rounded-xl hover:from-brand-400 hover:to-brand-500 transition">Book Now</a>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterRooms(type) {
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        const isActive = btn.dataset.filter === type;
+        btn.className = `filter-btn px-4 py-2 rounded-xl text-sm font-medium transition border ${isActive ? 'bg-white/10 text-white border-white/10' : 'text-slate-400 hover:text-white border-transparent'}`;
+      });
+      renderRooms(type);
+    }
+
+    renderRooms('all');
+  </script>
+</body>
+</html>
