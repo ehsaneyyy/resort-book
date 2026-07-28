@@ -44,10 +44,10 @@ const SEASONAL = [
 ];
 
 const RESORT = {
-  name: "Coastal Haven Resort",
-  tagline: "Where the Ocean Meets Luxury",
+  name: "Resort Demo",
+  tagline: "Your Perfect Stay Awaits",
   phone: "+91 98765 43210",
-  email: "info@coastalhaven.com",
+  email: "info@resortdemo.com",
   address: "123, Coastal Road, Palolem, South Goa 403702",
   checkInTime: "14:00",
   checkOutTime: "11:00",
