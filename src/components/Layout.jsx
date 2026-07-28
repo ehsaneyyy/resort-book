@@ -28,7 +28,7 @@ export default function Layout() {
                 Online
               </span>
               <span className="text-xs text-slate-600">{time}</span>
-              <div className="w-9 h-9 bg-brand-500/20 rounded-xl flex items-center justify-center text-brand-400 text-sm font-bold">{initials}</div>
+              <div className="w-9 h-9 bg-brand-500/20 rounded-xl flex items-center justify-center text-brand-400 text-sm font-bold">RA</div>
             </div>
           </div>
         </header>

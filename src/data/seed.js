@@ -44,7 +44,7 @@ const SEASONAL = [
 ];
 
 const RESORT = {
-  name: "Resort Demo",
+  name: "resort-demo/admin",
   tagline: "Your Perfect Stay Awaits",
   phone: "+91 98765 43210",
   email: "info@resortdemo.com",
