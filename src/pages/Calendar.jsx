@@ -58,12 +58,12 @@ export default function Calendar() {
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <button onClick={prev} className="p-1.5 hover:bg-white/[0.02] rounded transition-colors"><ChevronLeft className="w-4 h-4 text-slate-600" /></button>
+        <button onClick={prev} className="p-2 hover:bg-white/[0.02] rounded transition-colors"><ChevronLeft className="w-4 h-4 text-slate-600" /></button>
         <h2 className="text-sm font-medium text-white">{MONTH_NAMES[month]} {year}</h2>
-        <button onClick={next} className="p-1.5 hover:bg-white/[0.02] rounded transition-colors"><ChevronRight className="w-4 h-4 text-slate-600" /></button>
+        <button onClick={next} className="p-2 hover:bg-white/[0.02] rounded transition-colors"><ChevronRight className="w-4 h-4 text-slate-600" /></button>
       </div>
 
-      <div className="flex flex-wrap gap-2 text-[10px]">
+      <div className="flex flex-wrap gap-2 text-[12px]">
         {rooms.map(r => (
           <div key={r.id} className="flex items-center gap-1.5">
             <span className={`w-2 h-2 rounded-sm ${roomColors[r.id]}`} />
@@ -75,7 +75,7 @@ export default function Calendar() {
       <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] overflow-hidden">
         <div className="grid grid-cols-7 gap-px bg-white/[0.01]">
           {DAYS.map(d => (
-            <div key={d} className="bg-dark-800/50 text-center py-2 text-[10px] font-semibold text-slate-600 uppercase tracking-[1px]">{d}</div>
+            <div key={d} className="bg-dark-800/50 text-center py-2 text-[12px] font-semibold text-slate-600 uppercase tracking-[1px]">{d}</div>
           ))}
           {calendarDays.map((cell, i) => {
             if (!cell.day) return <div key={`e${i}`} className="bg-dark-800/30 min-h-[80px] lg:min-h-[110px]" />;
@@ -87,7 +87,7 @@ export default function Calendar() {
                 className={`bg-dark-800/50 min-h-[80px] lg:min-h-[110px] p-1.5 cursor-pointer transition-colors ${isSelected ? 'bg-white/[0.02] ring-1 ring-amber-500/30' : 'hover:bg-white/[0.01]'} ${cell.isToday ? 'bg-white/[0.01]' : ''}`}
               >
                 <div className="flex items-center justify-between mb-0.5">
-                  <span className={`text-[11px] font-medium ${cell.isToday ? 'text-amber-400' : 'text-slate-600'}`}>{cell.day}</span>
+                  <span className={`text-[12px] font-medium ${cell.isToday ? 'text-amber-400' : 'text-slate-600'}`}>{cell.day}</span>
                   {cell.events.length > 0 && <span className="w-1 h-1 bg-amber-500/60 rounded-full" />}
                 </div>
                 <div className="space-y-px">
@@ -108,7 +108,7 @@ export default function Calendar() {
         <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-medium text-white">{formatDate(selected)}</h3>
-            <span className="text-[11px] text-slate-600">{selectedEvents.length} booking{selectedEvents.length !== 1 ? 's' : ''}</span>
+            <span className="text-[12px] text-slate-600">{selectedEvents.length} booking{selectedEvents.length !== 1 ? 's' : ''}</span>
           </div>
           {selectedEvents.length === 0 ? (
             <p className="text-[13px] text-slate-600">No bookings</p>
@@ -116,7 +116,7 @@ export default function Calendar() {
             <div className="space-y-2">
               {selectedEvents.map((ev, i) => (
                 <div key={i} className="flex items-center gap-3 p-3 bg-dark-700/30 rounded border border-white/[0.02]">
-                  <div className={`w-8 h-8 rounded flex items-center justify-center text-white text-[10px] font-medium ${roomColors[ev.roomId] || 'bg-slate-600/30'}`}>
+                  <div className={`w-8 h-8 rounded flex items-center justify-center text-white text-[12px] font-medium ${roomColors[ev.roomId] || 'bg-slate-600/30'}`}>
                     <BedDouble className="w-4 h-4" />
                   </div>
                   <div className="flex-1 min-w-0">

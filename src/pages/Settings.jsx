@@ -75,14 +75,14 @@ export default function Settings() {
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
         <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-4 sm:p-5">
-          <h3 className="text-[10px] font-semibold text-slate-500 uppercase tracking-[2px] mb-4">General</h3>
+          <h3 className="text-[12px] font-semibold text-slate-500 uppercase tracking-[2px] mb-4">General</h3>
           <form onSubmit={saveResort} className="space-y-3">
             <div>
-              <label className="block text-[11px] text-slate-600 mb-1">Admin Display Name</label>
+              <label className="block text-[12px] text-slate-600 mb-1">Admin Display Name</label>
               <input value={adminName} onChange={e => setAdminName(e.target.value)} className="w-full px-3 py-2 bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10" />
             </div>
             <div>
-              <label className="block text-[11px] text-slate-600 mb-1">Currency Symbol</label>
+              <label className="block text-[12px] text-slate-600 mb-1">Currency Symbol</label>
               <input value={currency} onChange={e => setCurrency(e.target.value)} className="w-full px-3 py-2 bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10" maxLength={3} />
             </div>
             <button type="submit" className="px-4 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-[12px] font-medium rounded transition-colors">Save</button>
@@ -90,7 +90,7 @@ export default function Settings() {
         </div>
 
         <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-4 sm:p-5">
-          <h3 className="text-[10px] font-semibold text-slate-500 uppercase tracking-[2px] mb-4">System</h3>
+          <h3 className="text-[12px] font-semibold text-slate-500 uppercase tracking-[2px] mb-4">System</h3>
           <div className="space-y-2">
             <div className="flex items-center justify-between py-2 border-b border-white/[0.02]">
               <span className="text-sm text-slate-500">Total Rooms</span>
@@ -117,41 +117,41 @@ export default function Settings() {
       </div>
 
       <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-4 sm:p-5">
-        <h3 className="text-[10px] font-semibold text-slate-500 uppercase tracking-[2px] mb-4 flex items-center gap-2">
-          <MessageCircle className="w-3.5 h-3.5 text-emerald-400" /> WhatsApp
+        <h3 className="text-[12px] font-semibold text-slate-500 uppercase tracking-[2px] mb-4 flex items-center gap-2">
+          <MessageCircle className="w-4 h-4 text-emerald-400" /> WhatsApp
         </h3>
         <div>
-          <label className="block text-[11px] text-slate-600 mb-1">Owner's WhatsApp Number (with country code)</label>
+          <label className="block text-[12px] text-slate-600 mb-1">Owner's WhatsApp Number (with country code)</label>
           <input value={whatsappPhone} onChange={e => setWhatsappPhone(e.target.value)} className="w-full px-3 py-2 bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10" placeholder="+9198XXXXXXXX" />
-          <p className="text-[10px] text-slate-600 mt-1">Used in quick-send confirmation messages so guests can reach you.</p>
+          <p className="text-[12px] text-slate-600 mt-1">Used in quick-send confirmation messages so guests can reach you.</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
         <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-4 sm:p-5">
-          <h3 className="text-[10px] font-semibold text-slate-500 uppercase tracking-[2px] mb-2">Export</h3>
+          <h3 className="text-[12px] font-semibold text-slate-500 uppercase tracking-[2px] mb-2">Export</h3>
           <p className="text-[12px] text-slate-600 mb-3">Download all data as JSON.</p>
           <button onClick={handleExport} className="px-4 py-2 bg-dark-700 hover:bg-dark-600 text-slate-400 text-[12px] font-medium rounded transition-colors flex items-center gap-2">
-            <Download className="w-3.5 h-3.5" /> Export Backup
+            <Download className="w-4 h-4" /> Export Backup
           </button>
         </div>
 
         <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-4 sm:p-5">
-          <h3 className="text-[10px] font-semibold text-slate-500 uppercase tracking-[2px] mb-2">Import</h3>
+          <h3 className="text-[12px] font-semibold text-slate-500 uppercase tracking-[2px] mb-2">Import</h3>
           <p className="text-[12px] text-slate-600 mb-3">Restore from a JSON backup.</p>
           <label className="px-4 py-2 bg-dark-700 hover:bg-dark-600 text-slate-400 text-[12px] font-medium rounded transition-colors inline-flex items-center gap-2 cursor-pointer">
-            <Database className="w-3.5 h-3.5" /> Choose File
+            <Database className="w-4 h-4" /> Choose File
             <input type="file" accept=".json" onChange={handleFileImport} className="hidden" />
           </label>
-          {importError && <p className="text-[11px] text-red-400/70 mt-2">{importError}</p>}
+          {importError && <p className="text-[12px] text-red-400/70 mt-2">{importError}</p>}
         </div>
       </div>
 
       <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-4 sm:p-5">
-        <h3 className="text-[10px] font-semibold text-slate-500 uppercase tracking-[2px] mb-2">Reset</h3>
+        <h3 className="text-[12px] font-semibold text-slate-500 uppercase tracking-[2px] mb-2">Reset</h3>
         <p className="text-[12px] text-slate-600 mb-3">Replace all data with demo data.</p>
         <button onClick={() => setConfirmReset(true)} className="px-4 py-2 bg-dark-700 hover:bg-dark-600 text-slate-400 text-[12px] font-medium rounded transition-colors flex items-center gap-2">
-          <RefreshCw className="w-3.5 h-3.5" /> Load Demo Data
+          <RefreshCw className="w-4 h-4" /> Load Demo Data
         </button>
       </div>
 

@@ -79,7 +79,7 @@ export default function WhatsAppQuickAdd({ onClose }) {
         <div className="px-5 py-3.5 border-b border-white/[0.02] flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-full bg-emerald-500/10 flex items-center justify-center">
-              <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
+              <MessageCircle className="w-4 h-4 text-emerald-400" />
             </div>
             <h3 className="text-sm font-medium text-white">Quick Add</h3>
           </div>
@@ -91,34 +91,34 @@ export default function WhatsAppQuickAdd({ onClose }) {
         {step === 'form' && (
           <form onSubmit={submit} className="p-5 space-y-3">
             <div>
-              <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1">Guest Name</label>
+              <label className="block text-[12px] font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1">Guest Name</label>
               <input ref={inputRef} required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="w-full px-3 py-2 bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10" placeholder="Vikash M" />
             </div>
             <div>
-              <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1">Phone</label>
+              <label className="block text-[12px] font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1">Phone</label>
               <input required type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className="w-full px-3 py-2 bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1">Room</label>
+                <label className="block text-[12px] font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1">Room</label>
                 <select value={form.roomId} onChange={e => setForm({ ...form, roomId: e.target.value })} className="w-full px-3 py-2 bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10">
                   {rooms.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1">Check-in</label>
+                <label className="block text-[12px] font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1">Check-in</label>
                 <input required type="date" min={today()} value={form.checkIn} onChange={e => setForm({ ...form, checkIn: e.target.value })} className="w-full px-3 py-2 bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10" />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1">Nights</label>
+                <label className="block text-[12px] font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1">Nights</label>
                 <select value={form.nights} onChange={e => setForm({ ...form, nights: e.target.value })} className="w-full px-3 py-2 bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10">
                   {[1,2,3,4,5,6,7,10,14].map(n => <option key={n} value={n}>{n}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1">Adults</label>
+                <label className="block text-[12px] font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1">Adults</label>
                 <select value={form.adults} onChange={e => setForm({ ...form, adults: e.target.value })} className="w-full px-3 py-2 bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10">
                   {[1,2,3,4,5].map(n => <option key={n} value={n}>{n}</option>)}
                 </select>
@@ -132,12 +132,12 @@ export default function WhatsAppQuickAdd({ onClose }) {
               </div>
               <div className="flex items-center justify-between text-[12px]">
                 <span className="text-slate-500">{form.checkIn} → {checkOut}</span>
-                <span className="text-[10px] text-slate-600">Source: WhatsApp</span>
+                <span className="text-[12px] text-slate-600">Source: WhatsApp</span>
               </div>
             </div>
 
             <button type="submit" className="w-full py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-[12px] font-medium rounded transition-colors flex items-center justify-center gap-2">
-              <Plus className="w-3.5 h-3.5" /> Create Booking
+              <Plus className="w-4 h-4" /> Create Booking
             </button>
           </form>
         )}
@@ -153,7 +153,7 @@ export default function WhatsAppQuickAdd({ onClose }) {
             </div>
 
             <button onClick={openWhatsApp} className="w-full py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-[12px] font-medium rounded transition-colors flex items-center justify-center gap-2">
-              <Send className="w-3.5 h-3.5" /> Send Confirmation via WhatsApp
+              <Send className="w-4 h-4" /> Send Confirmation via WhatsApp
             </button>
 
             <button onClick={onClose} className="w-full py-2 bg-dark-700 text-slate-400 text-[12px] rounded transition-colors">Done</button>
