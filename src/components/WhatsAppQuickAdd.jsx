@@ -83,7 +83,7 @@ export default function WhatsAppQuickAdd({ onClose }) {
             </div>
             <h3 className="text-sm font-medium text-white">Quick Add</h3>
           </div>
-          <button onClick={onClose} className="p-1 text-slate-500 hover:text-amber-400 transition-colors">
+          <button onClick={onClose} className="p-1 text-slate-500 hover:text-amber-400 focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>
@@ -136,7 +136,7 @@ export default function WhatsAppQuickAdd({ onClose }) {
               </div>
             </div>
 
-            <button type="submit" className="w-full py-2.5 min-h-[44px] bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-medium rounded transition-colors flex items-center justify-center gap-2">
+            <button type="submit" className="w-full py-2.5 min-h-[44px] bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors flex items-center justify-center gap-2">
               <Plus className="w-4 h-4" /> Create Booking
             </button>
           </form>
@@ -152,11 +152,11 @@ export default function WhatsAppQuickAdd({ onClose }) {
               <p className="text-xs text-slate-500">{booking?.id} · {form.name} · {formatCurrency(total)}</p>
             </div>
 
-            <button onClick={openWhatsApp} className="w-full py-2.5 min-h-[44px] bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-medium rounded transition-colors flex items-center justify-center gap-2">
+            <button onClick={openWhatsApp} className="w-full py-2.5 min-h-[44px] bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors flex items-center justify-center gap-2">
               <Send className="w-4 h-4" /> Send Confirmation via WhatsApp
             </button>
 
-            <button onClick={onClose} className="w-full py-2 min-h-[44px] bg-dark-700 text-slate-400 text-xs rounded transition-colors">Done</button>
+            <button onClick={onClose} className="w-full py-2 min-h-[44px] bg-dark-700 text-slate-400 text-xs rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors">Done</button>
           </div>
         )}
       </div>

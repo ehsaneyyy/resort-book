@@ -40,22 +40,25 @@ export default function Rooms() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <p className="text-xs text-slate-500">{rooms.length} rooms · {occupied.length} occupied</p>
-        <button onClick={openAdd} className="px-3 py-2 min-h-[44px] bg-amber-500/10 text-amber-400 text-xs font-medium rounded hover:bg-amber-500/20 transition-colors flex items-center gap-1.5">
+        <button onClick={openAdd} className="px-3 py-2 min-h-[44px] bg-amber-500/10 text-amber-400 text-xs font-medium rounded hover:bg-amber-500/20 focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors flex items-center gap-1.5">
           <Plus className="w-4 h-4" /> Add Room
         </button>
       </div>
 
       <div className="flex gap-1 overflow-x-auto pb-1">
         {types.map(t => (
-          <button key={t} onClick={() => setFilter(t)} className={`px-3 py-2 min-h-[44px] rounded text-xs font-medium transition-colors whitespace-nowrap ${filter === t ? 'text-white bg-amber-500/10' : 'text-slate-500 hover:text-slate-400'}`}>{t === 'all' ? 'All' : t}</button>
+          <button key={t} onClick={() => setFilter(t)} className={`px-3 py-2 min-h-[44px] rounded text-xs font-medium focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors whitespace-nowrap ${filter === t ? 'text-white bg-amber-500/10' : 'text-slate-500 hover:text-slate-400'}`}>{t === 'all' ? 'All' : t}</button>
         ))}
       </div>
 
+      {filtered.length === 0 ? (
+        <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] py-12 text-center text-sm text-slate-500">No rooms found</div>
+      ) : (
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {filtered.map((r) => {
           const isOcc = occupied.includes(r.id);
           return (
-            <div key={r.id} className="bg-dark-800/50 rounded-lg border border-white/[0.02] hover:border-white/[0.05] transition-colors">
+            <div key={r.id} className="bg-dark-800/50 rounded-lg border border-white/[0.02] hover:border-white/[0.05] focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors">
               <div className="p-5">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
@@ -87,8 +90,8 @@ export default function Rooms() {
                     {r.weekendPrice !== r.price && <span className="text-xs text-slate-500 ml-2">Wknd {formatCurrency(r.weekendPrice)}</span>}
                   </div>
                   <div className="flex gap-2">
-                    <button onClick={() => openEdit(r)} className="p-2 text-slate-500 hover:text-amber-400 transition-colors"><Edit3 className="w-4 h-4" /></button>
-                    <button onClick={() => del(r.id)} className="p-2 text-slate-500 hover:text-red-400 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                    <button onClick={() => openEdit(r)} className="p-2 text-slate-500 hover:text-amber-400 focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors"><Edit3 className="w-4 h-4" /></button>
+                    <button onClick={() => del(r.id)} className="p-2 text-slate-500 hover:text-red-400 focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors"><Trash2 className="w-4 h-4" /></button>
                   </div>
                 </div>
               </div>
@@ -96,6 +99,7 @@ export default function Rooms() {
           );
         })}
       </div>
+      )}
 
       {modal && (
         <Modal title={modal === 'edit' ? 'Edit Room' : 'Add Room'} onClose={() => setModal(null)}>
@@ -117,8 +121,8 @@ export default function Rooms() {
             <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Description</label><textarea rows={2} value={form.description || ''} onChange={e => setForm({ ...form, description: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50 resize-none" /></div>
             <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Amenities (comma separated)</label><input value={form.amenities || ''} onChange={e => setForm({ ...form, amenities: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" placeholder="AC, WiFi, TV..." /></div>
             <div className="flex gap-2 pt-2">
-              <button type="submit" className="flex-1 py-2 min-h-[44px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-medium rounded transition-colors">{modal === 'edit' ? 'Update Room' : 'Add Room'}</button>
-              <button type="button" onClick={() => setModal(null)} className="px-4 py-2 min-h-[44px] bg-dark-700 text-slate-400 text-xs rounded transition-colors">Cancel</button>
+              <button type="submit" className="flex-1 py-2 min-h-[44px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors">{modal === 'edit' ? 'Update Room' : 'Add Room'}</button>
+              <button type="button" onClick={() => setModal(null)} className="px-4 py-2 min-h-[44px] bg-dark-700 text-slate-400 text-xs rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors">Cancel</button>
             </div>
           </form>
         </Modal>

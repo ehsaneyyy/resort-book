@@ -85,7 +85,7 @@ export default function Settings() {
               <label className="block text-xs text-slate-500 mb-1">Currency Symbol</label>
               <input value={currency} onChange={e => setCurrency(e.target.value)} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" maxLength={3} />
             </div>
-            <button type="submit" className="px-4 py-2 min-h-[44px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-medium rounded transition-colors">Save</button>
+            <button type="submit" className="px-4 py-2 min-h-[44px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors">Save</button>
           </form>
         </div>
 
@@ -131,7 +131,7 @@ export default function Settings() {
         <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-4 sm:p-5">
           <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-[2px] mb-2">Export</h3>
           <p className="text-xs text-slate-500 mb-3">Download all data as JSON.</p>
-          <button onClick={handleExport} className="px-4 py-2 min-h-[44px] bg-dark-700 hover:bg-dark-600 text-slate-400 text-xs font-medium rounded transition-colors flex items-center gap-2">
+          <button onClick={handleExport} className="px-4 py-2 min-h-[44px] bg-dark-700 hover:bg-dark-600 text-slate-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors flex items-center gap-2">
             <Download className="w-4 h-4" /> Export Backup
           </button>
         </div>
@@ -139,7 +139,7 @@ export default function Settings() {
         <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-4 sm:p-5">
           <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-[2px] mb-2">Import</h3>
           <p className="text-xs text-slate-500 mb-3">Restore from a JSON backup.</p>
-          <label className="px-4 py-2 min-h-[44px] bg-dark-700 hover:bg-dark-600 text-slate-400 text-xs font-medium rounded transition-colors inline-flex items-center gap-2 cursor-pointer">
+          <label className="px-4 py-2 min-h-[44px] bg-dark-700 hover:bg-dark-600 text-slate-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors inline-flex items-center gap-2 cursor-pointer">
             <Database className="w-4 h-4" /> Choose File
             <input type="file" accept=".json" onChange={handleFileImport} className="hidden" />
           </label>
@@ -150,7 +150,7 @@ export default function Settings() {
       <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-4 sm:p-5">
         <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-[2px] mb-2">Reset</h3>
         <p className="text-xs text-slate-500 mb-3">Replace all data with demo data.</p>
-        <button onClick={() => setConfirmReset(true)} className="px-4 py-2 min-h-[44px] bg-dark-700 hover:bg-dark-600 text-slate-400 text-xs font-medium rounded transition-colors flex items-center gap-2">
+        <button onClick={() => setConfirmReset(true)} className="px-4 py-2 min-h-[44px] bg-dark-700 hover:bg-dark-600 text-slate-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors flex items-center gap-2">
           <RefreshCw className="w-4 h-4" /> Load Demo Data
         </button>
       </div>

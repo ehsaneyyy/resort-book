@@ -51,15 +51,18 @@ export default function Guests() {
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search..." className="w-full sm:w-48 pl-8 pr-3 py-2 min-h-[44px] bg-dark-800/50 border border-white/[0.02] rounded text-sm text-white focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50 placeholder-slate-500" />
           </div>
-          <button onClick={openAdd} className="px-3 py-2 min-h-[44px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-medium rounded transition-colors flex items-center gap-1.5">
+          <button onClick={openAdd} className="px-3 py-2 min-h-[44px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors flex items-center gap-1.5">
             <UserPlus className="w-4 h-4" /> Add Guest
           </button>
         </div>
       </div>
 
+      {filtered.length === 0 ? (
+        <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] py-12 text-center text-sm text-slate-500">No guests found</div>
+      ) : (
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
         {filtered.map(g => (
-          <div key={g.id} className="bg-dark-800/50 rounded-lg border border-white/[0.02] hover:border-white/[0.05] transition-colors p-4 cursor-pointer" onClick={() => setDetail(g)}>
+          <div key={g.id} className="bg-dark-800/50 rounded-lg border border-white/[0.02] hover:border-white/[0.05] focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors p-4 cursor-pointer" onClick={() => setDetail(g)}>
               <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-500/15 to-amber-600/5 flex items-center justify-center text-amber-400/70 text-sm font-medium flex-shrink-0">{g.name.charAt(0)}</div>
@@ -72,7 +75,7 @@ export default function Guests() {
                 </div>
               </div>
               <div className="flex items-center gap-1">
-                <button onClick={(e) => { e.stopPropagation(); const link = whatsappLink(g.phone, `Hi ${g.name}!`); if (link !== '#') window.open(link, '_blank'); }} className="p-2 text-slate-500 hover:text-emerald-400 transition-colors"><MessageCircle className="w-4 h-4" /></button>
+                <button onClick={(e) => { e.stopPropagation(); const link = whatsappLink(g.phone, `Hi ${g.name}!`); if (link !== '#') window.open(link, '_blank'); }} className="p-2 text-slate-500 hover:text-emerald-400 focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors"><MessageCircle className="w-4 h-4" /></button>
                 <Eye className="w-4 h-4 text-slate-500" />
               </div>
             </div>
@@ -97,6 +100,7 @@ export default function Guests() {
           </div>
         ))}
       </div>
+      )}
 
       {detail && (
         <Modal title={detail.name} onClose={() => setDetail(null)}>
@@ -145,8 +149,8 @@ export default function Guests() {
             </div>
             <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Notes</label><textarea rows={2} value={form.notes || ''} onChange={e => setForm({ ...form, notes: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50 resize-none" /></div>
             <div className="flex gap-2 pt-2">
-              <button type="submit" className="flex-1 py-2 min-h-[44px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-medium rounded transition-colors">Add Guest</button>
-              <button type="button" onClick={() => setModal(null)} className="px-4 py-2 min-h-[44px] bg-dark-700 text-slate-400 text-xs rounded transition-colors">Cancel</button>
+              <button type="submit" className="flex-1 py-2 min-h-[44px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors">Add Guest</button>
+              <button type="button" onClick={() => setModal(null)} className="px-4 py-2 min-h-[44px] bg-dark-700 text-slate-400 text-xs rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors">Cancel</button>
             </div>
           </form>
         </Modal>

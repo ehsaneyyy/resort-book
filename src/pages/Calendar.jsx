@@ -58,9 +58,9 @@ export default function Calendar() {
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <button onClick={prev} className="p-2 hover:bg-white/[0.02] rounded transition-colors"><ChevronLeft className="w-4 h-4 text-slate-500" /></button>
+        <button onClick={prev} className="p-2 hover:bg-white/[0.02] rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors"><ChevronLeft className="w-4 h-4 text-slate-500" /></button>
         <h2 className="text-sm font-medium text-white">{MONTH_NAMES[month]} {year}</h2>
-        <button onClick={next} className="p-2 hover:bg-white/[0.02] rounded transition-colors"><ChevronRight className="w-4 h-4 text-slate-500" /></button>
+        <button onClick={next} className="p-2 hover:bg-white/[0.02] rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors"><ChevronRight className="w-4 h-4 text-slate-500" /></button>
       </div>
 
       <div className="flex flex-wrap gap-2 text-xs">
@@ -84,7 +84,7 @@ export default function Calendar() {
               <div
                 key={cell.day}
                 onClick={() => setSelected(isSelected ? null : cell.dateStr)}
-                className={`bg-dark-800/50 min-h-[80px] lg:min-h-[110px] p-1.5 cursor-pointer transition-colors ${isSelected ? 'bg-white/[0.02] ring-1 ring-amber-500/30' : 'hover:bg-white/[0.01]'} ${cell.isToday ? 'bg-white/[0.01]' : ''}`}
+                className={`bg-dark-800/50 min-h-[80px] lg:min-h-[110px] p-1.5 cursor-pointer focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors ${isSelected ? 'bg-white/[0.02] ring-1 ring-amber-500/30' : 'hover:bg-white/[0.01]'} ${cell.isToday ? 'bg-white/[0.01]' : ''}`}
               >
                 <div className="flex items-center justify-between mb-0.5">
                   <span className={`text-xs font-medium ${cell.isToday ? 'text-amber-400' : 'text-slate-500'}`}>{cell.day}</span>
@@ -92,11 +92,11 @@ export default function Calendar() {
                 </div>
                 <div className="space-y-px">
                   {cell.events.slice(0, 3).map((ev, j) => (
-                    <div key={j} className={`px-1 py-px rounded text-[8px] lg:text-[9px] font-medium truncate ${roomColors[ev.roomId] || 'bg-slate-600/30'} text-white/80`}>
+                    <div key={j} className={`px-1 py-px rounded text-[10px] lg:text-[11px] font-medium truncate ${roomColors[ev.roomId] || 'bg-slate-600/30'} text-white/80`}>
                       {ev.isCheckin ? '→ ' : ev.isCheckout ? '← ' : ''}{ev.guest?.name?.split(' ')[0] || ev.guestId}
                     </div>
                   ))}
-                  {cell.events.length > 3 && <p className="text-[8px] text-slate-500 text-center">+{cell.events.length - 3}</p>}
+                  {cell.events.length > 3 && <p className="text-[11px] text-slate-500 text-center">+{cell.events.length - 3}</p>}
                 </div>
               </div>
             );
@@ -122,8 +122,8 @@ export default function Calendar() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
                       <p className="text-sm text-white font-medium">{ev.room?.name || ev.roomId}</p>
-                      {ev.isCheckin && <span className="px-1.5 py-0.5 bg-emerald-500/10 text-emerald-400/80 text-[9px] font-medium rounded">IN</span>}
-                      {ev.isCheckout && <span className="px-1.5 py-0.5 bg-blue-500/10 text-blue-400/80 text-[9px] font-medium rounded">OUT</span>}
+                      {ev.isCheckin && <span className="px-1.5 py-0.5 bg-emerald-500/10 text-emerald-400/80 text-xs font-medium rounded">IN</span>}
+                      {ev.isCheckout && <span className="px-1.5 py-0.5 bg-blue-500/10 text-blue-400/80 text-xs font-medium rounded">OUT</span>}
                     </div>
                     <p className="text-xs text-slate-500">{ev.guest?.name || ev.guestId} · {ev.checkIn} → {ev.checkOut}</p>
                   </div>

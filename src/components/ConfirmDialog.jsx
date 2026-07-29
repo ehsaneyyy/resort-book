@@ -34,13 +34,13 @@ export default function ConfirmDialog({ title, message, onConfirm, onCancel, var
           <button
             ref={btnRef}
             onClick={onConfirm}
-            className={`flex-1 py-2.5 min-h-[44px] ${s.btn} font-medium rounded text-xs transition-colors`}
+            className={`flex-1 py-2.5 min-h-[44px] ${s.btn} font-medium rounded text-xs focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors`}
           >
             {confirmText}
           </button>
           <button
             onClick={onCancel}
-            className="px-5 py-2.5 min-h-[44px] bg-dark-700 hover:bg-dark-600 text-slate-400 text-xs font-medium rounded transition-colors"
+            className="px-5 py-2.5 min-h-[44px] bg-dark-700 hover:bg-dark-600 text-slate-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors"
           >
             Cancel
           </button>

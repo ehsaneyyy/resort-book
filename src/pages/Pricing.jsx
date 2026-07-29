@@ -69,14 +69,14 @@ export default function Pricing() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <p className="text-xs text-slate-500">{seasonal.length} rules · {seasonal.filter(s => s.isActive).length} active</p>
-        <button onClick={openAdd} className="px-3 py-2 min-h-[44px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-medium rounded transition-colors flex items-center gap-1.5">
+        <button onClick={openAdd} className="px-3 py-2 min-h-[44px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors flex items-center gap-1.5">
           <Plus className="w-4 h-4" /> Add Rule
         </button>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
         {presets.map((p, i) => (
-          <button key={i} onClick={() => openPreset(p)} className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-4 text-left hover:border-white/[0.05] transition-colors">
+          <button key={i} onClick={() => openPreset(p)} className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-4 text-left hover:border-white/[0.05] focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors">
             <h3 className="text-sm text-white font-medium mb-0.5">{p.name}</h3>
             <p className="text-xs text-slate-500">{p.adjustment > 0 ? '+' : ''}{p.adjustment}%</p>
           </button>
@@ -85,7 +85,7 @@ export default function Pricing() {
 
       <div className="space-y-2">
         {seasonal.map(rule => (
-          <div key={rule.id} className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-4 hover:border-white/[0.05] transition-colors">
+          <div key={rule.id} className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-4 hover:border-white/[0.05] focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors">
             <div className="flex items-start sm:items-center justify-between gap-3 flex-wrap">
               <div className="flex items-center gap-3">
                 <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${rule.isActive ? 'bg-emerald-500/10' : 'bg-dark-700/50'}`}>
@@ -102,9 +102,9 @@ export default function Pricing() {
               <div className="flex items-center gap-3 flex-shrink-0">
                 <p className={`text-base font-medium ${rule.adjustment >= 0 ? 'text-white' : 'text-red-400/70'}`}>{rule.adjustment > 0 ? '+' : ''}{rule.adjustment}%</p>
                 <div className="flex gap-1">
-                  <button onClick={() => toggle(rule)} className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${rule.isActive ? 'bg-amber-500/10 text-amber-400 hover:bg-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'}`}>{rule.isActive ? 'Off' : 'On'}</button>
-                  <button onClick={() => openEdit(rule)} className="p-2 text-slate-500 hover:text-amber-400 transition-colors"><Edit3 className="w-4 h-4" /></button>
-                  <button onClick={() => del(rule.id)} className="p-2 text-slate-500 hover:text-red-400 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                  <button onClick={() => toggle(rule)} className={`px-3 py-1.5 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors ${rule.isActive ? 'bg-amber-500/10 text-amber-400 hover:bg-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'}`}>{rule.isActive ? 'Off' : 'On'}</button>
+                  <button onClick={() => openEdit(rule)} className="p-2 text-slate-500 hover:text-amber-400 focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors"><Edit3 className="w-4 h-4" /></button>
+                  <button onClick={() => del(rule.id)} className="p-2 text-slate-500 hover:text-red-400 focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors"><Trash2 className="w-4 h-4" /></button>
                 </div>
               </div>
             </div>
@@ -129,8 +129,8 @@ export default function Pricing() {
               <label htmlFor="active" className="text-sm text-slate-400">Active</label>
             </div>
             <div className="flex gap-2 pt-2">
-              <button type="submit" className="flex-1 py-2 min-h-[44px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-medium rounded transition-colors">{modal === 'edit' ? 'Update' : 'Create'}</button>
-              <button type="button" onClick={() => setModal(null)} className="px-4 py-2 min-h-[44px] bg-dark-700 text-slate-400 text-xs rounded transition-colors">Cancel</button>
+              <button type="submit" className="flex-1 py-2 min-h-[44px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors">{modal === 'edit' ? 'Update' : 'Create'}</button>
+              <button type="button" onClick={() => setModal(null)} className="px-4 py-2 min-h-[44px] bg-dark-700 text-slate-400 text-xs rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors">Cancel</button>
             </div>
           </form>
         </Modal>

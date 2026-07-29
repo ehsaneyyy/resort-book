@@ -75,7 +75,7 @@ export default function Reports() {
     <div className="space-y-6">
       <div className="flex gap-1 overflow-x-auto pb-1">
         {['week', 'month', 'quarter', 'year'].map(r => (
-          <button key={r} onClick={() => setRange(r)} className={`px-3 py-2 min-h-[44px] rounded text-xs font-medium transition-colors capitalize whitespace-nowrap ${range === r ? 'text-white bg-amber-500/10' : 'text-slate-500 hover:text-slate-400'}`}>{r}</button>
+          <button key={r} onClick={() => setRange(r)} className={`px-3 py-2 min-h-[44px] rounded text-xs font-medium focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors capitalize whitespace-nowrap ${range === r ? 'text-white bg-amber-500/10' : 'text-slate-500 hover:text-slate-400'}`}>{r}</button>
         ))}
       </div>
 

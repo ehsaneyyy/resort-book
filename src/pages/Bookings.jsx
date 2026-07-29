@@ -92,7 +92,7 @@ export default function Bookings() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex gap-1 overflow-x-auto pb-1">
           {['all', 'Confirmed', 'Pending', 'Checked Out', 'Cancelled'].map(s => (
-            <button key={s} onClick={() => setFilter(s)} className={`px-3 py-2 min-h-[44px] rounded text-xs font-medium transition-colors whitespace-nowrap ${filter === s ? 'text-white bg-amber-500/10' : 'text-slate-500 hover:text-slate-400'}`}>
+            <button key={s} onClick={() => setFilter(s)} className={`px-3 py-2 min-h-[44px] rounded text-xs font-medium focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors whitespace-nowrap ${filter === s ? 'text-white bg-amber-500/10' : 'text-slate-500 hover:text-slate-400'}`}>
               {s === 'all' ? `All (${stats.total})` : `${s} (${stats[s]})`}
             </button>
           ))}
@@ -102,7 +102,7 @@ export default function Bookings() {
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search..." className="w-full sm:w-48 pl-8 pr-3 py-2 min-h-[44px] bg-dark-800/50 border border-white/[0.02] rounded text-sm text-white focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50 placeholder-slate-500" />
           </div>
-          <button onClick={openAdd} className="px-3 py-2 min-h-[44px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-medium rounded transition-colors flex items-center gap-1.5">
+          <button onClick={openAdd} className="px-3 py-2 min-h-[44px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors flex items-center gap-1.5">
             <Plus className="w-4 h-4" /> New
           </button>
         </div>
@@ -127,7 +127,7 @@ export default function Bookings() {
                     const g = getGuest(b.guestId);
                     const r = getRoom(b.roomId);
                     return (
-                      <tr key={b.id} className="hover:bg-white/[0.01] transition-colors">
+                      <tr key={b.id} className="hover:bg-white/[0.01] focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors">
                         <td className="py-3 px-4 text-xs font-mono text-slate-500">{b.id}</td>
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-2.5">
@@ -149,11 +149,11 @@ export default function Bookings() {
                         </td>
                         <td className="py-3 px-4">
                           <div className="flex gap-1">
-                            <button onClick={() => setDetail(b)} className="p-2 text-slate-500 hover:text-amber-400 transition-colors"><Eye className="w-4 h-4" /></button>
-                            <button onClick={() => sendWhatsApp(b, 'confirm')} className="p-2 text-slate-500 hover:text-emerald-400 transition-colors"><MessageCircle className="w-4 h-4" /></button>
-                            {b.status === 'Pending' && <><button onClick={() => update(b.id, 'Confirmed')} className="p-1.5 text-emerald-500/60 hover:text-emerald-400 transition-colors"><CheckCircle className="w-4 h-4" /></button><button onClick={() => update(b.id, 'Cancelled')} className="p-1.5 text-red-500/60 hover:text-red-400 transition-colors"><XCircle className="w-4 h-4" /></button></>}
-                            {b.status === 'Confirmed' && <><button onClick={() => update(b.id, 'Checked Out')} className="p-1.5 text-blue-500/60 hover:text-blue-400 transition-colors"><LogOut className="w-4 h-4" /></button><button onClick={() => update(b.id, 'Cancelled')} className="p-1.5 text-red-500/60 hover:text-red-400 transition-colors"><XCircle className="w-4 h-4" /></button></>}
-                            {(b.status === 'Checked Out' || b.status === 'Cancelled') && <button onClick={() => del(b.id)} className="p-2 text-slate-500 hover:text-red-400 transition-colors"><Trash2 className="w-4 h-4" /></button>}
+                            <button onClick={() => setDetail(b)} className="p-2 text-slate-500 hover:text-amber-400 focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors"><Eye className="w-4 h-4" /></button>
+                            <button onClick={() => sendWhatsApp(b, 'confirm')} className="p-2 text-slate-500 hover:text-emerald-400 focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors"><MessageCircle className="w-4 h-4" /></button>
+                            {b.status === 'Pending' && <><button onClick={() => update(b.id, 'Confirmed')} className="p-1.5 text-emerald-500/60 hover:text-emerald-400 focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors"><CheckCircle className="w-4 h-4" /></button><button onClick={() => update(b.id, 'Cancelled')} className="p-1.5 text-red-500/60 hover:text-red-400 focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors"><XCircle className="w-4 h-4" /></button></>}
+                            {b.status === 'Confirmed' && <><button onClick={() => update(b.id, 'Checked Out')} className="p-1.5 text-blue-500/60 hover:text-blue-400 focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors"><LogOut className="w-4 h-4" /></button><button onClick={() => update(b.id, 'Cancelled')} className="p-1.5 text-red-500/60 hover:text-red-400 focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors"><XCircle className="w-4 h-4" /></button></>}
+                            {(b.status === 'Checked Out' || b.status === 'Cancelled') && <button onClick={() => del(b.id)} className="p-2 text-slate-500 hover:text-red-400 focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors"><Trash2 className="w-4 h-4" /></button>}
                           </div>
                         </td>
                       </tr>
@@ -188,13 +188,13 @@ export default function Bookings() {
                     <div><span className="text-slate-500">Payment</span><p className={`${b.paymentStatus === 'Paid' ? 'text-emerald-400' : b.paymentStatus === 'Refunded' ? 'text-red-400' : 'text-amber-400'}`}>{b.paymentStatus}</p></div>
                   </div>
                   <div className="flex gap-2 pt-2 border-t border-white/[0.02]">
-                    <button onClick={() => setDetail(b)} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs text-slate-500 hover:text-amber-400 bg-white/[0.02] hover:bg-white/[0.04] rounded transition-colors"><Eye className="w-4 h-4" /> View</button>
-                    <button onClick={() => sendWhatsApp(b, 'confirm')} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs text-slate-500 hover:text-emerald-400 bg-white/[0.02] hover:bg-white/[0.04] rounded transition-colors"><MessageCircle className="w-4 h-4" /> WhatsApp</button>
-                    {b.status === 'Pending' && <button onClick={() => update(b.id, 'Confirmed')} className="flex-1 py-2.5 text-xs text-emerald-500/70 hover:text-emerald-400 bg-white/[0.02] hover:bg-white/[0.04] rounded transition-colors flex items-center justify-center gap-1"><CheckCircle className="w-4 h-4" /> Confirm</button>}
-                    {b.status === 'Pending' && <button onClick={() => update(b.id, 'Cancelled')} className="py-2.5 px-3 text-xs text-red-500/60 hover:text-red-400 bg-white/[0.02] hover:bg-white/[0.04] rounded transition-colors"><XCircle className="w-4 h-4" /></button>}
-                    {b.status === 'Confirmed' && <button onClick={() => update(b.id, 'Checked Out')} className="flex-1 py-2.5 text-xs text-blue-500/70 hover:text-blue-400 bg-white/[0.02] hover:bg-white/[0.04] rounded transition-colors flex items-center justify-center gap-1"><LogOut className="w-4 h-4" /> Check Out</button>}
-                    {b.status === 'Confirmed' && <button onClick={() => update(b.id, 'Cancelled')} className="py-2.5 px-3 text-xs text-red-500/60 hover:text-red-400 bg-white/[0.02] hover:bg-white/[0.04] rounded transition-colors"><XCircle className="w-4 h-4" /></button>}
-                    {(b.status === 'Checked Out' || b.status === 'Cancelled') && <button onClick={() => del(b.id)} className="flex-1 py-2.5 text-xs text-slate-500 hover:text-red-400 bg-white/[0.02] hover:bg-white/[0.04] rounded transition-colors flex items-center justify-center gap-1"><Trash2 className="w-4 h-4" /> Delete</button>}
+                    <button onClick={() => setDetail(b)} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs text-slate-500 hover:text-amber-400 bg-white/[0.02] hover:bg-white/[0.04] rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors"><Eye className="w-4 h-4" /> View</button>
+                    <button onClick={() => sendWhatsApp(b, 'confirm')} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs text-slate-500 hover:text-emerald-400 bg-white/[0.02] hover:bg-white/[0.04] rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors"><MessageCircle className="w-4 h-4" /> WhatsApp</button>
+                    {b.status === 'Pending' && <button onClick={() => update(b.id, 'Confirmed')} className="flex-1 py-2.5 text-xs text-emerald-500/70 hover:text-emerald-400 bg-white/[0.02] hover:bg-white/[0.04] rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors flex items-center justify-center gap-1"><CheckCircle className="w-4 h-4" /> Confirm</button>}
+                    {b.status === 'Pending' && <button onClick={() => update(b.id, 'Cancelled')} className="py-2.5 px-3 text-xs text-red-500/60 hover:text-red-400 bg-white/[0.02] hover:bg-white/[0.04] rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors"><XCircle className="w-4 h-4" /></button>}
+                    {b.status === 'Confirmed' && <button onClick={() => update(b.id, 'Checked Out')} className="flex-1 py-2.5 text-xs text-blue-500/70 hover:text-blue-400 bg-white/[0.02] hover:bg-white/[0.04] rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors flex items-center justify-center gap-1"><LogOut className="w-4 h-4" /> Check Out</button>}
+                    {b.status === 'Confirmed' && <button onClick={() => update(b.id, 'Cancelled')} className="py-2.5 px-3 text-xs text-red-500/60 hover:text-red-400 bg-white/[0.02] hover:bg-white/[0.04] rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors"><XCircle className="w-4 h-4" /></button>}
+                    {(b.status === 'Checked Out' || b.status === 'Cancelled') && <button onClick={() => del(b.id)} className="flex-1 py-2.5 text-xs text-slate-500 hover:text-red-400 bg-white/[0.02] hover:bg-white/[0.04] rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors flex items-center justify-center gap-1"><Trash2 className="w-4 h-4" /> Delete</button>}
                   </div>
                 </div>
               );
@@ -229,10 +229,10 @@ export default function Bookings() {
               </div>
               {detail.specialRequests && <div className="text-sm text-slate-500 bg-dark-700/50 rounded p-3 border border-white/[0.02]"><p className="text-slate-500 text-xs font-semibold uppercase tracking-[1.5px] mb-1">Special Requests</p>{detail.specialRequests}</div>}
               <div className="flex gap-2 pt-1">
-                <button onClick={() => printInvoice(detail)} className="px-3 py-2 min-h-[44px] bg-dark-700 hover:bg-dark-600 text-slate-400 text-xs font-medium rounded transition-colors flex items-center gap-1.5"><Printer className="w-4 h-4" /> Print</button>
-                <button onClick={() => sendWhatsApp(detail, 'confirm')} className="px-3 py-2 min-h-[44px] bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-medium rounded transition-colors flex items-center gap-1.5"><MessageCircle className="w-4 h-4" /> WhatsApp</button>
-                {detail.status === 'Pending' && <button onClick={() => { update(detail.id, 'Confirmed'); setDetail(null); }} className="flex-1 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-medium rounded transition-colors">Confirm</button>}
-                {detail.status === 'Confirmed' && <button onClick={() => { update(detail.id, 'Checked Out'); setDetail(null); }} className="flex-1 py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 text-xs font-medium rounded transition-colors">Check Out</button>}
+                <button onClick={() => printInvoice(detail)} className="px-3 py-2 min-h-[44px] bg-dark-700 hover:bg-dark-600 text-slate-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors flex items-center gap-1.5"><Printer className="w-4 h-4" /> Print</button>
+                <button onClick={() => sendWhatsApp(detail, 'confirm')} className="px-3 py-2 min-h-[44px] bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors flex items-center gap-1.5"><MessageCircle className="w-4 h-4" /> WhatsApp</button>
+                {detail.status === 'Pending' && <button onClick={() => { update(detail.id, 'Confirmed'); setDetail(null); }} className="flex-1 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors">Confirm</button>}
+                {detail.status === 'Confirmed' && <button onClick={() => { update(detail.id, 'Checked Out'); setDetail(null); }} className="flex-1 py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors">Check Out</button>}
               </div>
             </>); })()}
           </div>
@@ -292,8 +292,8 @@ export default function Bookings() {
             <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Source</label><select value={form.source || 'Direct'} onChange={e => setForm({ ...form, source: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50"><option>Direct</option><option>Phone</option><option>Website</option><option>Booking.com</option><option>Walk-in</option></select></div>
             <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Special Requests</label><textarea rows={2} value={form.specialRequests || ''} onChange={e => setForm({ ...form, specialRequests: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50 resize-none" /></div>
             <div className="flex gap-2 pt-2">
-              <button type="submit" className="flex-1 py-2 min-h-[44px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-medium rounded transition-colors">Create Booking</button>
-              <button type="button" onClick={() => setModal(null)} className="px-4 py-2 min-h-[44px] bg-dark-700 text-slate-400 text-xs rounded transition-colors">Cancel</button>
+              <button type="submit" className="flex-1 py-2 min-h-[44px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors">Create Booking</button>
+              <button type="button" onClick={() => setModal(null)} className="px-4 py-2 min-h-[44px] bg-dark-700 text-slate-400 text-xs rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors">Cancel</button>
             </div>
           </form>
         </Modal>
