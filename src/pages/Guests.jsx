@@ -2,13 +2,13 @@ import { useState } from 'react';
 import { useStore } from '../hooks/useStore';
 import { formatCurrency, formatDate } from '../data/utils';
 import { useToast } from '../components/Toast';
-import Modal from '../components/Modal';
-import GuestTimeline from '../components/GuestTimeline';
+import { Modal } from '../components/Modal';
+import { GuestTimeline } from '../components/GuestTimeline';
 import { Search, Eye, Star, UserPlus, MessageCircle } from 'lucide-react';
 import { whatsappLink } from '../data/templates';
 import { PHONE_REGEX, EMAIL_REGEX } from '../data/constants';
 
-export default function Guests() {
+export function Guests() {
   const { guests, updateGuests, resort } = useStore();
   const toast = useToast();
   const [search, setSearch] = useState('');

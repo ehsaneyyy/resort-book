@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
-import Sidebar from './Sidebar';
+import { Sidebar } from './Sidebar';
 
-export default function Layout() {
+export function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const pageName = location.pathname === '/' ? 'Dashboard' : location.pathname.slice(1).split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');

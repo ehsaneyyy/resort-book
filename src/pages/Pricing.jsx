@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useStore } from '../hooks/useStore';
 import { useToast } from '../components/Toast';
-import Modal from '../components/Modal';
-import ConfirmDialog from '../components/ConfirmDialog';
+import { Modal } from '../components/Modal';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 import { Calendar, Plus, Edit3, Trash2 } from 'lucide-react';
 import { MONTHS_SHORT } from '../data/constants';
 
@@ -21,7 +21,7 @@ function getMonthRange(months) {
   return { start: fmt(start), end: fmt(end) };
 }
 
-export default function Pricing() {
+export function Pricing() {
   const { seasonal, updateSeasonal } = useStore();
   const toast = useToast();
   const [modal, setModal] = useState(null);

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { formatCurrency, formatDate } from '../data/utils';
 
-export default function PrintInvoice({ booking, guest, room, resort, onClose }) {
+export function PrintInvoice({ booking, guest, room, resort, onClose }) {
   const printed = useRef(false);
 
   useEffect(() => {

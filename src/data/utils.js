@@ -1,3 +1,8 @@
+export function safeString(val, fallback = '\u2014') {
+  if (val === null || val === undefined) return fallback;
+  return String(val);
+}
+
 export function formatCurrency(n, symbol) {
   return (symbol || '\u20B9') + n.toLocaleString('en-IN');
 }

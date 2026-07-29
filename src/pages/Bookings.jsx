@@ -2,14 +2,14 @@ import { useState } from 'react';
 import { useStore } from '../hooks/useStore';
 import { formatCurrency, formatDate, statusColor, today } from '../data/utils';
 import { useToast } from '../components/Toast';
-import Modal from '../components/Modal';
-import ConfirmDialog from '../components/ConfirmDialog';
-import PrintInvoice from '../components/PrintInvoice';
+import { Modal } from '../components/Modal';
+import { ConfirmDialog } from '../components/ConfirmDialog';
+import { PrintInvoice } from '../components/PrintInvoice';
 import { Search, Eye, CheckCircle, XCircle, LogOut, Trash2, Printer, Plus, MessageCircle } from 'lucide-react';
 import { whatsappLink, confirmationMsg, preArrivalMsg, postStayMsg } from '../data/templates';
 import { PHONE_REGEX, EMAIL_REGEX } from '../data/constants';
 
-export default function Bookings() {
+export function Bookings() {
   const { bookings, updateBookings, getGuest, getRoom, resort, rooms, guests, updateGuests } = useStore();
   const toast = useToast();
   const [filter, setFilter] = useState('all');

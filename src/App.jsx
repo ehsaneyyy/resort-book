@@ -1,18 +1,18 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import Layout from './components/Layout';
+import { Layout } from './components/Layout';
 import { ToastProvider } from './components/Toast';
 import { StoreProvider } from './hooks/useStore';
-import ErrorBoundary from './components/ErrorBoundary';
-import Dashboard from './pages/Dashboard';
-import Rooms from './pages/Rooms';
-import Bookings from './pages/Bookings';
-import Guests from './pages/Guests';
-import Calendar from './pages/Calendar';
-import Reports from './pages/Reports';
-import Pricing from './pages/Pricing';
-import Settings from './pages/Settings';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { Dashboard } from './pages/Dashboard';
+import { Rooms } from './pages/Rooms';
+import { Bookings } from './pages/Bookings';
+import { Guests } from './pages/Guests';
+import { Calendar } from './pages/Calendar';
+import { Reports } from './pages/Reports';
+import { Pricing } from './pages/Pricing';
+import { Settings } from './pages/Settings';
 
-export default function App() {
+export function App() {
   return (
     <ErrorBoundary>
       <StoreProvider>

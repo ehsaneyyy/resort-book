@@ -3,7 +3,7 @@ import { useStore } from '../hooks/useStore';
 import { formatCurrency, today } from '../data/utils';
 import { MONTHS_SHORT } from '../data/constants';
 
-export default function Reports() {
+export function Reports() {
   const { bookings, seasonal, getRoom, resort } = useStore();
   const todayStr = today();
   const [range, setRange] = useState('month');

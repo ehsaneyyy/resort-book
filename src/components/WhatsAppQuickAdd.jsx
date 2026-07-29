@@ -6,11 +6,7 @@ import { whatsappLink, confirmationMsg } from '../data/templates';
 import { PHONE_REGEX } from '../data/constants';
 import { MessageCircle, Send, Plus } from 'lucide-react';
 
-function calcNights(a, b) {
-  return Math.ceil((new Date(b) - new Date(a)) / 864e5);
-}
-
-export default function WhatsAppQuickAdd({ onClose }) {
+export function WhatsAppQuickAdd({ onClose }) {
   const { rooms, guests, bookings, updateBookings, updateGuests, resort, getRoom } = useStore();
   const toast = useToast();
   const [step, setStep] = useState('form');

@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { useStore } from '../hooks/useStore';
 import { formatCurrency, today } from '../data/utils';
 import { useToast } from '../components/Toast';
-import Modal from '../components/Modal';
-import ConfirmDialog from '../components/ConfirmDialog';
+import { Modal } from '../components/Modal';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 import { Plus, Edit3, Trash2, BedDouble } from 'lucide-react';
 
-export default function Rooms() {
+export function Rooms() {
   const { rooms, updateRooms, bookings, resort } = useStore();
   const toast = useToast();
   const [filter, setFilter] = useState('all');

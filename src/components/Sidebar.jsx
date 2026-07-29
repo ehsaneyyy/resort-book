@@ -2,7 +2,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { LayoutDashboard, BedDouble, CalendarDays, Users, BarChart3, DollarSign, Settings, CalendarCheck, Menu, X, MessageCircle, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useStore } from '../hooks/useStore';
-import WhatsAppQuickAdd from './WhatsAppQuickAdd';
+import { WhatsAppQuickAdd } from './WhatsAppQuickAdd';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -15,7 +15,7 @@ const navItems = [
   { to: '/settings', icon: Settings, label: 'Settings' },
 ];
 
-export default function Sidebar({ sidebarOpen, onToggle }) {
+export function Sidebar({ sidebarOpen, onToggle }) {
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const location = useLocation();
   const { bookings } = useStore();

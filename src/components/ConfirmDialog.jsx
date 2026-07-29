@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { AlertTriangle } from 'lucide-react';
 
-export default function ConfirmDialog({ title, message, onConfirm, onCancel, variant = 'danger', confirmText = 'Confirm', icon }) {
+export function ConfirmDialog({ title, message, onConfirm, onCancel, variant = 'danger', confirmText = 'Confirm', icon }) {
   const btnRef = useRef(null);
 
   useEffect(() => {

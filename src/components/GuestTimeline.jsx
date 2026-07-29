@@ -2,7 +2,7 @@ import { useStore } from '../hooks/useStore';
 import { formatDate, formatCurrency, statusColor } from '../data/utils';
 import { Calendar, CreditCard, LogIn, LogOut, BookOpen } from 'lucide-react';
 
-export default function GuestTimeline({ guestId }) {
+export function GuestTimeline({ guestId }) {
   const { bookings, getRoom } = useStore();
   const guestBookings = bookings
     .filter(b => b.guestId === guestId)

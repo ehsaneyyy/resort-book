@@ -3,7 +3,7 @@ import { formatCurrency, formatDate, today } from '../data/utils';
 import { useToast } from '../components/Toast';
 import { CheckCircle, ArrowRight } from 'lucide-react';
 
-export default function Dashboard() {
+export function Dashboard() {
   const { bookings, rooms, guests, getGuest, getRoom, updateBookings, resort } = useStore();
   const toast = useToast();
   const todayStr = today();

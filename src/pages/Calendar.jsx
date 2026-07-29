@@ -9,7 +9,7 @@ function getDaysInMonth(y, m) { return new Date(y, m + 1, 0).getDate(); }
 function getFirstDayOfMonth(y, m) { return new Date(y, m, 1).getDay(); }
 function isInRange(dateStr, start, end) { return dateStr >= start && dateStr < end; }
 
-export default function Calendar() {
+export function Calendar() {
   const { rooms, bookings, getGuest } = useStore();
   const [viewDate, setViewDate] = useState(new Date());
   const [selected, setSelected] = useState(null);

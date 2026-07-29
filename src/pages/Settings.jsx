@@ -1,13 +1,13 @@
 import { useState, useRef } from 'react';
 import { useStore } from '../hooks/useStore';
 import { useToast } from '../components/Toast';
-import ConfirmDialog from '../components/ConfirmDialog';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 import { CURRENCIES, PHONE_REGEX, EMAIL_REGEX } from '../data/constants';
 import { RefreshCw, Download, Database, MessageCircle, Building2, Globe } from 'lucide-react';
 
 const CURRENCY_OPTIONS = CURRENCIES;
 
-export default function Settings() {
+export function Settings() {
   const store = useStore();
   const toast = useToast();
   const [confirmReset, setConfirmReset] = useState(false);
