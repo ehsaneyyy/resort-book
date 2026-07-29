@@ -1,3 +1,5 @@
+const SEED_VERSION = 2;
+
 function fmt(d) { return d.toISOString().split('T')[0]; }
 function addDays(d, n) { const r = new Date(d); r.setDate(r.getDate() + n); return r; }
 const now = new Date();
@@ -13,14 +15,14 @@ const ROOMS = [
 ];
 
 const GUESTS = [
-  { id: "G001", name: "booking user-1", email: "guest1@demo.com", phone: "9876540011", city: "City A", totalBookings: 3, totalSpent: 34650, lastStay: today, vip: true, notes: "" },
-  { id: "G002", name: "booking user-2", email: "guest2@demo.com", phone: "9876540012", city: "City B", totalBookings: 2, totalSpent: 15750, lastStay: fmt(addDays(now, -2)), vip: false, notes: "" },
-  { id: "G003", name: "booking user-3", email: "guest3@demo.com", phone: "9876540013", city: "City C", totalBookings: 5, totalSpent: 89200, lastStay: fmt(addDays(now, -5)), vip: true, notes: "" },
-  { id: "G004", name: "booking user-4", email: "guest4@demo.com", phone: "9876540014", city: "City D", totalBookings: 1, totalSpent: 11550, lastStay: fmt(addDays(now, 3)), vip: false, notes: "" },
-  { id: "G005", name: "booking user-5", email: "guest5@demo.com", phone: "9876540015", city: "City E", totalBookings: 4, totalSpent: 52800, lastStay: fmt(addDays(now, 2)), vip: true, notes: "" },
-  { id: "G006", name: "booking user-6", email: "guest6@demo.com", phone: "9876540016", city: "City F", totalBookings: 2, totalSpent: 29925, lastStay: fmt(addDays(now, -10)), vip: false, notes: "" },
-  { id: "G007", name: "booking user-7", email: "guest7@demo.com", phone: "9876540017", city: "City G", totalBookings: 1, totalSpent: 15000, lastStay: fmt(addDays(now, 1)), vip: false, notes: "" },
-  { id: "G008", name: "booking user-8", email: "guest8@demo.com", phone: "9876540018", city: "City H", totalBookings: 6, totalSpent: 78400, lastStay: fmt(addDays(now, -1)), vip: true, notes: "" },
+  { id: "G001", name: "Demo Guest 1", email: "g1@demo.com", phone: "1111111111", city: "Demo City 1", totalBookings: 3, totalSpent: 34650, lastStay: today, vip: true, notes: "" },
+  { id: "G002", name: "Demo Guest 2", email: "g2@demo.com", phone: "2222222222", city: "Demo City 2", totalBookings: 2, totalSpent: 15750, lastStay: fmt(addDays(now, -2)), vip: false, notes: "" },
+  { id: "G003", name: "Demo Guest 3", email: "g3@demo.com", phone: "3333333333", city: "Demo City 3", totalBookings: 5, totalSpent: 89200, lastStay: fmt(addDays(now, -5)), vip: true, notes: "" },
+  { id: "G004", name: "Demo Guest 4", email: "g4@demo.com", phone: "4444444444", city: "Demo City 4", totalBookings: 1, totalSpent: 11550, lastStay: fmt(addDays(now, 3)), vip: false, notes: "" },
+  { id: "G005", name: "Demo Guest 5", email: "g5@demo.com", phone: "5555555555", city: "Demo City 5", totalBookings: 4, totalSpent: 52800, lastStay: fmt(addDays(now, 2)), vip: true, notes: "" },
+  { id: "G006", name: "Demo Guest 6", email: "g6@demo.com", phone: "6666666666", city: "Demo City 6", totalBookings: 2, totalSpent: 29925, lastStay: fmt(addDays(now, -10)), vip: false, notes: "" },
+  { id: "G007", name: "Demo Guest 7", email: "g7@demo.com", phone: "7777777777", city: "Demo City 7", totalBookings: 1, totalSpent: 15000, lastStay: fmt(addDays(now, 1)), vip: false, notes: "" },
+  { id: "G008", name: "Demo Guest 8", email: "g8@demo.com", phone: "8888888888", city: "Demo City 8", totalBookings: 6, totalSpent: 78400, lastStay: fmt(addDays(now, -1)), vip: true, notes: "" },
 ];
 
 const BOOKINGS = [
@@ -46,13 +48,13 @@ const SEASONAL = [
 const RESORT = {
   name: "resort-demo/admin",
   tagline: "Your Perfect Stay Awaits",
-  phone: "+91 98765 43210",
-  email: "info@resortdemo.com",
-  address: "123, Coastal Road, Palolem, South Goa 403702",
+  phone: "+91 11111 11111",
+  email: "resort@demo.com",
+  address: "123, Demo Road, Demo City",
   checkInTime: "14:00",
   checkOutTime: "11:00",
   taxRate: 5,
   totalRooms: 6,
 };
 
-export { ROOMS, GUESTS, BOOKINGS, SEASONAL, RESORT };
+export { ROOMS, GUESTS, BOOKINGS, SEASONAL, RESORT, SEED_VERSION };

@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback } from 'react';
-import { ROOMS, GUESTS, BOOKINGS, SEASONAL, RESORT } from '../data/seed';
+import { ROOMS, GUESTS, BOOKINGS, SEASONAL, RESORT, SEED_VERSION } from '../data/seed';
 
 function load(key, fallback) {
   try {
@@ -12,9 +12,21 @@ function save(key, data) {
   localStorage.setItem('rh_' + key, JSON.stringify(data));
 }
 
+const VERSION_KEY = 'rh_seed_version';
+
+function initSeed() {
+  const stored = localStorage.getItem(VERSION_KEY);
+  if (stored !== String(SEED_VERSION)) {
+    localStorage.clear();
+    localStorage.setItem(VERSION_KEY, String(SEED_VERSION));
+  }
+}
+
 const StoreContext = createContext(null);
 
 export function StoreProvider({ children }) {
+  initSeed();
+
   const [rooms, setRooms] = useState(() => load('rooms', ROOMS));
   const [bookings, setBookings] = useState(() => load('bookings', BOOKINGS));
   const [guests, setGuests] = useState(() => load('guests', GUESTS));
