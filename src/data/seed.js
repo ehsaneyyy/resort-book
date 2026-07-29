@@ -13,14 +13,14 @@ const ROOMS = [
 ];
 
 const GUESTS = [
-  { id: "G001", name: "Rajesh Kumar", email: "rajesh.kumar@email.com", phone: "9876543210", city: "Mumbai", totalBookings: 3, totalSpent: 34650, lastStay: today, vip: true, notes: "Prefers sea-facing rooms. Anniversary guest." },
-  { id: "G002", name: "Priya Sharma", email: "priya.sharma@email.com", phone: "9876543211", city: "Bangalore", totalBookings: 2, totalSpent: 15750, lastStay: fmt(addDays(now, -2)), vip: false, notes: "" },
-  { id: "G003", name: "Amit Patel", email: "amit.patel@email.com", phone: "9876543212", city: "Delhi", totalBookings: 5, totalSpent: 89200, lastStay: fmt(addDays(now, -5)), vip: true, notes: "Corporate guest. Always books villas." },
-  { id: "G004", name: "Neha Singh", email: "neha.singh@email.com", phone: "9876543213", city: "Pune", totalBookings: 1, totalSpent: 11550, lastStay: fmt(addDays(now, 3)), vip: false, notes: "" },
-  { id: "G005", name: "Vikram Bhat", email: "vikram.bhat@email.com", phone: "9876543214", city: "Chennai", totalBookings: 4, totalSpent: 52800, lastStay: fmt(addDays(now, 2)), vip: true, notes: "Loyal customer since 2024." },
-  { id: "G006", name: "Anjali Gupta", email: "anjali.gupta@email.com", phone: "9876543215", city: "Kolkata", totalBookings: 2, totalSpent: 29925, lastStay: fmt(addDays(now, -10)), vip: false, notes: "Requested early check-in last time." },
-  { id: "G007", name: "Sarah Williams", email: "sarah.w@email.com", phone: "+44 7700 123456", city: "London, UK", totalBookings: 1, totalSpent: 15000, lastStay: fmt(addDays(now, 1)), vip: false, notes: "International guest. Needs airport transfer." },
-  { id: "G008", name: "Deepa Menon", email: "deepa.m@email.com", phone: "9876543216", city: "Kochi", totalBookings: 6, totalSpent: 78400, lastStay: fmt(addDays(now, -1)), vip: true, notes: "Longest staying guest." },
+  { id: "G001", name: "booking user-1", email: "guest1@demo.com", phone: "9876540011", city: "City A", totalBookings: 3, totalSpent: 34650, lastStay: today, vip: true, notes: "" },
+  { id: "G002", name: "booking user-2", email: "guest2@demo.com", phone: "9876540012", city: "City B", totalBookings: 2, totalSpent: 15750, lastStay: fmt(addDays(now, -2)), vip: false, notes: "" },
+  { id: "G003", name: "booking user-3", email: "guest3@demo.com", phone: "9876540013", city: "City C", totalBookings: 5, totalSpent: 89200, lastStay: fmt(addDays(now, -5)), vip: true, notes: "" },
+  { id: "G004", name: "booking user-4", email: "guest4@demo.com", phone: "9876540014", city: "City D", totalBookings: 1, totalSpent: 11550, lastStay: fmt(addDays(now, 3)), vip: false, notes: "" },
+  { id: "G005", name: "booking user-5", email: "guest5@demo.com", phone: "9876540015", city: "City E", totalBookings: 4, totalSpent: 52800, lastStay: fmt(addDays(now, 2)), vip: true, notes: "" },
+  { id: "G006", name: "booking user-6", email: "guest6@demo.com", phone: "9876540016", city: "City F", totalBookings: 2, totalSpent: 29925, lastStay: fmt(addDays(now, -10)), vip: false, notes: "" },
+  { id: "G007", name: "booking user-7", email: "guest7@demo.com", phone: "9876540017", city: "City G", totalBookings: 1, totalSpent: 15000, lastStay: fmt(addDays(now, 1)), vip: false, notes: "" },
+  { id: "G008", name: "booking user-8", email: "guest8@demo.com", phone: "9876540018", city: "City H", totalBookings: 6, totalSpent: 78400, lastStay: fmt(addDays(now, -1)), vip: true, notes: "" },
 ];
 
 const BOOKINGS = [
