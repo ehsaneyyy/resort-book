@@ -1,4 +1,4 @@
-const SEED_VERSION = 2;
+const SEED_VERSION = 3;
 
 function fmt(d) { return d.toISOString().split('T')[0]; }
 function addDays(d, n) { const r = new Date(d); r.setDate(r.getDate() + n); return r; }
@@ -47,7 +47,6 @@ const SEASONAL = [
 
 const RESORT = {
   name: "resort-demo/admin",
-  tagline: "Your Perfect Stay Awaits",
   currency: "\u20B9",
   phone: "+91 11111 11111",
   whatsappPhone: "+919999999999",

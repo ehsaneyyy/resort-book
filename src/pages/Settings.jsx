@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useStore } from '../hooks/useStore';
 import { useToast } from '../components/Toast';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { CURRENCIES, PHONE_REGEX, EMAIL_REGEX } from '../data/constants';
-import { RefreshCw, Download, Database, MessageCircle, Building2, Clock, Percent, Phone, Mail, MapPin, Globe } from 'lucide-react';
+import { RefreshCw, Download, Database, MessageCircle, Building2, Globe } from 'lucide-react';
 
 const CURRENCY_OPTIONS = CURRENCIES;
 
@@ -15,35 +15,27 @@ export default function Settings() {
   const [importData, setImportData] = useState('');
   const [importError, setImportError] = useState('');
 
-  const [resortName, setResortName] = useState(store.resort?.name || '');
-  const [tagline, setTagline] = useState(store.resort?.tagline || '');
-  const [currency, setCurrency] = useState(store.resort?.currency || '\u20B9');
-  const [phone, setPhone] = useState(store.resort?.phone || '');
-  const [email, setEmail] = useState(store.resort?.email || '');
-  const [address, setAddress] = useState(store.resort?.address || '');
-  const [checkInTime, setCheckInTime] = useState(store.resort?.checkInTime || '14:00');
-  const [checkOutTime, setCheckOutTime] = useState(store.resort?.checkOutTime || '11:00');
-  const [taxRate, setTaxRate] = useState(store.resort?.taxRate ?? 0);
-  const [whatsappPhone, setWhatsappPhone] = useState(store.resort?.whatsappPhone || '');
+  const initial = useRef({ resortName: store.resort?.name || '', currency: store.resort?.currency || '\u20B9', phone: store.resort?.phone || '', email: store.resort?.email || '', address: store.resort?.address || '', checkInTime: store.resort?.checkInTime || '14:00', checkOutTime: store.resort?.checkOutTime || '11:00', taxRate: store.resort?.taxRate ?? 0, whatsappPhone: store.resort?.whatsappPhone || '' });
+
+  const [resortName, setResortName] = useState(initial.current.resortName);
+  const [currency, setCurrency] = useState(initial.current.currency);
+  const [phone, setPhone] = useState(initial.current.phone);
+  const [email, setEmail] = useState(initial.current.email);
+  const [address, setAddress] = useState(initial.current.address);
+  const [checkInTime, setCheckInTime] = useState(initial.current.checkInTime);
+  const [checkOutTime, setCheckOutTime] = useState(initial.current.checkOutTime);
+  const [taxRate, setTaxRate] = useState(initial.current.taxRate);
+  const [whatsappPhone, setWhatsappPhone] = useState(initial.current.whatsappPhone);
+
+  const hasChanges = resortName !== initial.current.resortName || currency !== initial.current.currency || phone !== initial.current.phone || email !== initial.current.email || address !== initial.current.address || checkInTime !== initial.current.checkInTime || checkOutTime !== initial.current.checkOutTime || taxRate !== initial.current.taxRate || whatsappPhone !== initial.current.whatsappPhone;
 
   const saveResort = (e) => {
     e.preventDefault();
     if (phone && !PHONE_REGEX.test(phone)) { toast('Invalid phone format', 'warning'); return; }
     if (email && !EMAIL_REGEX.test(email)) { toast('Invalid email format', 'warning'); return; }
     if (whatsappPhone && !PHONE_REGEX.test(whatsappPhone)) { toast('Invalid WhatsApp number format', 'warning'); return; }
-    store.updateResort({
-      ...store.resort,
-      name: resortName,
-      tagline,
-      currency,
-      phone,
-      email,
-      address,
-      checkInTime,
-      checkOutTime,
-      taxRate: Number(taxRate),
-      whatsappPhone,
-    });
+    store.updateResort({ ...store.resort, name: resortName, currency, phone, email, address, checkInTime, checkOutTime, taxRate: Number(taxRate), whatsappPhone });
+    initial.current = { resortName, currency, phone, email, address, checkInTime, checkOutTime, taxRate: Number(taxRate), whatsappPhone };
     toast('Settings saved', 'success');
   };
 
@@ -122,17 +114,13 @@ export default function Settings() {
               <input value={resortName} onChange={e => setResortName(e.target.value)} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Tagline</label>
-              <input value={tagline} onChange={e => setTagline(e.target.value)} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" />
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
               <label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Currency</label>
               <select value={currency} onChange={e => setCurrency(e.target.value)} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50">
                 {CURRENCY_OPTIONS.map(c => <option key={c.symbol} value={c.symbol}>{c.symbol} — {c.label}</option>)}
               </select>
             </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Phone</label>
               <input value={phone} onChange={e => setPhone(e.target.value)} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" placeholder="+91 11111 11111" />
@@ -160,9 +148,9 @@ export default function Settings() {
               <input type="number" min="0" max="100" step="0.1" value={taxRate} onChange={e => setTaxRate(e.target.value)} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" />
             </div>
           </div>
-          <div className="flex justify-end pt-2">
+          {hasChanges && <div className="flex justify-end pt-2">
             <button type="submit" className="px-5 py-2 min-h-[44px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors">Save Settings</button>
-          </div>
+          </div>}
         </form>
       </div>
 
