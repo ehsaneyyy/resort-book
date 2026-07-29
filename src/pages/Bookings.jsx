@@ -7,6 +7,7 @@ import ConfirmDialog from '../components/ConfirmDialog';
 import PrintInvoice from '../components/PrintInvoice';
 import { Search, Eye, CheckCircle, XCircle, LogOut, Trash2, Printer, Plus, MessageCircle } from 'lucide-react';
 import { whatsappLink, confirmationMsg, preArrivalMsg, postStayMsg } from '../data/templates';
+import { PHONE_REGEX, EMAIL_REGEX } from '../data/constants';
 
 export default function Bookings() {
   const { bookings, updateBookings, getGuest, getRoom, resort, rooms, guests, updateGuests } = useStore();
@@ -50,6 +51,7 @@ export default function Bookings() {
 
   const stats = { total: bookings.length, Confirmed: bookings.filter(b => b.status === 'Confirmed').length, Pending: bookings.filter(b => b.status === 'Pending').length, Cancelled: bookings.filter(b => b.status === 'Cancelled').length, 'Checked Out': bookings.filter(b => b.status === 'Checked Out').length };
 
+  const curr = resort?.currency;
   const openAdd = () => {
     const todayStr = new Date().toISOString().split('T')[0];
     setForm({ roomId: '', guestId: '', checkIn: todayStr, checkOut: '', adults: 2, children: 0, specialRequests: '', source: 'Direct', newGuest: false, name: '', phone: '', email: '', city: '' });
@@ -63,6 +65,10 @@ export default function Bookings() {
 
     if (form.checkIn < today()) { toast('Check-in cannot be in the past', 'warning'); return; }
     if (form.checkOut <= form.checkIn) { toast('Check-out must be after check-in', 'warning'); return; }
+    if (form.newGuest) {
+      if (!PHONE_REGEX.test(form.phone)) { toast('Invalid phone format', 'warning'); return; }
+      if (form.email && !EMAIL_REGEX.test(form.email)) { toast('Invalid email format', 'warning'); return; }
+    }
 
     let guestId = form.guestId;
     if (form.newGuest) {
@@ -141,7 +147,7 @@ export default function Bookings() {
                           <p className="text-xs text-slate-500">{b.nights}N · {b.adults}A{b.children ? `, ${b.children}C` : ''}</p>
                         </td>
                         <td className="py-3 px-4">
-                          <p className="text-sm text-white font-medium">{formatCurrency(b.total)}</p>
+                          <p className="text-sm text-white font-medium">{formatCurrency(b.total, curr)}</p>
                           <p className={`text-xs ${b.paymentStatus === 'Paid' ? 'text-emerald-500/70' : b.paymentStatus === 'Refunded' ? 'text-red-500/70' : 'text-amber-500/70'}`}>{b.paymentStatus}</p>
                         </td>
                         <td className="py-3 px-4">
@@ -182,7 +188,7 @@ export default function Bookings() {
                   </div>
                   <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-sm mb-3">
                     <div><span className="text-slate-500">Room</span><p className="text-white">{r?.name || b.roomId}</p></div>
-                    <div><span className="text-slate-500">Amount</span><p className="text-white font-medium">{formatCurrency(b.total)}</p></div>
+                    <div><span className="text-slate-500">Amount</span><p className="text-white font-medium">{formatCurrency(b.total, curr)}</p></div>
                     <div><span className="text-slate-500">Dates</span><p className="text-white">{formatDate(b.checkIn)} → {formatDate(b.checkOut)}</p></div>
                     <div><span className="text-slate-500">Nights</span><p className="text-white">{b.nights}N · {b.adults}A{b.children ? `, ${b.children}C` : ''}</p></div>
                     <div><span className="text-slate-500">Payment</span><p className={`${b.paymentStatus === 'Paid' ? 'text-emerald-400' : b.paymentStatus === 'Refunded' ? 'text-red-400' : 'text-amber-400'}`}>{b.paymentStatus}</p></div>
@@ -223,7 +229,7 @@ export default function Bookings() {
                   <div><p className="text-slate-500">Source</p><p className="text-white">{detail.source}</p></div>
                   <div><p className="text-slate-500">Check-in</p><p className="text-white">{formatDate(detail.checkIn)}</p></div>
                   <div><p className="text-slate-500">Check-out</p><p className="text-white">{formatDate(detail.checkOut)}</p></div>
-                  <div><p className="text-slate-500">Total</p><p className="text-base font-medium text-white">{formatCurrency(detail.total)}</p></div>
+                  <div><p className="text-slate-500">Total</p><p className="text-base font-medium text-white">{formatCurrency(detail.total, curr)}</p></div>
                   <div><p className="text-slate-500">Payment</p><p className={`font-medium ${detail.paymentStatus === 'Paid' ? 'text-emerald-400' : 'text-amber-400'}`}>{detail.paymentStatus}</p></div>
                 </div>
               </div>
@@ -255,7 +261,7 @@ export default function Bookings() {
               <label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Room</label>
               <select required value={form.roomId || ''} onChange={e => setForm({ ...form, roomId: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50">
                 <option value="">Select...</option>
-                {rooms.map(r => <option key={r.id} value={r.id}>{r.name} — {formatCurrency(r.price)}/night</option>)}
+                {rooms.map(r => <option key={r.id} value={r.id}>{r.name} — {formatCurrency(r.price, curr)}/night</option>)}
               </select>
             </div>
             <div className="grid grid-cols-2 gap-3">

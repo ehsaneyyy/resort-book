@@ -1,11 +1,13 @@
 import { useState, useMemo } from 'react';
 import { useStore } from '../hooks/useStore';
 import { formatCurrency, today } from '../data/utils';
+import { MONTHS_SHORT } from '../data/constants';
 
 export default function Reports() {
-  const { bookings, seasonal, getRoom } = useStore();
+  const { bookings, seasonal, getRoom, resort } = useStore();
   const todayStr = today();
   const [range, setRange] = useState('month');
+  const curr = resort?.currency;
 
   const dateRange = useMemo(() => {
     const now = new Date(todayStr);
@@ -53,8 +55,6 @@ export default function Reports() {
     return { revenue, avgRate, avgNights, totalBookings: relevant.length, confirmedBookings: confirmed.length, totalGuests: new Set(confirmed.map(b => b.guestId)).size, revenueByRoomType, sortedRooms, sourceStats };
   }, [relevant, getRoom]);
 
-  const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
   const yearlyRevenue = useMemo(() => {
     const now = new Date(todayStr);
     const data = [];
@@ -81,9 +81,9 @@ export default function Reports() {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {[
-          { label: 'Revenue', value: formatCurrency(stats.revenue) },
+          { label: 'Revenue', value: formatCurrency(stats.revenue, curr) },
           { label: 'Bookings', value: stats.totalBookings },
-          { label: 'Avg Rate', value: formatCurrency(stats.avgRate) },
+          { label: 'Avg Rate', value: formatCurrency(stats.avgRate, curr) },
           { label: 'Avg Stay', value: stats.avgNights + 'N' },
         ].map((s, i) => (
           <div key={i} className="border-l-2 border-amber-500/30 pl-3">
@@ -98,10 +98,10 @@ export default function Reports() {
         <div className="space-y-1.5">
           {yearlyRevenue.map((rev, i) => (
             <div key={i} className="flex items-center gap-2.5">
-              <span className="text-xs text-slate-500 w-7 text-right">{monthLabels[i]}</span>
+              <span className="text-xs text-slate-500 w-7 text-right">{MONTHS_SHORT[i]}</span>
               <div className="flex-1 h-5 bg-dark-700/30 rounded overflow-hidden">
                 <div className="h-full bg-amber-500/50 flex items-center pl-1.5" style={{ width: `${(rev / maxRevenue) * 100}%` }}>
-                  {rev > 0 && <span className="text-[9px] text-white/80 font-medium">{formatCurrency(rev)}</span>}
+                  {rev > 0 && <span className="text-[9px] text-white/80 font-medium">{formatCurrency(rev, curr)}</span>}
                 </div>
               </div>
             </div>
@@ -116,7 +116,7 @@ export default function Reports() {
             {Object.entries(stats.revenueByRoomType).sort((a, b) => b[1] - a[1]).map(([type, rev]) => (
               <div key={type} className="flex items-center justify-between p-2.5 bg-dark-700/20 rounded text-sm">
                 <span className="text-slate-300">{type}</span>
-                <span className="text-white font-medium">{formatCurrency(rev)}</span>
+                <span className="text-white font-medium">{formatCurrency(rev, curr)}</span>
               </div>
             ))}
           </div>

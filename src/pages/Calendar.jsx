@@ -2,8 +2,7 @@ import { useState, useMemo } from 'react';
 import { useStore } from '../hooks/useStore';
 import { formatDate, today } from '../data/utils';
 import { ChevronLeft, ChevronRight, BedDouble } from 'lucide-react';
-
-const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+import { MONTHS_LONG as MONTH_NAMES } from '../data/constants';
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 function getDaysInMonth(y, m) { return new Date(y, m + 1, 0).getDate(); }

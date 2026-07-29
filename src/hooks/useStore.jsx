@@ -1,10 +1,23 @@
 import { createContext, useContext, useState, useCallback } from 'react';
 import { ROOMS, GUESTS, BOOKINGS, SEASONAL, RESORT, SEED_VERSION } from '../data/seed';
 
+function validateShape(key, data) {
+  try {
+    if (key === 'rooms') return Array.isArray(data) && data.every(r => r.id && r.name);
+    if (key === 'guests') return Array.isArray(data) && data.every(g => g.id && g.name);
+    if (key === 'bookings') return Array.isArray(data) && data.every(b => b.id && b.guestId);
+    if (key === 'seasonal') return Array.isArray(data) && data.every(s => s.id && s.name);
+    if (key === 'resort') return data && data.name;
+    return false;
+  } catch { return false; }
+}
+
 function load(key, fallback) {
   try {
     const s = localStorage.getItem('rh_' + key);
-    return s ? JSON.parse(s) : JSON.parse(JSON.stringify(fallback));
+    const parsed = s ? JSON.parse(s) : null;
+    if (parsed && validateShape(key, parsed)) return parsed;
+    return JSON.parse(JSON.stringify(fallback));
   } catch { return JSON.parse(JSON.stringify(fallback)); }
 }
 
@@ -51,7 +64,6 @@ export function StoreProvider({ children }) {
 
   const getGuest = (id) => guests.find(g => g.id === id);
   const getRoom = (id) => rooms.find(r => r.id === id);
-  const getBooking = (id) => bookings.find(b => b.id === id);
 
   const resetAll = () => {
     try { localStorage.clear(); } catch {}
@@ -62,7 +74,7 @@ export function StoreProvider({ children }) {
     setResort(JSON.parse(JSON.stringify(RESORT)));
   };
 
-  const value = { rooms, bookings, guests, seasonal, resort, getGuest, getRoom, getBooking, updateRooms, updateBookings, updateGuests, updateSeasonal, updateResort, resetAll };
+  const value = { rooms, bookings, guests, seasonal, resort, getGuest, getRoom, updateRooms, updateBookings, updateGuests, updateSeasonal, updateResort, resetAll };
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

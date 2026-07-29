@@ -18,7 +18,8 @@ export function confirmationMsg(booking, guest, room, resort) {
     `🕑 Check-in: ${resort?.checkInTime || '2PM'} · Check-out: ${resort?.checkOutTime || '11AM'}`,
   ];
   if (resort?.address) lines.push(`📍 ${resort.address}`);
-  lines.push(``, `Need anything? Reply here or call ${resort?.phone || 'the resort'}.`);
+  const contact = resort?.whatsappPhone || resort?.phone || 'the resort';
+  lines.push(``, `Need anything? Reply here or call ${contact}.`);
   return lines.join('\n');
 }
 

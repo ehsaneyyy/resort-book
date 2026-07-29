@@ -6,14 +6,16 @@ import Modal from '../components/Modal';
 import GuestTimeline from '../components/GuestTimeline';
 import { Search, Eye, Star, UserPlus, MessageCircle } from 'lucide-react';
 import { whatsappLink } from '../data/templates';
+import { PHONE_REGEX, EMAIL_REGEX } from '../data/constants';
 
 export default function Guests() {
-  const { guests, updateGuests } = useStore();
+  const { guests, updateGuests, resort } = useStore();
   const toast = useToast();
   const [search, setSearch] = useState('');
   const [detail, setDetail] = useState(null);
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState({});
+  const curr = resort?.currency;
   const filtered = search
     ? guests.filter(g => g.name.toLowerCase().includes(search.toLowerCase()) || g.email.toLowerCase().includes(search.toLowerCase()) || g.phone.includes(search))
     : guests;
@@ -25,6 +27,8 @@ export default function Guests() {
 
   const save = (e) => {
     e.preventDefault();
+    if (!PHONE_REGEX.test(form.phone)) { toast('Invalid phone format', 'warning'); return; }
+    if (form.email && !EMAIL_REGEX.test(form.email)) { toast('Invalid email format', 'warning'); return; }
     const maxNum = guests.reduce((max, g) => {
       const n = parseInt(g.id.replace(/\D/g, ''), 10);
       return n > max ? n : max;
@@ -65,10 +69,10 @@ export default function Guests() {
           <div key={g.id} className="bg-dark-800/50 rounded-lg border border-white/[0.02] hover:border-white/[0.05] focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors p-4 cursor-pointer" onClick={() => setDetail(g)}>
               <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-500/15 to-amber-600/5 flex items-center justify-center text-amber-400/70 text-sm font-medium flex-shrink-0">{g.name.charAt(0)}</div>
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-500/15 to-amber-600/5 flex items-center justify-center text-amber-400/70 text-sm font-medium flex-shrink-0">{(g.name || '?').charAt(0)}</div>
                 <div>
                   <div className="flex items-center gap-1.5">
-                    <h3 className="text-sm font-medium text-white">{g.name}</h3>
+                    <h3 className="text-sm font-medium text-white">{g.name || '—'}</h3>
                     {g.vip && <Star className="w-3 h-3 text-amber-400/70" fill="currentColor" />}
                   </div>
                   <p className="text-xs text-slate-500">{g.id}</p>
@@ -85,7 +89,7 @@ export default function Guests() {
                 <p className="text-[9px] text-slate-500 uppercase tracking-[1px]">Bookings</p>
               </div>
               <div className="flex-1 bg-dark-700/30 rounded px-2.5 py-2">
-                <p className="text-sm text-white font-medium">{formatCurrency(g.totalSpent)}</p>
+                <p className="text-sm text-white font-medium">{formatCurrency(g.totalSpent, curr)}</p>
                 <p className="text-[9px] text-slate-500 uppercase tracking-[1px]">Spent</p>
               </div>
               <div className="flex-1 bg-dark-700/30 rounded px-2.5 py-2">
@@ -94,8 +98,8 @@ export default function Guests() {
               </div>
             </div>
             <div className="flex items-center justify-between text-xs text-slate-500">
-              <span>{g.city}</span>
-              <span>{g.phone}</span>
+              <span>{g.city || '—'}</span>
+              <span>{g.phone || '—'}</span>
             </div>
           </div>
         ))}
@@ -121,7 +125,7 @@ export default function Guests() {
             {detail.notes && <div className="text-sm text-slate-500 bg-dark-700/50 rounded p-3 border border-white/[0.02]">{detail.notes}</div>}
             <div className="grid grid-cols-3 gap-2">
               <div className="bg-dark-700/30 rounded p-3 text-center"><p className="text-base font-medium text-white">{detail.totalBookings}</p><p className="text-[9px] text-slate-500 uppercase tracking-[1px]">Stays</p></div>
-              <div className="bg-dark-700/30 rounded p-3 text-center"><p className="text-base font-medium text-white">{formatCurrency(detail.totalSpent)}</p><p className="text-[9px] text-slate-500 uppercase tracking-[1px]">Spent</p></div>
+              <div className="bg-dark-700/30 rounded p-3 text-center"><p className="text-base font-medium text-white">{formatCurrency(detail.totalSpent, curr)}</p><p className="text-[9px] text-slate-500 uppercase tracking-[1px]">Spent</p></div>
               <div className="bg-dark-700/30 rounded p-3 text-center"><p className="text-sm font-medium text-white">{detail.vip ? 'VIP' : 'Regular'}</p><p className="text-[9px] text-slate-500 uppercase tracking-[1px]">Status</p></div>
             </div>
           </div>

@@ -4,7 +4,7 @@ import { useToast } from '../components/Toast';
 import { CheckCircle, ArrowRight } from 'lucide-react';
 
 export default function Dashboard() {
-  const { bookings, rooms, guests, getGuest, getRoom, updateBookings } = useStore();
+  const { bookings, rooms, guests, getGuest, getRoom, updateBookings, resort } = useStore();
   const toast = useToast();
   const todayStr = today();
   const confirmed = bookings.filter(b => b.status === 'Confirmed');
@@ -17,6 +17,7 @@ export default function Dashboard() {
   const recentBookings = [...bookings].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 6);
   const upcomingArrivals = confirmed.filter(b => b.checkIn > todayStr).sort((a, b) => a.checkIn.localeCompare(b.checkIn)).slice(0, 4);
 
+  const curr = resort?.currency;
   const confirmBooking = (id) => {
     updateBookings(prev => prev.map(b => b.id === id ? { ...b, status: 'Confirmed' } : b));
     toast('Booking confirmed', 'success');
@@ -27,7 +28,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
         {[
           { label: 'Total Bookings', value: bookings.length, sub: `${confirmed.length} confirmed` },
-          { label: "Today's Revenue", value: formatCurrency(todayRevenue), sub: `${todayCheckins.length} check-ins` },
+          { label: "Today's Revenue", value: formatCurrency(todayRevenue, curr), sub: `${todayCheckins.length} check-ins` },
           { label: 'Occupancy', value: `${occupancy}%`, sub: `${occupied}/${rooms.length} rooms` },
           { label: 'Pending', value: pending.length, sub: pending.length > 0 ? 'Needs attention' : 'All clear' },
           { label: 'Guests', value: guests.length, sub: `${guests.filter(g => g.vip).length} VIP` },
@@ -61,7 +62,7 @@ export default function Dashboard() {
                       <p className="text-xs text-slate-500">{room?.name || b.roomId} · {formatDate(b.checkIn)}</p>
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <p className="text-sm text-white font-medium">{formatCurrency(b.total)}</p>
+                      <p className="text-sm text-white font-medium">{formatCurrency(b.total, curr)}</p>
                       <p className={`text-xs ${b.status === 'Confirmed' ? 'text-emerald-500/70' : b.status === 'Pending' ? 'text-amber-500/70' : b.status === 'Cancelled' ? 'text-red-500/70' : 'text-slate-500/70'}`}>{b.status}</p>
                     </div>
                   </div>
@@ -91,7 +92,7 @@ export default function Dashboard() {
                       </div>
                       <div className="text-right flex-shrink-0">
                         <p className="text-xs text-slate-500">{daysUntil === 1 ? 'Tomorrow' : `${daysUntil} days`}</p>
-                        <p className="text-xs text-slate-500">{formatCurrency(b.total)}</p>
+                        <p className="text-xs text-slate-500">{formatCurrency(b.total, curr)}</p>
                       </div>
                     </div>
                   );

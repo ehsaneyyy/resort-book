@@ -48,7 +48,9 @@ const SEASONAL = [
 const RESORT = {
   name: "resort-demo/admin",
   tagline: "Your Perfect Stay Awaits",
+  currency: "\u20B9",
   phone: "+91 11111 11111",
+  whatsappPhone: "+919999999999",
   email: "resort@demo.com",
   address: "123, Demo Road, Demo City",
   checkInTime: "14:00",

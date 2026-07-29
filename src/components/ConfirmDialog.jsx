@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { AlertTriangle, Trash2 } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 
-export default function ConfirmDialog({ title, message, onConfirm, onCancel, variant = 'danger', confirmText = 'Confirm' }) {
+export default function ConfirmDialog({ title, message, onConfirm, onCancel, variant = 'danger', confirmText = 'Confirm', icon }) {
   const btnRef = useRef(null);
 
   useEffect(() => {
@@ -26,7 +26,7 @@ export default function ConfirmDialog({ title, message, onConfirm, onCancel, var
         onClick={(e) => e.stopPropagation()}
       >
         <div className={`w-10 h-10 ${s.icon} rounded-lg flex items-center justify-center mb-4`}>
-          <AlertTriangle className={`w-5 h-5 ${s.iconColor}`} />
+          {icon || <AlertTriangle className={`w-5 h-5 ${s.iconColor}`} />}
         </div>
         <h3 className="text-sm font-medium text-white mb-1.5">{title}</h3>
         <p className="text-sm text-slate-500 mb-5">{message}</p>

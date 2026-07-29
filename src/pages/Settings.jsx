@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { useStore } from '../hooks/useStore';
 import { useToast } from '../components/Toast';
-import { RefreshCw, Download, Database, AlertTriangle, MessageCircle } from 'lucide-react';
 import ConfirmDialog from '../components/ConfirmDialog';
+import { CURRENCIES, PHONE_REGEX, EMAIL_REGEX } from '../data/constants';
+import { RefreshCw, Download, Database, MessageCircle, Building2, Clock, Percent, Phone, Mail, MapPin, Globe } from 'lucide-react';
+
+const CURRENCY_OPTIONS = CURRENCIES;
 
 export default function Settings() {
   const store = useStore();
@@ -11,13 +14,36 @@ export default function Settings() {
   const [confirmImport, setConfirmImport] = useState(false);
   const [importData, setImportData] = useState('');
   const [importError, setImportError] = useState('');
-  const [adminName, setAdminName] = useState(store.resort?.name || 'resort-demo/admin');
-  const [currency, setCurrency] = useState(store.resort?.currency || '₹');
+
+  const [resortName, setResortName] = useState(store.resort?.name || '');
+  const [tagline, setTagline] = useState(store.resort?.tagline || '');
+  const [currency, setCurrency] = useState(store.resort?.currency || '\u20B9');
+  const [phone, setPhone] = useState(store.resort?.phone || '');
+  const [email, setEmail] = useState(store.resort?.email || '');
+  const [address, setAddress] = useState(store.resort?.address || '');
+  const [checkInTime, setCheckInTime] = useState(store.resort?.checkInTime || '14:00');
+  const [checkOutTime, setCheckOutTime] = useState(store.resort?.checkOutTime || '11:00');
+  const [taxRate, setTaxRate] = useState(store.resort?.taxRate ?? 0);
   const [whatsappPhone, setWhatsappPhone] = useState(store.resort?.whatsappPhone || '');
 
   const saveResort = (e) => {
     e.preventDefault();
-    store.updateResort({ ...store.resort, name: adminName, currency, whatsappPhone });
+    if (phone && !PHONE_REGEX.test(phone)) { toast('Invalid phone format', 'warning'); return; }
+    if (email && !EMAIL_REGEX.test(email)) { toast('Invalid email format', 'warning'); return; }
+    if (whatsappPhone && !PHONE_REGEX.test(whatsappPhone)) { toast('Invalid WhatsApp number format', 'warning'); return; }
+    store.updateResort({
+      ...store.resort,
+      name: resortName,
+      tagline,
+      currency,
+      phone,
+      email,
+      address,
+      checkInTime,
+      checkOutTime,
+      taxRate: Number(taxRate),
+      whatsappPhone,
+    });
     toast('Settings saved', 'success');
   };
 
@@ -41,72 +67,137 @@ export default function Settings() {
     setImportError('');
     try {
       const data = JSON.parse(importData);
-      ['rooms', 'guests', 'bookings', 'invoices', 'seasonal', 'resort'].forEach(key => {
+      if (!data || typeof data !== 'object') throw new Error('Invalid JSON structure');
+      const validKeys = ['rooms', 'guests', 'bookings', 'invoices', 'seasonal', 'resort'];
+      for (const key of validKeys) {
+        if (data[key] !== undefined) {
+          if (key === 'resort') {
+            if (!data[key].name) throw new Error(`Invalid ${key} data`);
+          } else if (!Array.isArray(data[key]) || !data[key].every(item => item.id)) {
+            throw new Error(`Invalid ${key} data`);
+          }
+        }
+      }
+      validKeys.forEach(key => {
         if (data[key]) localStorage.setItem(`rh_${key}`, JSON.stringify(data[key]));
       });
       toast('Data imported. Reloading...', 'success');
       setTimeout(() => window.location.reload(), 500);
     } catch (err) {
-      setImportError('Invalid JSON file');
+      setImportError(err.message || 'Invalid JSON file');
     }
   };
 
   const handleFileImport = (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { setImportError('File too large (max 5MB)'); return; }
+    setImportError('');
     const reader = new FileReader();
     reader.onload = (ev) => { setImportData(ev.target.result); setConfirmImport(true); };
     reader.readAsText(file);
   };
 
   const resetData = () => {
-    const keys = ['rh_rooms', 'rh_guests', 'rh_bookings', 'rh_invoices', 'rh_seasonal', 'rh_resort'];
-    keys.forEach(k => localStorage.removeItem(k));
-    toast('Data cleared. Reloading...', 'info');
+    store.resetAll();
+    toast('Demo data loaded. Reloading...', 'info');
     setTimeout(() => window.location.reload(), 500);
   };
 
   const totalRooms = store.rooms.length;
   const totalBookings = store.bookings.length;
   const totalGuests = store.guests.length;
-  const totalInvoices = (store.invoices || []).length;
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
-        <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-4 sm:p-5">
-          <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-[2px] mb-4">General</h3>
-          <form onSubmit={saveResort} className="space-y-3">
-            <div>
-              <label className="block text-xs text-slate-500 mb-1">Admin Display Name</label>
-              <input value={adminName} onChange={e => setAdminName(e.target.value)} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" />
-            </div>
-            <div>
-              <label className="block text-xs text-slate-500 mb-1">Currency Symbol</label>
-              <input value={currency} onChange={e => setCurrency(e.target.value)} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" maxLength={3} />
-            </div>
-            <button type="submit" className="px-4 py-2 min-h-[44px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors">Save</button>
-          </form>
+    <div className="max-w-3xl mx-auto space-y-5">
+      <div className="bg-dark-800/50 rounded-lg border border-white/[0.02]">
+        <div className="px-5 py-3.5 border-b border-white/[0.02] flex items-center gap-2.5">
+          <Building2 className="w-4 h-4 text-amber-400/70" />
+          <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-[2px]">Property Profile</h2>
         </div>
+        <form onSubmit={saveResort} className="p-5 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Resort Name</label>
+              <input value={resortName} onChange={e => setResortName(e.target.value)} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Tagline</label>
+              <input value={tagline} onChange={e => setTagline(e.target.value)} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Currency</label>
+              <select value={currency} onChange={e => setCurrency(e.target.value)} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50">
+                {CURRENCY_OPTIONS.map(c => <option key={c.symbol} value={c.symbol}>{c.symbol} — {c.label}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Phone</label>
+              <input value={phone} onChange={e => setPhone(e.target.value)} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" placeholder="+91 11111 11111" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Email</label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Address</label>
+            <textarea rows={2} value={address} onChange={e => setAddress(e.target.value)} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50 resize-none" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Check-in Time</label>
+              <input type="time" value={checkInTime} onChange={e => setCheckInTime(e.target.value)} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Check-out Time</label>
+              <input type="time" value={checkOutTime} onChange={e => setCheckOutTime(e.target.value)} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Tax Rate (%)</label>
+              <input type="number" min="0" max="100" step="0.1" value={taxRate} onChange={e => setTaxRate(e.target.value)} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" />
+            </div>
+          </div>
+          <div className="flex justify-end pt-2">
+            <button type="submit" className="px-5 py-2 min-h-[44px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors">Save Settings</button>
+          </div>
+        </form>
+      </div>
 
-        <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-4 sm:p-5">
-          <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-[2px] mb-4">System</h3>
-          <div className="space-y-2">
+      <div className="bg-dark-800/50 rounded-lg border border-white/[0.02]">
+        <div className="px-5 py-3.5 border-b border-white/[0.02] flex items-center gap-2.5">
+          <MessageCircle className="w-4 h-4 text-emerald-400/70" />
+          <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-[2px]">WhatsApp</h2>
+        </div>
+        <div className="p-5">
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Owner's WhatsApp Number</label>
+            <input value={whatsappPhone} onChange={e => setWhatsappPhone(e.target.value)} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" placeholder="+9198XXXXXXXX" />
+            <p className="text-xs text-slate-500 mt-1.5">This number appears in confirmation messages so guests can reach you on WhatsApp.</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="bg-dark-800/50 rounded-lg border border-white/[0.02]">
+          <div className="px-5 py-3.5 border-b border-white/[0.02] flex items-center gap-2.5">
+            <Globe className="w-4 h-4 text-slate-500" />
+            <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-[2px]">System</h2>
+          </div>
+          <div className="p-5 space-y-3">
             <div className="flex items-center justify-between py-2 border-b border-white/[0.02]">
-              <span className="text-sm text-slate-500">Total Rooms</span>
+              <span className="text-sm text-slate-500">Rooms</span>
               <span className="text-sm text-white font-medium">{totalRooms}</span>
             </div>
             <div className="flex items-center justify-between py-2 border-b border-white/[0.02]">
-              <span className="text-sm text-slate-500">Total Bookings</span>
+              <span className="text-sm text-slate-500">Bookings</span>
               <span className="text-sm text-white font-medium">{totalBookings}</span>
             </div>
             <div className="flex items-center justify-between py-2 border-b border-white/[0.02]">
-              <span className="text-sm text-slate-500">Total Guests</span>
+              <span className="text-sm text-slate-500">Guests</span>
               <span className="text-sm text-white font-medium">{totalGuests}</span>
-            </div>
-            <div className="flex items-center justify-between py-2 border-b border-white/[0.02]">
-              <span className="text-sm text-slate-500">Total Invoices</span>
-              <span className="text-sm text-white font-medium">{totalInvoices}</span>
             </div>
             <div className="flex items-center justify-between py-2">
               <span className="text-sm text-slate-500">Storage</span>
@@ -114,50 +205,39 @@ export default function Settings() {
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-4 sm:p-5">
-        <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-[2px] mb-4 flex items-center gap-2">
-          <MessageCircle className="w-4 h-4 text-emerald-400" /> WhatsApp
-        </h3>
-        <div>
-          <label className="block text-xs text-slate-500 mb-1">Owner's WhatsApp Number (with country code)</label>
-          <input value={whatsappPhone} onChange={e => setWhatsappPhone(e.target.value)} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" placeholder="+9198XXXXXXXX" />
-          <p className="text-xs text-slate-500 mt-1">Used in quick-send confirmation messages so guests can reach you.</p>
+        <div className="space-y-5">
+          <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-5">
+            <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-[2px] mb-3">Export</h3>
+            <p className="text-xs text-slate-500 mb-3">Download all data as a JSON file.</p>
+            <button onClick={handleExport} className="px-4 py-2 min-h-[44px] bg-dark-700 hover:bg-dark-600 text-slate-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors flex items-center gap-2">
+              <Download className="w-4 h-4" /> Export Backup
+            </button>
+          </div>
+
+          <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-5">
+            <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-[2px] mb-3">Import</h3>
+            <p className="text-xs text-slate-500 mb-3">Restore data from a JSON backup.</p>
+            <label className="px-4 py-2 min-h-[44px] bg-dark-700 hover:bg-dark-600 text-slate-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors inline-flex items-center gap-2 cursor-pointer">
+              <Database className="w-4 h-4" /> Choose File
+              <input type="file" accept=".json" onChange={handleFileImport} className="hidden" />
+            </label>
+            {importError && <p className="text-xs text-red-400/70 mt-2">{importError}</p>}
+          </div>
+
+          <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-5">
+            <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-[2px] mb-3">Reset</h3>
+            <p className="text-xs text-slate-500 mb-3">Replace all data with fresh demo data.</p>
+            <button onClick={() => setConfirmReset(true)} className="px-4 py-2 min-h-[44px] bg-dark-700 hover:bg-dark-600 text-slate-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors flex items-center gap-2">
+              <RefreshCw className="w-4 h-4" /> Load Demo Data
+            </button>
+          </div>
         </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
-        <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-4 sm:p-5">
-          <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-[2px] mb-2">Export</h3>
-          <p className="text-xs text-slate-500 mb-3">Download all data as JSON.</p>
-          <button onClick={handleExport} className="px-4 py-2 min-h-[44px] bg-dark-700 hover:bg-dark-600 text-slate-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors flex items-center gap-2">
-            <Download className="w-4 h-4" /> Export Backup
-          </button>
-        </div>
-
-        <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-4 sm:p-5">
-          <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-[2px] mb-2">Import</h3>
-          <p className="text-xs text-slate-500 mb-3">Restore from a JSON backup.</p>
-          <label className="px-4 py-2 min-h-[44px] bg-dark-700 hover:bg-dark-600 text-slate-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors inline-flex items-center gap-2 cursor-pointer">
-            <Database className="w-4 h-4" /> Choose File
-            <input type="file" accept=".json" onChange={handleFileImport} className="hidden" />
-          </label>
-          {importError && <p className="text-xs text-red-400/70 mt-2">{importError}</p>}
-        </div>
-      </div>
-
-      <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-4 sm:p-5">
-        <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-[2px] mb-2">Reset</h3>
-        <p className="text-xs text-slate-500 mb-3">Replace all data with demo data.</p>
-        <button onClick={() => setConfirmReset(true)} className="px-4 py-2 min-h-[44px] bg-dark-700 hover:bg-dark-600 text-slate-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors flex items-center gap-2">
-          <RefreshCw className="w-4 h-4" /> Load Demo Data
-        </button>
       </div>
 
       {confirmReset && (
         <ConfirmDialog
-          icon={<AlertTriangle className="w-5 h-5 text-amber-400" />}
+          icon={<RefreshCw className="w-5 h-5 text-amber-400" />}
           title="Reset All Data?"
           message="This replaces all bookings, guests, rooms, and invoices with demo data. This cannot be undone."
           confirmText="Reset"
@@ -168,7 +248,7 @@ export default function Settings() {
 
       {confirmImport && (
         <ConfirmDialog
-          icon={<AlertTriangle className="w-5 h-5 text-amber-400" />}
+          icon={<Database className="w-5 h-5 text-amber-400" />}
           title="Import Data?"
           message="This replaces all current data with the imported file."
           confirmText="Import"

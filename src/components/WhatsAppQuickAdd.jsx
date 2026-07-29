@@ -3,6 +3,7 @@ import { useStore } from '../hooks/useStore';
 import { useToast } from './Toast';
 import { formatCurrency, today } from '../data/utils';
 import { whatsappLink, confirmationMsg } from '../data/templates';
+import { PHONE_REGEX } from '../data/constants';
 import { MessageCircle, Send, Plus } from 'lucide-react';
 
 function calcNights(a, b) {
@@ -25,6 +26,7 @@ export default function WhatsAppQuickAdd({ onClose }) {
     return d.toISOString().split('T')[0];
   };
 
+  const curr = resort?.currency;
   const room = getRoom(form.roomId);
   const checkOut = calcCheckOut();
   const nights = Number(form.nights);
@@ -34,6 +36,7 @@ export default function WhatsAppQuickAdd({ onClose }) {
     e.preventDefault();
     const roomObj = rooms.find(r => r.id === form.roomId);
     if (!roomObj || !form.name.trim() || !form.phone.trim()) return;
+    if (!PHONE_REGEX.test(form.phone)) { toast('Invalid phone format', 'warning'); return; }
     if (form.checkIn < today()) { toast('Check-in cannot be in the past', 'warning'); return; }
 
     let guestId = form.guestId;
@@ -128,7 +131,7 @@ export default function WhatsAppQuickAdd({ onClose }) {
             <div className="bg-dark-700/30 rounded p-3 space-y-1">
               <div className="flex items-center justify-between text-xs">
                 <span className="text-slate-500">{room?.name || 'Select room'} · {nights}N</span>
-                <span className="text-white font-medium">{formatCurrency(total)}</span>
+                <span className="text-white font-medium">{formatCurrency(total, curr)}</span>
               </div>
               <div className="flex items-center justify-between text-xs">
                 <span className="text-slate-500">{form.checkIn} → {checkOut}</span>
@@ -149,7 +152,7 @@ export default function WhatsAppQuickAdd({ onClose }) {
                 <MessageCircle className="w-5 h-5 text-emerald-400" />
               </div>
               <p className="text-sm text-white font-medium mb-1">Booking Created</p>
-              <p className="text-xs text-slate-500">{booking?.id} · {form.name} · {formatCurrency(total)}</p>
+              <p className="text-xs text-slate-500">{booking?.id} · {form.name} · {formatCurrency(total, curr)}</p>
             </div>
 
             <button onClick={openWhatsApp} className="w-full py-2.5 min-h-[44px] bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors flex items-center justify-center gap-2">

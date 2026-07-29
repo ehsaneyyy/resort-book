@@ -7,12 +7,13 @@ import ConfirmDialog from '../components/ConfirmDialog';
 import { Plus, Edit3, Trash2, BedDouble } from 'lucide-react';
 
 export default function Rooms() {
-  const { rooms, updateRooms, bookings } = useStore();
+  const { rooms, updateRooms, bookings, resort } = useStore();
   const toast = useToast();
   const [filter, setFilter] = useState('all');
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState({});
   const [confirmId, setConfirmId] = useState(null);
+  const curr = resort?.currency;
   const types = ['all', ...new Set(rooms.map(r => r.type))];
   const filtered = filter === 'all' ? rooms : rooms.filter(r => r.type === filter);
   const occupied = bookings.filter(b => b.status === 'Confirmed' && today() >= b.checkIn && today() < b.checkOut).map(b => b.roomId);
@@ -85,9 +86,9 @@ export default function Rooms() {
 
                 <div className="flex items-center justify-between pt-4 border-t border-white/[0.02]">
                   <div>
-                    <span className="text-base font-medium text-white">{formatCurrency(r.price)}</span>
+                    <span className="text-base font-medium text-white">{formatCurrency(r.price, curr)}</span>
                     <span className="text-xs text-slate-500">/night</span>
-                    {r.weekendPrice !== r.price && <span className="text-xs text-slate-500 ml-2">Wknd {formatCurrency(r.weekendPrice)}</span>}
+                    {r.weekendPrice !== r.price && <span className="text-xs text-slate-500 ml-2">Wknd {formatCurrency(r.weekendPrice, curr)}</span>}
                   </div>
                   <div className="flex gap-2">
                     <button onClick={() => openEdit(r)} className="p-2 text-slate-500 hover:text-amber-400 focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors"><Edit3 className="w-4 h-4" /></button>
@@ -109,14 +110,14 @@ export default function Rooms() {
               <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Type</label><select value={form.type || ''} onChange={e => setForm({ ...form, type: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50"><option>Standard</option><option>Deluxe</option><option>Suite</option><option>Premium Suite</option><option>Villa</option></select></div>
             </div>
             <div className="grid grid-cols-3 gap-3">
-              <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Weekday (₹)</label><input required type="number" value={form.price || ''} onChange={e => setForm({ ...form, price: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" /></div>
-              <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Weekend (₹)</label><input required type="number" value={form.weekendPrice || ''} onChange={e => setForm({ ...form, weekendPrice: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" /></div>
-              <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Capacity</label><input required type="number" value={form.capacity || ''} onChange={e => setForm({ ...form, capacity: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" /></div>
+              <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Weekday (₹)</label><input required type="number" min="0" value={form.price || ''} onChange={e => setForm({ ...form, price: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" /></div>
+              <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Weekend (₹)</label><input required type="number" min="0" value={form.weekendPrice || ''} onChange={e => setForm({ ...form, weekendPrice: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" /></div>
+              <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Capacity</label><input required type="number" min="1" value={form.capacity || ''} onChange={e => setForm({ ...form, capacity: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" /></div>
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Beds</label><input required value={form.beds || ''} onChange={e => setForm({ ...form, beds: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" /></div>
-              <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Size (sqft)</label><input required type="number" value={form.size || ''} onChange={e => setForm({ ...form, size: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" /></div>
-              <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Floor</label><input required type="number" value={form.floor ?? ''} onChange={e => setForm({ ...form, floor: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" /></div>
+              <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Size (sqft)</label><input required type="number" min="0" value={form.size || ''} onChange={e => setForm({ ...form, size: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" /></div>
+              <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Floor</label><input required type="number" min="0" value={form.floor ?? ''} onChange={e => setForm({ ...form, floor: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" /></div>
             </div>
             <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Description</label><textarea rows={2} value={form.description || ''} onChange={e => setForm({ ...form, description: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50 resize-none" /></div>
             <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Amenities (comma separated)</label><input value={form.amenities || ''} onChange={e => setForm({ ...form, amenities: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" placeholder="AC, WiFi, TV..." /></div>
