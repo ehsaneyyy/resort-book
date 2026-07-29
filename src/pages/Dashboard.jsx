@@ -1,7 +1,7 @@
 import { useStore } from '../hooks/useStore';
 import { formatCurrency, formatDate, today } from '../data/utils';
 import { useToast } from '../components/Toast';
-import { CheckCircle, AlertCircle, ArrowRight } from 'lucide-react';
+import { CheckCircle, ArrowRight } from 'lucide-react';
 
 export default function Dashboard() {
   const { bookings, rooms, guests, getGuest, getRoom, updateBookings } = useStore();
@@ -23,46 +23,46 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+    <div className="space-y-7">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-6">
         {[
-          { label: 'Bookings', value: bookings.length, sub: `${confirmed.length} confirmed` },
+          { label: 'Total Bookings', value: bookings.length, sub: `${confirmed.length} confirmed` },
           { label: "Today's Revenue", value: formatCurrency(todayRevenue), sub: `${todayCheckins.length} check-ins` },
           { label: 'Occupancy', value: `${occupancy}%`, sub: `${occupied}/${rooms.length} rooms` },
           { label: 'Pending', value: pending.length, sub: pending.length > 0 ? 'Needs attention' : 'All clear' },
           { label: 'Guests', value: guests.length, sub: `${guests.filter(g => g.vip).length} VIP` },
         ].map((s, i) => (
-          <div key={i} className="bg-dark-800 border border-white/5 p-4">
-            <p className="text-[11px] text-slate-500 uppercase tracking-wider mb-1">{s.label}</p>
-            <p className="text-xl font-semibold text-white">{s.value}</p>
-            <p className="text-[11px] text-slate-500 mt-0.5">{s.sub}</p>
+          <div key={i} className="border-l-2 border-amber-500/30 pl-3">
+            <p className="text-[10px] font-medium text-slate-500 uppercase tracking-[1.5px]">{s.label}</p>
+            <p className="text-2xl font-medium text-white mt-1 tracking-tight">{s.value}</p>
+            <p className="text-[12px] text-slate-600 mt-0.5">{s.sub}</p>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <div className="lg:col-span-2 space-y-5">
-          <div className="bg-dark-800 border border-white/5">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
-              <h3 className="text-sm font-medium text-white">Recent Bookings</h3>
-              <a href="/bookings" className="text-[11px] text-slate-500 hover:text-white flex items-center gap-1 transition-colors">View all <ArrowRight className="w-3 h-3" /></a>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+          <div className="bg-dark-800/50 rounded-lg border border-white/[0.02]">
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.02]">
+              <h2 className="text-[10px] font-semibold text-slate-500 uppercase tracking-[2px]">Recent Bookings</h2>
+              <a href="/bookings" className="text-[11px] text-slate-600 hover:text-slate-400 flex items-center gap-1 transition-colors">All <ArrowRight className="w-3 h-3" /></a>
             </div>
-            <div className="divide-y divide-white/5">
+            <div className="divide-y divide-white/[0.02]">
               {recentBookings.map(b => {
                 const guest = getGuest(b.guestId);
                 const room = getRoom(b.roomId);
                 return (
-                  <div key={b.id} className="flex items-center gap-3 px-4 py-2.5 hover:bg-white/[0.02] transition-colors">
-                    <div className="w-8 h-8 bg-dark-700 rounded flex items-center justify-center text-slate-400 text-xs font-medium flex-shrink-0">
+                  <div key={b.id} className="flex items-center gap-3 px-5 py-3 hover:bg-white/[0.01] transition-colors">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-500/20 to-amber-600/10 flex items-center justify-center text-amber-400/80 text-xs font-medium flex-shrink-0">
                       {guest?.name.charAt(0) || '?'}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-white truncate">{guest?.name || 'Unknown'}</p>
-                      <p className="text-[11px] text-slate-500">{room?.name || b.roomId} · {formatDate(b.checkIn)}</p>
+                      <p className="text-[12px] text-slate-600">{room?.name || b.roomId} · {formatDate(b.checkIn)}</p>
                     </div>
                     <div className="text-right flex-shrink-0">
                       <p className="text-sm text-white font-medium">{formatCurrency(b.total)}</p>
-                      <p className={`text-[10px] ${b.status === 'Confirmed' ? 'text-emerald-500' : b.status === 'Pending' ? 'text-amber-500' : b.status === 'Cancelled' ? 'text-red-500' : 'text-slate-500'}`}>{b.status}</p>
+                      <p className={`text-[11px] ${b.status === 'Confirmed' ? 'text-emerald-500/70' : b.status === 'Pending' ? 'text-amber-500/70' : b.status === 'Cancelled' ? 'text-red-500/70' : 'text-slate-500/70'}`}>{b.status}</p>
                     </div>
                   </div>
                 );
@@ -71,27 +71,27 @@ export default function Dashboard() {
           </div>
 
           {upcomingArrivals.length > 0 && (
-            <div className="bg-dark-800 border border-white/5">
-              <div className="px-4 py-3 border-b border-white/5">
-                <h3 className="text-sm font-medium text-white">Upcoming Arrivals</h3>
+            <div className="bg-dark-800/50 rounded-lg border border-white/[0.02]">
+              <div className="px-5 py-3.5 border-b border-white/[0.02]">
+                <h2 className="text-[10px] font-semibold text-slate-500 uppercase tracking-[2px]">Upcoming Arrivals</h2>
               </div>
-              <div className="divide-y divide-white/5">
+              <div className="divide-y divide-white/[0.02]">
                 {upcomingArrivals.map(b => {
                   const guest = getGuest(b.guestId);
                   const room = getRoom(b.roomId);
                   const daysUntil = Math.ceil((new Date(b.checkIn) - new Date(todayStr)) / 864e5);
                   return (
-                    <div key={b.id} className="flex items-center gap-3 px-4 py-2.5">
-                      <div className="w-8 h-8 bg-dark-700 rounded flex items-center justify-center text-slate-400 text-xs font-medium flex-shrink-0">
+                    <div key={b.id} className="flex items-center gap-3 px-5 py-3">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-500/20 to-amber-600/10 flex items-center justify-center text-amber-400/80 text-xs font-medium flex-shrink-0">
                         {guest?.name.charAt(0) || '?'}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-white truncate">{guest?.name || 'Unknown'}</p>
-                        <p className="text-[11px] text-slate-500">{room?.name || b.roomId} · {b.nights}N</p>
+                        <p className="text-[12px] text-slate-600">{room?.name || b.roomId} · {b.nights}N</p>
                       </div>
                       <div className="text-right flex-shrink-0">
-                        <p className="text-[11px] text-slate-400">{daysUntil === 1 ? 'Tomorrow' : `${daysUntil}d`}</p>
-                        <p className="text-[11px] text-slate-500">{formatCurrency(b.total)}</p>
+                        <p className="text-[12px] text-slate-600">{daysUntil === 1 ? 'Tomorrow' : `${daysUntil} days`}</p>
+                        <p className="text-[12px] text-slate-600">{formatCurrency(b.total)}</p>
                       </div>
                     </div>
                   );
@@ -101,27 +101,27 @@ export default function Dashboard() {
           )}
         </div>
 
-        <div className="space-y-5">
-          <div className="bg-dark-800 border border-white/5">
-            <div className="px-4 py-3 border-b border-white/5">
-              <h3 className="text-sm font-medium text-white">Today</h3>
+        <div className="space-y-6">
+          <div className="bg-dark-800/50 rounded-lg border border-white/[0.02]">
+            <div className="px-5 py-3.5 border-b border-white/[0.02]">
+              <h2 className="text-[10px] font-semibold text-slate-500 uppercase tracking-[2px]">Today</h2>
             </div>
-            <div className="p-4 space-y-3">
+            <div className="p-5 space-y-4">
               <div>
-                <p className="text-[11px] text-slate-500 uppercase tracking-wider mb-2">Check-ins ({todayCheckins.length})</p>
+                <p className="text-[10px] font-medium text-slate-500 uppercase tracking-[1.5px] mb-2.5">Check-ins ({todayCheckins.length})</p>
                 {todayCheckins.length === 0 ? (
-                  <p className="text-xs text-slate-600">None today</p>
+                  <p className="text-[12px] text-slate-600">—</p>
                 ) : (
-                  <div className="space-y-1.5">
+                  <div className="space-y-2">
                     {todayCheckins.map(b => {
                       const guest = getGuest(b.guestId);
                       const room = getRoom(b.roomId);
                       return (
-                        <div key={b.id} className="flex items-center gap-2 text-xs">
-                          <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full flex-shrink-0" />
-                          <span className="text-slate-300 truncate">{guest?.name}</span>
+                        <div key={b.id} className="flex items-center gap-2.5 text-[12px]">
+                          <span className="w-1.5 h-1.5 bg-emerald-500/60 rounded-full flex-shrink-0" />
+                          <span className="text-slate-300">{guest?.name}</span>
                           <span className="text-slate-600">·</span>
-                          <span className="text-slate-500 truncate">{room?.name}</span>
+                          <span className="text-slate-600">{room?.name}</span>
                         </div>
                       );
                     })}
@@ -129,20 +129,20 @@ export default function Dashboard() {
                 )}
               </div>
               <div>
-                <p className="text-[11px] text-slate-500 uppercase tracking-wider mb-2">Check-outs ({todayCheckouts.length})</p>
+                <p className="text-[10px] font-medium text-slate-500 uppercase tracking-[1.5px] mb-2.5">Check-outs ({todayCheckouts.length})</p>
                 {todayCheckouts.length === 0 ? (
-                  <p className="text-xs text-slate-600">None today</p>
+                  <p className="text-[12px] text-slate-600">—</p>
                 ) : (
-                  <div className="space-y-1.5">
+                  <div className="space-y-2">
                     {todayCheckouts.map(b => {
                       const guest = getGuest(b.guestId);
                       const room = getRoom(b.roomId);
                       return (
-                        <div key={b.id} className="flex items-center gap-2 text-xs">
-                          <span className="w-1.5 h-1.5 bg-blue-500 rounded-full flex-shrink-0" />
-                          <span className="text-slate-300 truncate">{guest?.name}</span>
+                        <div key={b.id} className="flex items-center gap-2.5 text-[12px]">
+                          <span className="w-1.5 h-1.5 bg-blue-500/60 rounded-full flex-shrink-0" />
+                          <span className="text-slate-300">{guest?.name}</span>
                           <span className="text-slate-600">·</span>
-                          <span className="text-slate-500 truncate">{room?.name}</span>
+                          <span className="text-slate-600">{room?.name}</span>
                         </div>
                       );
                     })}
@@ -153,22 +153,21 @@ export default function Dashboard() {
           </div>
 
           {pending.length > 0 && (
-            <div className="bg-dark-800 border border-white/5">
-              <div className="px-4 py-3 border-b border-white/5 flex items-center gap-2">
-                <AlertCircle className="w-3.5 h-3.5 text-amber-500" />
-                <h3 className="text-sm font-medium text-white">Pending</h3>
+            <div className="bg-dark-800/50 rounded-lg border border-white/[0.02]">
+              <div className="px-5 py-3.5 border-b border-white/[0.02]">
+                <h2 className="text-[10px] font-semibold text-slate-500 uppercase tracking-[2px]">Pending Confirmation</h2>
               </div>
-              <div className="divide-y divide-white/5">
+              <div className="divide-y divide-white/[0.02]">
                 {pending.map(b => {
                   const guest = getGuest(b.guestId);
                   const room = getRoom(b.roomId);
                   return (
-                    <div key={b.id} className="flex items-center gap-3 px-4 py-2.5">
+                    <div key={b.id} className="flex items-center gap-3 px-5 py-3">
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-white truncate">{guest?.name || 'Unknown'}</p>
-                        <p className="text-[11px] text-slate-500">{room?.name || b.roomId} · {formatDate(b.checkIn)}</p>
+                        <p className="text-[12px] text-slate-600">{room?.name || b.roomId} · {formatDate(b.checkIn)}</p>
                       </div>
-                      <button onClick={() => confirmBooking(b.id)} className="px-2.5 py-1 bg-emerald-500/10 text-emerald-400 text-[11px] font-medium rounded hover:bg-emerald-500/20 transition-colors flex items-center gap-1">
+                      <button onClick={() => confirmBooking(b.id)} className="px-2.5 py-1.5 bg-amber-500/10 text-amber-400 text-[11px] font-medium rounded hover:bg-amber-500/20 transition-colors flex items-center gap-1">
                         <CheckCircle className="w-3 h-3" /> Confirm
                       </button>
                     </div>
@@ -178,16 +177,16 @@ export default function Dashboard() {
             </div>
           )}
 
-          <div className="bg-dark-800 border border-white/5">
-            <div className="px-4 py-3 border-b border-white/5">
-              <h3 className="text-sm font-medium text-white">Rooms</h3>
+          <div className="bg-dark-800/50 rounded-lg border border-white/[0.02]">
+            <div className="px-5 py-3.5 border-b border-white/[0.02]">
+              <h2 className="text-[10px] font-semibold text-slate-500 uppercase tracking-[2px]">Room Status</h2>
             </div>
-            <div className="p-3">
+            <div className="p-4">
               <div className="grid grid-cols-3 gap-1.5">
                 {rooms.map(r => {
-                  const isOccupied = confirmed.some(b => b.roomId === r.id && todayStr >= b.checkIn && todayStr < b.checkOut);
+                  const isOcc = confirmed.some(b => b.roomId === r.id && todayStr >= b.checkIn && todayStr < b.checkOut);
                   return (
-                    <div key={r.id} className={`px-2 py-1.5 rounded text-center text-[10px] font-medium ${isOccupied ? 'bg-red-500/10 text-red-400' : 'bg-emerald-500/10 text-emerald-400'}`}>
+                    <div key={r.id} className={`px-2 py-1.5 rounded text-center text-[10px] font-medium ${isOcc ? 'bg-red-500/8 text-red-400/70' : 'bg-emerald-500/8 text-emerald-400/70'}`}>
                       {r.name.split(' ')[0]}
                     </div>
                   );

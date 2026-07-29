@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useStore } from '../hooks/useStore';
 import { useToast } from '../components/Toast';
-import { Settings as SettingsIcon, RefreshCw, Download, Database, Shield, AlertTriangle } from 'lucide-react';
+import { RefreshCw, Download, Database, AlertTriangle } from 'lucide-react';
 import ConfirmDialog from '../components/ConfirmDialog';
 
 export default function Settings() {
@@ -71,89 +71,74 @@ export default function Settings() {
   const totalInvoices = (store.invoices || []).length;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <div className="bg-dark-800 border border-white/5 p-5">
-          <div className="flex items-center gap-2 mb-4">
-            <SettingsIcon className="w-4 h-4 text-slate-500" />
-            <h3 className="text-[12px] text-slate-500 uppercase tracking-wider">General</h3>
-          </div>
+        <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-5">
+          <h3 className="text-[10px] font-semibold text-slate-500 uppercase tracking-[2px] mb-4">General</h3>
           <form onSubmit={saveResort} className="space-y-3">
             <div>
-              <label className="block text-[11px] text-slate-500 mb-1">Admin Display Name</label>
-              <input value={adminName} onChange={e => setAdminName(e.target.value)} className="w-full px-3 py-2 bg-dark-700 border border-white/10 rounded text-white text-sm focus:outline-none focus:border-white/20" />
+              <label className="block text-[11px] text-slate-600 mb-1">Admin Display Name</label>
+              <input value={adminName} onChange={e => setAdminName(e.target.value)} className="w-full px-3 py-2 bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10" />
             </div>
             <div>
-              <label className="block text-[11px] text-slate-500 mb-1">Currency Symbol</label>
-              <input value={currency} onChange={e => setCurrency(e.target.value)} className="w-full px-3 py-2 bg-dark-700 border border-white/10 rounded text-white text-sm focus:outline-none focus:border-white/20" maxLength={3} />
+              <label className="block text-[11px] text-slate-600 mb-1">Currency Symbol</label>
+              <input value={currency} onChange={e => setCurrency(e.target.value)} className="w-full px-3 py-2 bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10" maxLength={3} />
             </div>
-            <button type="submit" className="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white text-[12px] font-medium rounded transition-colors">Save Settings</button>
+            <button type="submit" className="px-4 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-[12px] font-medium rounded transition-colors">Save</button>
           </form>
         </div>
 
-        <div className="bg-dark-800 border border-white/5 p-5">
-          <div className="flex items-center gap-2 mb-4">
-            <Shield className="w-4 h-4 text-slate-500" />
-            <h3 className="text-[12px] text-slate-500 uppercase tracking-wider">System Status</h3>
-          </div>
+        <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-5">
+          <h3 className="text-[10px] font-semibold text-slate-500 uppercase tracking-[2px] mb-4">System</h3>
           <div className="space-y-2">
-            <div className="flex items-center justify-between py-2 border-b border-white/5">
-              <span className="text-[12px] text-slate-400">Total Rooms</span>
-              <span className="text-[12px] text-white font-medium">{totalRooms}</span>
+            <div className="flex items-center justify-between py-2 border-b border-white/[0.02]">
+              <span className="text-sm text-slate-500">Total Rooms</span>
+              <span className="text-sm text-white font-medium">{totalRooms}</span>
             </div>
-            <div className="flex items-center justify-between py-2 border-b border-white/5">
-              <span className="text-[12px] text-slate-400">Total Bookings</span>
-              <span className="text-[12px] text-white font-medium">{totalBookings}</span>
+            <div className="flex items-center justify-between py-2 border-b border-white/[0.02]">
+              <span className="text-sm text-slate-500">Total Bookings</span>
+              <span className="text-sm text-white font-medium">{totalBookings}</span>
             </div>
-            <div className="flex items-center justify-between py-2 border-b border-white/5">
-              <span className="text-[12px] text-slate-400">Total Guests</span>
-              <span className="text-[12px] text-white font-medium">{totalGuests}</span>
+            <div className="flex items-center justify-between py-2 border-b border-white/[0.02]">
+              <span className="text-sm text-slate-500">Total Guests</span>
+              <span className="text-sm text-white font-medium">{totalGuests}</span>
             </div>
-            <div className="flex items-center justify-between py-2 border-b border-white/5">
-              <span className="text-[12px] text-slate-400">Total Invoices</span>
-              <span className="text-[12px] text-white font-medium">{totalInvoices}</span>
+            <div className="flex items-center justify-between py-2 border-b border-white/[0.02]">
+              <span className="text-sm text-slate-500">Total Invoices</span>
+              <span className="text-sm text-white font-medium">{totalInvoices}</span>
             </div>
             <div className="flex items-center justify-between py-2">
-              <span className="text-[12px] text-slate-400">Storage</span>
-              <span className="text-[12px] text-white font-medium">localStorage</span>
+              <span className="text-sm text-slate-500">Storage</span>
+              <span className="text-sm text-white font-medium">localStorage</span>
             </div>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <div className="bg-dark-800 border border-white/5 p-5">
-          <div className="flex items-center gap-2 mb-4">
-            <Download className="w-4 h-4 text-slate-500" />
-            <h3 className="text-[12px] text-slate-500 uppercase tracking-wider">Export Data</h3>
-          </div>
-          <p className="text-[12px] text-slate-500 mb-3">Download a backup of all data as JSON.</p>
-          <button onClick={handleExport} className="px-4 py-2 bg-dark-700 hover:bg-dark-600 text-white text-[12px] font-medium rounded transition-colors flex items-center gap-2">
+        <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-5">
+          <h3 className="text-[10px] font-semibold text-slate-500 uppercase tracking-[2px] mb-2">Export</h3>
+          <p className="text-[12px] text-slate-600 mb-3">Download all data as JSON.</p>
+          <button onClick={handleExport} className="px-4 py-2 bg-dark-700 hover:bg-dark-600 text-slate-400 text-[12px] font-medium rounded transition-colors flex items-center gap-2">
             <Download className="w-3.5 h-3.5" /> Export Backup
           </button>
         </div>
 
-        <div className="bg-dark-800 border border-white/5 p-5">
-          <div className="flex items-center gap-2 mb-4">
-            <Database className="w-4 h-4 text-slate-500" />
-            <h3 className="text-[12px] text-slate-500 uppercase tracking-wider">Import Data</h3>
-          </div>
-          <p className="text-[12px] text-slate-500 mb-3">Restore from a backup JSON file.</p>
-          <label className="px-4 py-2 bg-dark-700 hover:bg-dark-600 text-white text-[12px] font-medium rounded transition-colors inline-flex items-center gap-2 cursor-pointer">
+        <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-5">
+          <h3 className="text-[10px] font-semibold text-slate-500 uppercase tracking-[2px] mb-2">Import</h3>
+          <p className="text-[12px] text-slate-600 mb-3">Restore from a JSON backup.</p>
+          <label className="px-4 py-2 bg-dark-700 hover:bg-dark-600 text-slate-400 text-[12px] font-medium rounded transition-colors inline-flex items-center gap-2 cursor-pointer">
             <Database className="w-3.5 h-3.5" /> Choose File
             <input type="file" accept=".json" onChange={handleFileImport} className="hidden" />
           </label>
-          {importError && <p className="text-[11px] text-red-400 mt-2">{importError}</p>}
+          {importError && <p className="text-[11px] text-red-400/70 mt-2">{importError}</p>}
         </div>
       </div>
 
-      <div className="bg-dark-800 border border-white/5 p-5">
-        <div className="flex items-center gap-2 mb-4">
-          <RefreshCw className="w-4 h-4 text-slate-500" />
-          <h3 className="text-[12px] text-slate-500 uppercase tracking-wider">Reset Data</h3>
-        </div>
-        <p className="text-[12px] text-slate-500 mb-3">Load demo data. This replaces all current data.</p>
-        <button onClick={() => setConfirmReset(true)} className="px-4 py-2 bg-dark-700 hover:bg-dark-600 text-white text-[12px] font-medium rounded transition-colors flex items-center gap-2">
+      <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-5">
+        <h3 className="text-[10px] font-semibold text-slate-500 uppercase tracking-[2px] mb-2">Reset</h3>
+        <p className="text-[12px] text-slate-600 mb-3">Replace all data with demo data.</p>
+        <button onClick={() => setConfirmReset(true)} className="px-4 py-2 bg-dark-700 hover:bg-dark-600 text-slate-400 text-[12px] font-medium rounded transition-colors flex items-center gap-2">
           <RefreshCw className="w-3.5 h-3.5" /> Load Demo Data
         </button>
       </div>
