@@ -4,7 +4,8 @@ import { formatCurrency, formatDate, statusColor } from '../data/utils';
 import { useToast } from '../components/Toast';
 import Modal from '../components/Modal';
 import ConfirmDialog from '../components/ConfirmDialog';
-import { Search, Eye, CheckCircle, XCircle, LogOut, Trash2, Printer, Plus } from 'lucide-react';
+import { Search, Eye, CheckCircle, XCircle, LogOut, Trash2, Printer, Plus, MessageCircle } from 'lucide-react';
+import { whatsappLink, confirmationMsg, preArrivalMsg, postStayMsg } from '../data/templates';
 
 export default function Bookings() {
   const { bookings, updateBookings, getGuest, getRoom, resort, rooms, guests, updateGuests } = useStore();
@@ -28,6 +29,17 @@ export default function Bookings() {
   };
 
   const del = (id) => setConfirmId(id);
+
+  const sendWhatsApp = (booking, type) => {
+    const g = getGuest(booking.guestId);
+    const r = getRoom(booking.roomId);
+    let msg;
+    if (type === 'confirm') msg = confirmationMsg(booking, g, r, resort);
+    else if (type === 'arrival') msg = preArrivalMsg(booking, g, r, resort);
+    else msg = postStayMsg(g, resort);
+    const link = whatsappLink(g?.phone || '', msg);
+    if (link !== '#') window.open(link, '_blank');
+  };
 
   const printInvoice = (booking) => {
     const g = getGuest(booking.guestId);
@@ -191,6 +203,7 @@ export default function Bookings() {
                     <td className="py-3 px-4">
                       <div className="flex gap-1">
                         <button onClick={() => setDetail(b)} className="p-1 text-slate-600 hover:text-amber-400 transition-colors"><Eye className="w-3.5 h-3.5" /></button>
+                        <button onClick={() => sendWhatsApp(b, 'confirm')} className="p-1 text-slate-600 hover:text-emerald-400 transition-colors"><MessageCircle className="w-3.5 h-3.5" /></button>
                         {b.status === 'Pending' && <><button onClick={() => update(b.id, 'Confirmed')} className="p-1 text-emerald-500/60 hover:text-emerald-400 transition-colors"><CheckCircle className="w-3.5 h-3.5" /></button><button onClick={() => update(b.id, 'Cancelled')} className="p-1 text-red-500/60 hover:text-red-400 transition-colors"><XCircle className="w-3.5 h-3.5" /></button></>}
                         {b.status === 'Confirmed' && <><button onClick={() => update(b.id, 'Checked Out')} className="p-1 text-blue-500/60 hover:text-blue-400 transition-colors"><LogOut className="w-3.5 h-3.5" /></button><button onClick={() => update(b.id, 'Cancelled')} className="p-1 text-red-500/60 hover:text-red-400 transition-colors"><XCircle className="w-3.5 h-3.5" /></button></>}
                         {(b.status === 'Checked Out' || b.status === 'Cancelled') && <button onClick={() => del(b.id)} className="p-1 text-slate-600 hover:text-red-400 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>}
@@ -231,6 +244,7 @@ export default function Bookings() {
               {detail.specialRequests && <div className="text-[13px] text-slate-500 bg-dark-700/50 rounded p-3 border border-white/[0.02]"><p className="text-slate-600 text-[10px] font-semibold uppercase tracking-[1.5px] mb-1">Special Requests</p>{detail.specialRequests}</div>}
               <div className="flex gap-2 pt-1">
                 <button onClick={() => printInvoice(detail)} className="px-3 py-2 bg-dark-700 hover:bg-dark-600 text-slate-400 text-[12px] font-medium rounded transition-colors flex items-center gap-1.5"><Printer className="w-3.5 h-3.5" /> Print</button>
+                <button onClick={() => sendWhatsApp(detail, 'confirm')} className="px-3 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-[12px] font-medium rounded transition-colors flex items-center gap-1.5"><MessageCircle className="w-3.5 h-3.5" /> WhatsApp</button>
                 {detail.status === 'Pending' && <button onClick={() => { update(detail.id, 'Confirmed'); setDetail(null); }} className="flex-1 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-[12px] font-medium rounded transition-colors">Confirm</button>}
                 {detail.status === 'Confirmed' && <button onClick={() => { update(detail.id, 'Checked Out'); setDetail(null); }} className="flex-1 py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 text-[12px] font-medium rounded transition-colors">Check Out</button>}
               </div>

@@ -4,7 +4,8 @@ import { formatCurrency, formatDate } from '../data/utils';
 import { useToast } from '../components/Toast';
 import Modal from '../components/Modal';
 import GuestTimeline from '../components/GuestTimeline';
-import { Search, Eye, Star, UserPlus } from 'lucide-react';
+import { Search, Eye, Star, UserPlus, MessageCircle } from 'lucide-react';
+import { whatsappLink } from '../data/templates';
 
 export default function Guests() {
   const { guests, updateGuests } = useStore();
@@ -59,7 +60,7 @@ export default function Guests() {
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
         {filtered.map(g => (
           <div key={g.id} className="bg-dark-800/50 rounded-lg border border-white/[0.02] hover:border-white/[0.05] transition-colors p-4 cursor-pointer" onClick={() => setDetail(g)}>
-            <div className="flex items-start justify-between mb-3">
+              <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-500/15 to-amber-600/5 flex items-center justify-center text-amber-400/70 text-sm font-medium flex-shrink-0">{g.name.charAt(0)}</div>
                 <div>
@@ -70,7 +71,10 @@ export default function Guests() {
                   <p className="text-[11px] text-slate-600">{g.id}</p>
                 </div>
               </div>
-              <Eye className="w-3.5 h-3.5 text-slate-600" />
+              <div className="flex items-center gap-1">
+                <button onClick={(e) => { e.stopPropagation(); const link = whatsappLink(g.phone, `Hi ${g.name}!`); if (link !== '#') window.open(link, '_blank'); }} className="p-1 text-slate-600 hover:text-emerald-400 transition-colors"><MessageCircle className="w-3.5 h-3.5" /></button>
+                <Eye className="w-3.5 h-3.5 text-slate-600" />
+              </div>
             </div>
             <div className="flex items-center gap-3 mb-3">
               <div className="flex-1 bg-dark-700/30 rounded px-2.5 py-2">

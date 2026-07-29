@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useStore } from '../hooks/useStore';
 import { useToast } from '../components/Toast';
-import { RefreshCw, Download, Database, AlertTriangle } from 'lucide-react';
+import { RefreshCw, Download, Database, AlertTriangle, MessageCircle } from 'lucide-react';
 import ConfirmDialog from '../components/ConfirmDialog';
 
 export default function Settings() {
@@ -13,10 +13,11 @@ export default function Settings() {
   const [importError, setImportError] = useState('');
   const [adminName, setAdminName] = useState(store.resort?.name || 'resort-demo/admin');
   const [currency, setCurrency] = useState(store.resort?.currency || '₹');
+  const [whatsappPhone, setWhatsappPhone] = useState(store.resort?.whatsappPhone || '');
 
   const saveResort = (e) => {
     e.preventDefault();
-    store.updateResort({ name: adminName, currency });
+    store.updateResort({ ...store.resort, name: adminName, currency, whatsappPhone });
     toast('Settings saved', 'success');
   };
 
@@ -112,6 +113,17 @@ export default function Settings() {
               <span className="text-sm text-white font-medium">localStorage</span>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-5">
+        <h3 className="text-[10px] font-semibold text-slate-500 uppercase tracking-[2px] mb-4 flex items-center gap-2">
+          <MessageCircle className="w-3.5 h-3.5 text-emerald-400" /> WhatsApp
+        </h3>
+        <div>
+          <label className="block text-[11px] text-slate-600 mb-1">Owner's WhatsApp Number (with country code)</label>
+          <input value={whatsappPhone} onChange={e => setWhatsappPhone(e.target.value)} className="w-full px-3 py-2 bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10" placeholder="+9198XXXXXXXX" />
+          <p className="text-[10px] text-slate-600 mt-1">Used in quick-send confirmation messages so guests can reach you.</p>
         </div>
       </div>
 

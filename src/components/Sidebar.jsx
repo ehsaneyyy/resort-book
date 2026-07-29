@@ -1,7 +1,8 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, BedDouble, CalendarDays, Users, BarChart3, DollarSign, Settings, CalendarCheck, Menu, X } from 'lucide-react';
+import { LayoutDashboard, BedDouble, CalendarDays, Users, BarChart3, DollarSign, Settings, CalendarCheck, Menu, X, MessageCircle, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useStore } from '../hooks/useStore';
+import WhatsAppQuickAdd from './WhatsAppQuickAdd';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -16,6 +17,7 @@ const navItems = [
 
 export default function Sidebar() {
   const [open, setOpen] = useState(false);
+  const [showQuickAdd, setShowQuickAdd] = useState(false);
   const location = useLocation();
   const { bookings } = useStore();
   const pending = bookings.filter(b => b.status === 'Pending').length;
@@ -61,7 +63,17 @@ export default function Sidebar() {
             );
           })}
         </nav>
+
+        <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-white/[0.02]">
+          <button onClick={() => { setOpen(false); setShowQuickAdd(true); }} className="flex items-center gap-3 px-3 py-2 w-full text-[13px] text-slate-600 hover:text-emerald-400 transition-colors border-l-2 border-transparent hover:border-emerald-500/60">
+            <MessageCircle className="w-4 h-4" />
+            <span>Quick Add</span>
+            <Plus className="w-3 h-3 ml-auto" />
+          </button>
+        </div>
       </aside>
+
+      {showQuickAdd && <WhatsAppQuickAdd onClose={() => setShowQuickAdd(false)} />}
     </>
   );
 }

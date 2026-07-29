@@ -19,7 +19,7 @@ export function StoreProvider({ children }) {
   const [bookings, setBookings] = useState(() => load('bookings', BOOKINGS));
   const [guests, setGuests] = useState(() => load('guests', GUESTS));
   const [seasonal, setSeasonal] = useState(() => load('seasonal', SEASONAL));
-  const [resort] = useState(() => load('resort', RESORT));
+  const [resort, setResort] = useState(() => load('resort', RESORT));
 
   const persist = useCallback((setter, key) => (updater) => {
     setter(prev => {
@@ -33,6 +33,7 @@ export function StoreProvider({ children }) {
   const updateBookings = persist(setBookings, 'bookings');
   const updateGuests = persist(setGuests, 'guests');
   const updateSeasonal = persist(setSeasonal, 'seasonal');
+  const updateResort = persist(setResort, 'resort');
 
   const getGuest = (id) => guests.find(g => g.id === id);
   const getRoom = (id) => rooms.find(r => r.id === id);
@@ -46,7 +47,7 @@ export function StoreProvider({ children }) {
     setSeasonal(JSON.parse(JSON.stringify(SEASONAL)));
   };
 
-  const value = { rooms, bookings, guests, seasonal, resort, getGuest, getRoom, getBooking, updateRooms, updateBookings, updateGuests, updateSeasonal, resetAll };
+  const value = { rooms, bookings, guests, seasonal, resort, getGuest, getRoom, getBooking, updateRooms, updateBookings, updateGuests, updateSeasonal, updateResort, resetAll };
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }
