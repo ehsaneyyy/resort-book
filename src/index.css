@@ -37,3 +37,9 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--color-dark-600); border-radius: 2px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--color-dark-500); }
+
+@media print {
+  body > *:not(.print-overlay) { display: none !important; }
+  body { background: #fff !important; }
+  .print-overlay { display: block !important; position: static !important; }
+}

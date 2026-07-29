@@ -4,6 +4,7 @@ import { formatCurrency, formatDate, statusColor, today } from '../data/utils';
 import { useToast } from '../components/Toast';
 import Modal from '../components/Modal';
 import ConfirmDialog from '../components/ConfirmDialog';
+import PrintInvoice from '../components/PrintInvoice';
 import { Search, Eye, CheckCircle, XCircle, LogOut, Trash2, Printer, Plus, MessageCircle } from 'lucide-react';
 import { whatsappLink, confirmationMsg, preArrivalMsg, postStayMsg } from '../data/templates';
 
@@ -41,70 +42,11 @@ export default function Bookings() {
     if (link !== '#') window.open(link, '_blank');
   };
 
-  const printInvoice = (booking) => {
-    const g = getGuest(booking.guestId);
-    const r = getRoom(booking.roomId);
-    const taxAmount = Math.round(booking.total * (resort.taxRate / (100 + resort.taxRate)));
-    const subtotal = booking.total - taxAmount;
-    const initials = resort.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-    const w = window.open('', '_blank');
-    w.document.write(`<!DOCTYPE html><html><head><title>Booking ${booking.id}</title><style>
-      *{margin:0;padding:0;box-sizing:border-box}
-      body{font-family:system-ui,-apple-system,sans-serif;padding:40px;color:#1a1a2e;line-height:1.5}
-      .header{text-align:center;margin-bottom:24px;border-bottom:2px solid #c9995a;padding-bottom:16px}
-      .header .logo{display:inline-block;width:40px;height:40px;background:#c9995a;border-radius:6px;text-align:center;line-height:40px;color:#fff;font-size:14px;font-weight:600;margin-bottom:6px}
-      .header h1{font-size:16px;color:#1a1a2e;font-weight:600;margin-bottom:2px}
-      .header p{font-size:11px;color:#888}
-      .section{margin-bottom:16px}
-      .section h3{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#999;margin-bottom:8px;border-bottom:1px solid #eee;padding-bottom:4px}
-      .row{display:flex;justify-content:space-between;padding:3px 0;font-size:12px}
-      .row .label{color:#888}
-      .row .value{font-weight:500;color:#1a1a2e}
-      .total-row{font-size:14px;text-align:right;margin-top:12px;padding-top:10px;border-top:2px solid #c9995a;color:#c9995a;font-weight:600}
-      .footer{text-align:center;margin-top:24px;font-size:10px;color:#aaa;border-top:1px solid #eee;padding-top:12px}
-      @media print{body{padding:20px}}
-    </style></head><body>
-      <div class="header">
-        <div class="logo">${initials}</div>
-        <h1>${resort.name}</h1>
-        <p>${resort.address}</p>
-        <p>${resort.phone} · ${resort.email}</p>
-      </div>
-      <div class="section">
-        <h3>Booking</h3>
-        <div class="row"><span class="label">ID</span><span class="value">${booking.id}</span></div>
-        <div class="row"><span class="label">Status</span><span class="value">${booking.status}</span></div>
-        <div class="row"><span class="label">Source</span><span class="value">${booking.source}</span></div>
-      </div>
-      <div class="section">
-        <h3>Guest</h3>
-        <div class="row"><span class="label">Name</span><span class="value">${g?.name || 'N/A'}</span></div>
-        <div class="row"><span class="label">Phone</span><span class="value">${g?.phone || 'N/A'}</span></div>
-        <div class="row"><span class="label">Email</span><span class="value">${g?.email || 'N/A'}</span></div>
-      </div>
-      <div class="section">
-        <h3>Stay</h3>
-        <div class="row"><span class="label">Room</span><span class="value">${r?.name || booking.roomId}</span></div>
-        <div class="row"><span class="label">Check-in</span><span class="value">${formatDate(booking.checkIn)} at ${resort.checkInTime}</span></div>
-        <div class="row"><span class="label">Check-out</span><span class="value">${formatDate(booking.checkOut)} at ${resort.checkOutTime}</span></div>
-        <div class="row"><span class="label">Nights</span><span class="value">${booking.nights}</span></div>
-        <div class="row"><span class="label">Guests</span><span class="value">${booking.adults}A${booking.children ? ', ' + booking.children + 'C' : ''}</span></div>
-      </div>
-      <div class="section">
-        <h3>Billing</h3>
-        <div class="row"><span class="label">Room charges</span><span class="value">${formatCurrency(subtotal)}</span></div>
-        <div class="row"><span class="label">Tax (${resort.taxRate}%)</span><span class="value">${formatCurrency(taxAmount)}</span></div>
-        <div class="total-row">Total: ${formatCurrency(booking.total)}</div>
-        <div class="row" style="margin-top:6px"><span class="label">Payment</span><span class="value">${booking.paymentStatus} (${booking.paymentMethod})</span></div>
-      </div>
-      ${booking.specialRequests ? '<div class="section"><h3>Special Requests</h3><p style="font-size:12px;color:#555">' + booking.specialRequests + '</p></div>' : ''}
-      <div class="footer">
-        <p>${resort.name} · Generated ${new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-      </div>
-    </body></html>`);
-    w.document.close();
-    w.print();
-  };
+  const [printBooking, setPrintBooking] = useState(null);
+  const printGuest = printBooking ? getGuest(printBooking.guestId) : null;
+  const printRoom = printBooking ? getRoom(printBooking.roomId) : null;
+
+  const printInvoice = (booking) => setPrintBooking(booking);
 
   const stats = { total: bookings.length, Confirmed: bookings.filter(b => b.status === 'Confirmed').length, Pending: bookings.filter(b => b.status === 'Pending').length, Cancelled: bookings.filter(b => b.status === 'Cancelled').length, 'Checked Out': bookings.filter(b => b.status === 'Checked Out').length };
 
@@ -315,6 +257,8 @@ export default function Bookings() {
           </form>
         </Modal>
       )}
+
+      {printBooking && <PrintInvoice booking={printBooking} guest={printGuest} room={printRoom} resort={resort} onClose={() => setPrintBooking(null)} />}
     </div>
   );
 }
