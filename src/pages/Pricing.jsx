@@ -68,8 +68,8 @@ export default function Pricing() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <p className="text-[12px] text-slate-600">{seasonal.length} rules · {seasonal.filter(s => s.isActive).length} active</p>
-        <button onClick={openAdd} className="px-3 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-[12px] font-medium rounded transition-colors flex items-center gap-1.5">
+        <p className="text-xs text-slate-500">{seasonal.length} rules · {seasonal.filter(s => s.isActive).length} active</p>
+        <button onClick={openAdd} className="px-3 py-2 min-h-[44px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-medium rounded transition-colors flex items-center gap-1.5">
           <Plus className="w-4 h-4" /> Add Rule
         </button>
       </div>
@@ -78,7 +78,7 @@ export default function Pricing() {
         {presets.map((p, i) => (
           <button key={i} onClick={() => openPreset(p)} className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-4 text-left hover:border-white/[0.05] transition-colors">
             <h3 className="text-sm text-white font-medium mb-0.5">{p.name}</h3>
-            <p className="text-[12px] text-slate-600">{p.adjustment > 0 ? '+' : ''}{p.adjustment}%</p>
+            <p className="text-xs text-slate-500">{p.adjustment > 0 ? '+' : ''}{p.adjustment}%</p>
           </button>
         ))}
       </div>
@@ -89,22 +89,22 @@ export default function Pricing() {
             <div className="flex items-start sm:items-center justify-between gap-3 flex-wrap">
               <div className="flex items-center gap-3">
                 <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${rule.isActive ? 'bg-emerald-500/10' : 'bg-dark-700/50'}`}>
-                  <Calendar className={`w-4 h-4 ${rule.isActive ? 'text-emerald-400/70' : 'text-slate-600'}`} />
+                  <Calendar className={`w-4 h-4 ${rule.isActive ? 'text-emerald-400/70' : 'text-slate-500'}`} />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="text-sm text-white font-medium">{rule.name}</h3>
-                    <span className={`text-[9px] font-medium ${rule.isActive ? 'text-emerald-400/70' : 'text-slate-600'}`}>{rule.isActive ? 'Active' : 'Off'}</span>
+                    <span className={`text-[9px] font-medium ${rule.isActive ? 'text-emerald-400/70' : 'text-slate-500'}`}>{rule.isActive ? 'Active' : 'Off'}</span>
                   </div>
-                  <p className="text-[12px] text-slate-600">{formatPeriod(rule.startDate, rule.endDate)}</p>
+                  <p className="text-xs text-slate-500">{formatPeriod(rule.startDate, rule.endDate)}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 flex-shrink-0">
                 <p className={`text-base font-medium ${rule.adjustment >= 0 ? 'text-white' : 'text-red-400/70'}`}>{rule.adjustment > 0 ? '+' : ''}{rule.adjustment}%</p>
                 <div className="flex gap-1">
-                  <button onClick={() => toggle(rule)} className={`px-3 py-1.5 text-[12px] font-medium rounded transition-colors ${rule.isActive ? 'bg-amber-500/10 text-amber-400 hover:bg-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'}`}>{rule.isActive ? 'Off' : 'On'}</button>
-                  <button onClick={() => openEdit(rule)} className="p-2 text-slate-600 hover:text-amber-400 transition-colors"><Edit3 className="w-4 h-4" /></button>
-                  <button onClick={() => del(rule.id)} className="p-2 text-slate-600 hover:text-red-400 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                  <button onClick={() => toggle(rule)} className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${rule.isActive ? 'bg-amber-500/10 text-amber-400 hover:bg-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'}`}>{rule.isActive ? 'Off' : 'On'}</button>
+                  <button onClick={() => openEdit(rule)} className="p-2 text-slate-500 hover:text-amber-400 transition-colors"><Edit3 className="w-4 h-4" /></button>
+                  <button onClick={() => del(rule.id)} className="p-2 text-slate-500 hover:text-red-400 transition-colors"><Trash2 className="w-4 h-4" /></button>
                 </div>
               </div>
             </div>
@@ -115,22 +115,22 @@ export default function Pricing() {
       {modal && (
         <Modal title={modal === 'edit' ? 'Edit Rule' : 'Add Rule'} onClose={() => setModal(null)}>
           <form onSubmit={save} className="space-y-4">
-            <div><label className="block text-[12px] font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Name</label><input required value={form.name || ''} onChange={e => setForm({ ...form, name: e.target.value })} className="w-full px-3 py-2 bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10" /></div>
+            <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Name</label><input required value={form.name || ''} onChange={e => setForm({ ...form, name: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" /></div>
             <div className="grid grid-cols-2 gap-3">
-              <div><label className="block text-[12px] font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Start</label><input required type="date" value={form.startDate || ''} onChange={e => setForm({ ...form, startDate: e.target.value })} className="w-full px-3 py-2 bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10" /></div>
-              <div><label className="block text-[12px] font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">End</label><input required type="date" value={form.endDate || ''} onChange={e => setForm({ ...form, endDate: e.target.value })} className="w-full px-3 py-2 bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10" /></div>
+              <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Start</label><input required type="date" value={form.startDate || ''} onChange={e => setForm({ ...form, startDate: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" /></div>
+              <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">End</label><input required type="date" value={form.endDate || ''} onChange={e => setForm({ ...form, endDate: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" /></div>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div><label className="block text-[12px] font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Adjustment</label><input required type="number" value={form.adjustment ?? ''} onChange={e => setForm({ ...form, adjustment: e.target.value })} className="w-full px-3 py-2 bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10" placeholder="+20 or -10" /></div>
-              <div><label className="block text-[12px] font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Type</label><select value={form.type || ''} onChange={e => setForm({ ...form, type: e.target.value })} className="w-full px-3 py-2 bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10"><option value="percentage">Percentage (%)</option><option value="fixed">Fixed (₹)</option></select></div>
+              <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Adjustment</label><input required type="number" value={form.adjustment ?? ''} onChange={e => setForm({ ...form, adjustment: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" placeholder="+20 or -10" /></div>
+              <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Type</label><select value={form.type || ''} onChange={e => setForm({ ...form, type: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50"><option value="percentage">Percentage (%)</option><option value="fixed">Fixed (₹)</option></select></div>
             </div>
             <div className="flex items-center gap-2">
               <input type="checkbox" id="active" checked={form.isActive ?? true} onChange={e => setForm({ ...form, isActive: e.target.checked })} className="w-4 h-4 accent-amber-500" />
-              <label htmlFor="active" className="text-[13px] text-slate-400">Active</label>
+              <label htmlFor="active" className="text-sm text-slate-400">Active</label>
             </div>
             <div className="flex gap-2 pt-2">
-              <button type="submit" className="flex-1 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-[12px] font-medium rounded transition-colors">{modal === 'edit' ? 'Update' : 'Create'}</button>
-              <button type="button" onClick={() => setModal(null)} className="px-4 py-2 bg-dark-700 text-slate-400 text-[12px] rounded transition-colors">Cancel</button>
+              <button type="submit" className="flex-1 py-2 min-h-[44px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-medium rounded transition-colors">{modal === 'edit' ? 'Update' : 'Create'}</button>
+              <button type="button" onClick={() => setModal(null)} className="px-4 py-2 min-h-[44px] bg-dark-700 text-slate-400 text-xs rounded transition-colors">Cancel</button>
             </div>
           </form>
         </Modal>

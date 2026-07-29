@@ -44,7 +44,7 @@ export default function GuestTimeline({ guestId }) {
         return (
           <div key={booking.id} className="relative">
             <div className="flex items-center gap-3 mb-3">
-              <span className={`px-2 py-0.5 text-[12px] rounded-full font-medium border ${statusColor(booking.status)}`}>{booking.status}</span>
+              <span className={`px-2.5 py-1 text-xs rounded-full font-medium border ${statusColor(booking.status)}`}>{booking.status}</span>
               <span className="text-xs text-slate-500">{booking.id}</span>
             </div>
             <div className="relative pl-6 border-l-2 border-white/10 space-y-4 ml-1.5">
@@ -56,7 +56,7 @@ export default function GuestTimeline({ guestId }) {
                   <div className="bg-dark-700/30 rounded-lg p-3 border border-white/5">
                     <div className="flex items-center justify-between mb-1">
                       <p className={`text-sm font-medium ${ev.color}`}>{ev.label}</p>
-                      <p className="text-[12px] text-slate-500">{formatDate(ev.date)}</p>
+                      <p className="text-xs text-slate-500">{formatDate(ev.date)}</p>
                     </div>
                     <p className="text-xs text-slate-400">{ev.detail}</p>
                   </div>

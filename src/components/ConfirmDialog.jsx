@@ -29,18 +29,18 @@ export default function ConfirmDialog({ title, message, onConfirm, onCancel, var
           <AlertTriangle className={`w-5 h-5 ${s.iconColor}`} />
         </div>
         <h3 className="text-sm font-medium text-white mb-1.5">{title}</h3>
-        <p className="text-[13px] text-slate-500 mb-5">{message}</p>
+        <p className="text-sm text-slate-500 mb-5">{message}</p>
         <div className="flex gap-2">
           <button
             ref={btnRef}
             onClick={onConfirm}
-            className={`flex-1 py-2.5 ${s.btn} font-medium rounded text-[12px] transition-colors`}
+            className={`flex-1 py-2.5 min-h-[44px] ${s.btn} font-medium rounded text-xs transition-colors`}
           >
             {confirmText}
           </button>
           <button
             onClick={onCancel}
-            className="px-5 py-2.5 bg-dark-700 hover:bg-dark-600 text-slate-400 text-[12px] font-medium rounded transition-colors"
+            className="px-5 py-2.5 min-h-[44px] bg-dark-700 hover:bg-dark-600 text-slate-400 text-xs font-medium rounded transition-colors"
           >
             Cancel
           </button>

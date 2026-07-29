@@ -23,7 +23,7 @@ export default function Sidebar({ sidebarOpen, onToggle }) {
 
   return (
     <>
-      <button onClick={onToggle} className="lg:hidden fixed top-3 left-3 z-50 flex items-center justify-center w-10 h-10 bg-dark-800/80 border border-white/[0.03] rounded-lg text-slate-500 hover:text-white transition-colors active:scale-95">
+      <button onClick={onToggle} className="lg:hidden fixed top-3 left-3 z-50 flex items-center justify-center min-w-[44px] min-h-[44px] bg-dark-800/80 border border-white/[0.03] rounded-lg text-slate-500 hover:text-white transition-colors active:scale-95">
         {sidebarOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
       </button>
 
@@ -35,10 +35,10 @@ export default function Sidebar({ sidebarOpen, onToggle }) {
             <span className="text-white text-[11px] font-semibold">RA</span>
           </div>
           <div className="min-w-0">
-            <p className="text-[13px] font-medium text-white truncate">resort-demo</p>
-            <p className="text-[9px] text-slate-600 tracking-wide uppercase">Admin Panel</p>
+            <p className="text-sm font-medium text-white truncate">resort-demo</p>
+            <p className="text-[9px] text-slate-500 tracking-wide uppercase">Admin Panel</p>
           </div>
-          <button onClick={onToggle} className="lg:hidden ml-auto flex items-center justify-center w-8 h-8 text-slate-600 hover:text-white rounded-lg transition-colors">
+          <button onClick={onToggle} className="lg:hidden ml-auto flex items-center justify-center w-8 h-8 text-slate-500 hover:text-white rounded-lg transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -51,7 +51,7 @@ export default function Sidebar({ sidebarOpen, onToggle }) {
                 key={item.to}
                 to={item.to}
                 onClick={onToggle}
-                className={`flex items-center gap-3 px-3 py-2.5 min-h-[44px] text-[13px] transition-colors rounded-lg ${isActive ? 'text-white bg-white/[0.04]' : 'text-slate-600 hover:text-slate-300 hover:bg-white/[0.02]'}`}
+                className={`flex items-center gap-3 px-3 py-2.5 min-h-[44px] text-sm transition-colors rounded-lg ${isActive ? 'text-white bg-white/[0.04]' : 'text-slate-500 hover:text-slate-300 hover:bg-white/[0.02]'}`}
               >
                 <item.icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-amber-400/80' : ''}`} />
                 <span>{item.label}</span>
@@ -64,7 +64,7 @@ export default function Sidebar({ sidebarOpen, onToggle }) {
         </nav>
 
         <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-white/[0.02]">
-          <button onClick={() => { onToggle(); setTimeout(() => setShowQuickAdd(true), 200); }} className="flex items-center gap-3 px-3 py-2.5 min-h-[44px] w-full text-[13px] text-slate-600 hover:text-emerald-400 transition-colors rounded-lg hover:bg-white/[0.02]">
+          <button onClick={() => { onToggle(); setTimeout(() => setShowQuickAdd(true), 200); }} className="flex items-center gap-3 px-3 py-2.5 min-h-[44px] w-full text-sm text-slate-500 hover:text-emerald-400 transition-colors rounded-lg hover:bg-white/[0.02]">
             <MessageCircle className="w-4 h-4" />
             <span>Quick Add</span>
             <Plus className="w-3 h-3 ml-auto" />

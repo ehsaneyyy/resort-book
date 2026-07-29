@@ -14,8 +14,8 @@ export default function Layout() {
       <div className="lg:ml-56">
         <header className="sticky top-0 z-30 bg-dark-900/70 backdrop-blur-md border-b border-white/[0.02]">
           <div className="flex items-center justify-between h-13 px-4 sm:px-6 pl-14 lg:pl-6">
-            <h1 className="text-[15px] font-medium text-white tracking-tight">{pageName}</h1>
-            <span className="text-[12px] text-slate-600">{today}</span>
+            <h1 className="text-base font-medium text-white tracking-tight">{pageName}</h1>
+            <span className="text-xs text-slate-500">{today}</span>
           </div>
         </header>
         <main className="p-4 sm:p-6">

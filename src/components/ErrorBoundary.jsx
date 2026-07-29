@@ -23,7 +23,7 @@ export default class ErrorBoundary extends Component {
             <p className="text-slate-400 text-sm mb-6">
               An unexpected error occurred. Your data is safe — this is a display issue.
             </p>
-            <p className="text-xs text-slate-600 bg-dark-800 rounded-xl p-3 mb-6 font-mono break-all">
+            <p className="text-xs text-slate-500 bg-dark-800 rounded-xl p-3 mb-6 font-mono break-all">
               {this.state.error?.message || 'Unknown error'}
             </p>
             <button

@@ -9,17 +9,19 @@ function load(key, fallback) {
 }
 
 function save(key, data) {
-  localStorage.setItem('rh_' + key, JSON.stringify(data));
+  try { localStorage.setItem('rh_' + key, JSON.stringify(data)); } catch {}
 }
 
 const VERSION_KEY = 'rh_seed_version';
 
 function initSeed() {
-  const stored = localStorage.getItem(VERSION_KEY);
-  if (stored !== String(SEED_VERSION)) {
-    localStorage.clear();
-    localStorage.setItem(VERSION_KEY, String(SEED_VERSION));
-  }
+  try {
+    const stored = localStorage.getItem(VERSION_KEY);
+    if (stored !== String(SEED_VERSION)) {
+      localStorage.clear();
+      localStorage.setItem(VERSION_KEY, String(SEED_VERSION));
+    }
+  } catch {}
 }
 
 const StoreContext = createContext(null);
@@ -52,11 +54,12 @@ export function StoreProvider({ children }) {
   const getBooking = (id) => bookings.find(b => b.id === id);
 
   const resetAll = () => {
-    localStorage.clear();
+    try { localStorage.clear(); } catch {}
     setRooms(JSON.parse(JSON.stringify(ROOMS)));
     setBookings(JSON.parse(JSON.stringify(BOOKINGS)));
     setGuests(JSON.parse(JSON.stringify(GUESTS)));
     setSeasonal(JSON.parse(JSON.stringify(SEASONAL)));
+    setResort(JSON.parse(JSON.stringify(RESORT)));
   };
 
   const value = { rooms, bookings, guests, seasonal, resort, getGuest, getRoom, getBooking, updateRooms, updateBookings, updateGuests, updateSeasonal, updateResort, resetAll };
