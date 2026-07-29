@@ -2,10 +2,8 @@ import { useState, useMemo } from 'react';
 import { useStore } from '../hooks/useStore';
 import { formatCurrency, today } from '../data/utils';
 
-function getDaysInMonth(y, m) { return new Date(y, m + 1, 0).getDate(); }
-
 export default function Reports() {
-  const { bookings, rooms, seasonal, getGuest, getRoom } = useStore();
+  const { bookings, seasonal, getRoom } = useStore();
   const todayStr = today();
   const [range, setRange] = useState('month');
 
@@ -48,9 +46,7 @@ export default function Reports() {
       revenueByRoomType[type] = (revenueByRoomType[type] || 0) + b.total;
     });
     const topRooms = {};
-    confirmed.forEach(b => {
-      topRooms[b.roomId] = (topRooms[b.roomId] || 0) + 1;
-    });
+    confirmed.forEach(b => { topRooms[b.roomId] = (topRooms[b.roomId] || 0) + 1; });
     const sortedRooms = Object.entries(topRooms).sort((a, b) => b[1] - a[1]).map(([id, count]) => ({ room: getRoom(id), count }));
     const sourceStats = {};
     confirmed.forEach(b => { sourceStats[b.source] = (sourceStats[b.source] || 0) + 1; });
@@ -76,36 +72,36 @@ export default function Reports() {
   const maxRevenue = Math.max(...yearlyRevenue, 1);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-2">
+    <div className="space-y-5">
+      <div className="flex gap-1">
         {['week', 'month', 'quarter', 'year'].map(r => (
-          <button key={r} onClick={() => setRange(r)} className={`px-4 py-2 rounded-xl text-sm font-medium transition border capitalize ${range === r ? 'bg-white/10 text-white border-white/10' : 'text-slate-400 hover:text-white border-transparent'}`}>{r}</button>
+          <button key={r} onClick={() => setRange(r)} className={`px-3 py-1.5 rounded text-[12px] font-medium transition-colors capitalize ${range === r ? 'bg-white/10 text-white' : 'text-slate-500 hover:text-slate-300'}`}>{r}</button>
         ))}
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
-          { label: 'Total Revenue', value: formatCurrency(stats.revenue), color: 'text-emerald-400' },
-          { label: 'Total Bookings', value: stats.totalBookings, color: 'text-white' },
-          { label: 'Avg Rate', value: formatCurrency(stats.avgRate), color: 'text-amber-400' },
-          { label: 'Avg Stay', value: stats.avgNights + 'N', color: 'text-blue-400' },
+          { label: 'Revenue', value: formatCurrency(stats.revenue) },
+          { label: 'Bookings', value: stats.totalBookings },
+          { label: 'Avg Rate', value: formatCurrency(stats.avgRate) },
+          { label: 'Avg Stay', value: stats.avgNights + 'N' },
         ].map((s, i) => (
-          <div key={i} className="bg-dark-800/50 rounded-2xl border border-white/5 p-5">
-            <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">{s.label}</p>
-            <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
+          <div key={i} className="bg-dark-800 border border-white/5 p-4">
+            <p className="text-[11px] text-slate-500 uppercase tracking-wider mb-1">{s.label}</p>
+            <p className="text-lg font-semibold text-white">{s.value}</p>
           </div>
         ))}
       </div>
 
-      <div className="bg-dark-800/50 rounded-2xl border border-white/5 p-6">
-        <h3 className="text-sm font-medium text-slate-400 mb-4">Monthly Revenue Trend ({new Date().getFullYear()})</h3>
-        <div className="space-y-2">
+      <div className="bg-dark-800 border border-white/5 p-4">
+        <h3 className="text-[11px] text-slate-500 uppercase tracking-wider mb-3">Revenue ({new Date().getFullYear()})</h3>
+        <div className="space-y-1.5">
           {yearlyRevenue.map((rev, i) => (
-            <div key={i} className="flex items-center gap-3">
-              <span className="text-xs text-slate-500 w-8 text-right">{monthLabels[i]}</span>
-              <div className="flex-1 h-6 bg-dark-700/50 rounded-lg overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-brand-500 to-brand-600 rounded-lg flex items-center pl-2" style={{ width: `${(rev / maxRevenue) * 100}%` }}>
-                  {rev > 0 && <span className="text-[10px] text-white font-medium">{formatCurrency(rev)}</span>}
+            <div key={i} className="flex items-center gap-2">
+              <span className="text-[10px] text-slate-600 w-6 text-right">{monthLabels[i]}</span>
+              <div className="flex-1 h-5 bg-dark-700/50 rounded-sm overflow-hidden">
+                <div className="h-full bg-brand-600/80 flex items-center pl-1.5" style={{ width: `${(rev / maxRevenue) * 100}%` }}>
+                  {rev > 0 && <span className="text-[9px] text-white font-medium">{formatCurrency(rev)}</span>}
                 </div>
               </div>
             </div>
@@ -113,51 +109,48 @@ export default function Reports() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-dark-800/50 rounded-2xl border border-white/5 p-6">
-          <h3 className="text-sm font-medium text-slate-400 mb-4">Revenue by Room Type</h3>
-          <div className="space-y-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="bg-dark-800 border border-white/5 p-4">
+          <h3 className="text-[11px] text-slate-500 uppercase tracking-wider mb-3">Revenue by Type</h3>
+          <div className="space-y-2">
             {Object.entries(stats.revenueByRoomType).sort((a, b) => b[1] - a[1]).map(([type, rev]) => (
-              <div key={type} className="flex items-center justify-between p-3 bg-dark-700/50 rounded-xl">
-                <span className="text-sm text-white">{type}</span>
-                <span className="text-sm font-medium text-amber-400">{formatCurrency(rev)}</span>
+              <div key={type} className="flex items-center justify-between p-2 bg-dark-700/30 rounded text-[12px]">
+                <span className="text-white">{type}</span>
+                <span className="text-slate-300 font-medium">{formatCurrency(rev)}</span>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="bg-dark-800/50 rounded-2xl border border-white/5 p-6">
-          <h3 className="text-sm font-medium text-slate-400 mb-4">Top Rooms</h3>
-          <div className="space-y-3">
+        <div className="bg-dark-800 border border-white/5 p-4">
+          <h3 className="text-[11px] text-slate-500 uppercase tracking-wider mb-3">Top Rooms</h3>
+          <div className="space-y-2">
             {stats.sortedRooms.slice(0, 5).map((r, i) => (
-              <div key={i} className="flex items-center gap-3 p-3 bg-dark-700/50 rounded-xl">
-                <div className="w-10 h-10 bg-brand-500/20 rounded-xl flex items-center justify-center text-brand-400 text-sm font-bold">{i + 1}</div>
+              <div key={i} className="flex items-center gap-2.5 p-2 bg-dark-700/30 rounded">
+                <div className="w-7 h-7 bg-dark-700 rounded flex items-center justify-center text-[10px] font-medium text-slate-400">{i + 1}</div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-white font-medium">{r.room?.name || 'Unknown'}</p>
-                  <p className="text-[10px] text-slate-500">{r.room?.type}</p>
+                  <p className="text-[12px] text-white">{r.room?.name || 'Unknown'}</p>
+                  <p className="text-[10px] text-slate-600">{r.room?.type}</p>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm font-bold text-white">{r.count}</p>
-                  <p className="text-[10px] text-slate-500">bookings</p>
-                </div>
+                <p className="text-[12px] font-medium text-white">{r.count}</p>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="bg-dark-800/50 rounded-2xl border border-white/5 p-6">
-          <h3 className="text-sm font-medium text-slate-400 mb-4">Booking Sources</h3>
-          <div className="space-y-3">
+        <div className="bg-dark-800 border border-white/5 p-4">
+          <h3 className="text-[11px] text-slate-500 uppercase tracking-wider mb-3">Sources</h3>
+          <div className="space-y-2">
             {Object.entries(stats.sourceStats).sort((a, b) => b[1] - a[1]).map(([src, count]) => {
               const pct = Math.round((count / stats.confirmedBookings) * 100);
               return (
                 <div key={src} className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-white">{src}</span>
-                    <span className="text-xs text-slate-500">{count} ({pct}%)</span>
+                  <div className="flex items-center justify-between text-[12px]">
+                    <span className="text-white">{src}</span>
+                    <span className="text-slate-500">{count} ({pct}%)</span>
                   </div>
-                  <div className="h-2 bg-dark-700/50 rounded-full overflow-hidden">
-                    <div className="h-full bg-brand-500 rounded-full" style={{ width: `${pct}%` }} />
+                  <div className="h-1.5 bg-dark-700/50 rounded-sm overflow-hidden">
+                    <div className="h-full bg-brand-600/80 rounded-sm" style={{ width: `${pct}%` }} />
                   </div>
                 </div>
               );
@@ -165,16 +158,16 @@ export default function Reports() {
           </div>
         </div>
 
-        <div className="bg-dark-800/50 rounded-2xl border border-white/5 p-6">
-          <h3 className="text-sm font-medium text-slate-400 mb-4">Seasonal Rules</h3>
-          <div className="space-y-3">
+        <div className="bg-dark-800 border border-white/5 p-4">
+          <h3 className="text-[11px] text-slate-500 uppercase tracking-wider mb-3">Pricing Rules</h3>
+          <div className="space-y-2">
             {seasonal.map(s => (
-              <div key={s.id} className="p-3 bg-dark-700/50 rounded-xl">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm text-white font-medium">{s.name}</span>
-                  <span className={`px-2 py-0.5 text-[10px] rounded-full font-medium border ${s.isActive ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/20' : 'bg-red-500/20 text-red-400 border-red-500/20'}`}>{s.isActive ? 'Active' : 'Inactive'}</span>
+              <div key={s.id} className="p-2 bg-dark-700/30 rounded text-[12px]">
+                <div className="flex items-center justify-between mb-0.5">
+                  <span className="text-white font-medium">{s.name}</span>
+                  <span className={`text-[10px] font-medium ${s.isActive ? 'text-emerald-400' : 'text-slate-600'}`}>{s.isActive ? 'Active' : 'Off'}</span>
                 </div>
-                <p className="text-[10px] text-slate-500">{s.startDate} → {s.endDate} &middot; {s.adjustment > 0 ? '+' : ''}{s.adjustment}%</p>
+                <p className="text-[10px] text-slate-600">{s.startDate} → {s.endDate} · {s.adjustment > 0 ? '+' : ''}{s.adjustment}%</p>
               </div>
             ))}
           </div>

@@ -32,9 +32,7 @@ export default function Calendar() {
       bookings.forEach(b => {
         if (b.status === 'Cancelled') return;
         if (isInRange(dateStr, b.checkIn, b.checkOut)) {
-          const isCheckin = dateStr === b.checkIn;
-          const isCheckout = dateStr === b.checkOut;
-          events.push({ ...b, isCheckin, isCheckout, guest: getGuest(b.guestId) });
+          events.push({ ...b, isCheckin: dateStr === b.checkIn, isCheckout: dateStr === b.checkOut, guest: getGuest(b.guestId) });
         }
       });
       cells.push({ day: d, dateStr, events, isToday: dateStr === todayStr });
@@ -54,50 +52,50 @@ export default function Calendar() {
   }, [selected, bookings, rooms]);
 
   const roomColors = {};
-  const palette = ['bg-brand-500', 'bg-emerald-500', 'bg-blue-500', 'bg-purple-500', 'bg-rose-500', 'bg-amber-500', 'bg-teal-500'];
+  const palette = ['bg-brand-600', 'bg-emerald-600', 'bg-blue-600', 'bg-purple-600', 'bg-rose-600', 'bg-amber-600', 'bg-teal-600'];
   rooms.forEach((r, i) => { roomColors[r.id] = palette[i % palette.length]; });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <button onClick={prev} className="p-2 hover:bg-white/5 rounded-xl transition"><ChevronLeft className="w-5 h-5 text-slate-400" /></button>
-        <h2 className="text-xl font-bold text-white">{MONTH_NAMES[month]} {year}</h2>
-        <button onClick={next} className="p-2 hover:bg-white/5 rounded-xl transition"><ChevronRight className="w-5 h-5 text-slate-400" /></button>
+        <button onClick={prev} className="p-1.5 hover:bg-white/5 rounded transition-colors"><ChevronLeft className="w-4 h-4 text-slate-400" /></button>
+        <h2 className="text-sm font-medium text-white">{MONTH_NAMES[month]} {year}</h2>
+        <button onClick={next} className="p-1.5 hover:bg-white/5 rounded transition-colors"><ChevronRight className="w-4 h-4 text-slate-400" /></button>
       </div>
 
-      <div className="flex flex-wrap gap-2 text-xs">
+      <div className="flex flex-wrap gap-2 text-[10px]">
         {rooms.map(r => (
-          <div key={r.id} className="flex items-center gap-2">
-            <span className={`w-2 h-2 rounded-full ${roomColors[r.id]}`} />
-            <span className="text-slate-400">{r.name}</span>
+          <div key={r.id} className="flex items-center gap-1.5">
+            <span className={`w-2 h-2 rounded-sm ${roomColors[r.id]}`} />
+            <span className="text-slate-500">{r.name}</span>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-7 gap-px bg-white/5 rounded-2xl overflow-hidden">
+      <div className="grid grid-cols-7 gap-px bg-white/5">
         {DAYS.map(d => (
-          <div key={d} className="bg-dark-800/80 text-center py-2 text-xs font-medium text-slate-500">{d}</div>
+          <div key={d} className="bg-dark-800 text-center py-1.5 text-[10px] font-medium text-slate-500">{d}</div>
         ))}
         {calendarDays.map((cell, i) => {
-          if (!cell.day) return <div key={`e${i}`} className="bg-dark-800/20 min-h-[80px] lg:min-h-[120px]" />;
+          if (!cell.day) return <div key={`e${i}`} className="bg-dark-800/50 min-h-[60px] lg:min-h-[100px]" />;
           const isSelected = selected === cell.dateStr;
           return (
             <div
               key={cell.day}
               onClick={() => setSelected(isSelected ? null : cell.dateStr)}
-              className={`bg-dark-800/50 min-h-[80px] lg:min-h-[120px] p-1.5 cursor-pointer transition border border-transparent ${isSelected ? 'ring-2 ring-brand-500 bg-dark-700/50' : 'hover:bg-dark-700/30'} ${cell.isToday ? 'bg-white/[0.02]' : ''}`}
+              className={`bg-dark-800 min-h-[60px] lg:min-h-[100px] p-1 cursor-pointer transition-colors border ${isSelected ? 'border-brand-500/50 bg-dark-700/50' : 'border-transparent hover:bg-white/[0.02]'} ${cell.isToday ? 'bg-white/[0.02]' : ''}`}
             >
-              <div className="flex items-center justify-between mb-1">
-                <span className={`text-xs lg:text-sm font-medium ${cell.isToday ? 'text-brand-400' : 'text-slate-400'}`}>{cell.day}</span>
-                {cell.events.length > 0 && <span className="w-1.5 h-1.5 bg-brand-500 rounded-full" />}
+              <div className="flex items-center justify-between mb-0.5">
+                <span className={`text-[11px] font-medium ${cell.isToday ? 'text-brand-400' : 'text-slate-500'}`}>{cell.day}</span>
+                {cell.events.length > 0 && <span className="w-1 h-1 bg-brand-500 rounded-full" />}
               </div>
-              <div className="space-y-0.5">
+              <div className="space-y-px">
                 {cell.events.slice(0, 3).map((ev, j) => (
-                  <div key={j} className={`px-1 py-0.5 rounded text-[9px] lg:text-[10px] font-medium truncate ${roomColors[ev.roomId] || 'bg-slate-500'} text-white`}>
+                  <div key={j} className={`px-1 py-px rounded-sm text-[8px] lg:text-[9px] font-medium truncate ${roomColors[ev.roomId] || 'bg-slate-600'} text-white`}>
                     {ev.isCheckin ? '→ ' : ev.isCheckout ? '← ' : ''}{ev.guest?.name?.split(' ')[0] || ev.guestId}
                   </div>
                 ))}
-                {cell.events.length > 3 && <p className="text-[9px] text-slate-500 text-center">+{cell.events.length - 3} more</p>}
+                {cell.events.length > 3 && <p className="text-[8px] text-slate-600 text-center">+{cell.events.length - 3}</p>}
               </div>
             </div>
           );
@@ -105,29 +103,29 @@ export default function Calendar() {
       </div>
 
       {selected && (
-        <div className="bg-dark-800/50 rounded-2xl border border-white/5 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-white">{formatDate(selected)}</h3>
-            <span className="text-sm text-slate-500">{selectedEvents.length} booking{selectedEvents.length !== 1 ? 's' : ''}</span>
+        <div className="bg-dark-800 border border-white/5 p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-medium text-white">{formatDate(selected)}</h3>
+            <span className="text-[11px] text-slate-500">{selectedEvents.length} booking{selectedEvents.length !== 1 ? 's' : ''}</span>
           </div>
           {selectedEvents.length === 0 ? (
-            <p className="text-slate-500 text-sm">No bookings for this date</p>
+            <p className="text-[12px] text-slate-600">No bookings</p>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {selectedEvents.map((ev, i) => (
-                <div key={i} className="flex items-center gap-4 p-3 bg-dark-700/50 rounded-xl border border-white/5">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm font-bold ${roomColors[ev.roomId] || 'bg-slate-500'}`}>
-                    <BedDouble className="w-5 h-5" />
+                <div key={i} className="flex items-center gap-3 p-2.5 bg-dark-700/50 rounded border border-white/5">
+                  <div className={`w-8 h-8 rounded flex items-center justify-center text-white text-[10px] font-medium ${roomColors[ev.roomId] || 'bg-slate-600'}`}>
+                    <BedDouble className="w-4 h-4" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="text-white text-sm font-medium">{ev.room?.name || ev.roomId}</p>
-                      {ev.isCheckin && <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-400 text-[10px] rounded-full font-medium border border-emerald-500/20">Check-in</span>}
-                      {ev.isCheckout && <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 text-[10px] rounded-full font-medium border border-blue-500/20">Check-out</span>}
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-[12px] text-white font-medium">{ev.room?.name || ev.roomId}</p>
+                      {ev.isCheckin && <span className="px-1.5 py-0.5 bg-emerald-500/10 text-emerald-400 text-[9px] font-medium rounded">IN</span>}
+                      {ev.isCheckout && <span className="px-1.5 py-0.5 bg-blue-500/10 text-blue-400 text-[9px] font-medium rounded">OUT</span>}
                     </div>
-                    <p className="text-slate-500 text-xs">{ev.guest?.name || ev.guestId} &middot; {ev.checkIn} → {ev.checkOut}</p>
+                    <p className="text-[11px] text-slate-500">{ev.guest?.name || ev.guestId} · {ev.checkIn} → {ev.checkOut}</p>
                   </div>
-                  <span className={`px-2.5 py-1 text-[10px] rounded-full font-medium border ${ev.status === 'Confirmed' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/20' : 'bg-yellow-500/20 text-yellow-400 border-yellow-500/20'}`}>{ev.status}</span>
+                  <span className={`px-2 py-0.5 text-[9px] font-medium rounded ${ev.status === 'Confirmed' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}`}>{ev.status}</span>
                 </div>
               ))}
             </div>
