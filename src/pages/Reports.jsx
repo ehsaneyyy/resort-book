@@ -73,13 +73,13 @@ export default function Reports() {
 
   return (
     <div className="space-y-6">
-      <div className="flex gap-1">
+      <div className="flex gap-1 overflow-x-auto pb-1">
         {['week', 'month', 'quarter', 'year'].map(r => (
-          <button key={r} onClick={() => setRange(r)} className={`px-3 py-1.5 rounded text-[12px] font-medium transition-colors capitalize ${range === r ? 'text-white' : 'text-slate-600 hover:text-slate-400'}`}>{r}</button>
+          <button key={r} onClick={() => setRange(r)} className={`px-3 py-1.5 rounded text-[12px] font-medium transition-colors capitalize whitespace-nowrap ${range === r ? 'text-white' : 'text-slate-600 hover:text-slate-400'}`}>{r}</button>
         ))}
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {[
           { label: 'Revenue', value: formatCurrency(stats.revenue) },
           { label: 'Bookings', value: stats.totalBookings },
@@ -109,7 +109,7 @@ export default function Reports() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
         <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-5">
           <h3 className="text-[10px] font-semibold text-slate-500 uppercase tracking-[2px] mb-3">Revenue by Type</h3>
           <div className="space-y-2">

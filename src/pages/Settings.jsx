@@ -73,8 +73,8 @@ export default function Settings() {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
+        <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-4 sm:p-5">
           <h3 className="text-[10px] font-semibold text-slate-500 uppercase tracking-[2px] mb-4">General</h3>
           <form onSubmit={saveResort} className="space-y-3">
             <div>
@@ -89,7 +89,7 @@ export default function Settings() {
           </form>
         </div>
 
-        <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-5">
+        <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-4 sm:p-5">
           <h3 className="text-[10px] font-semibold text-slate-500 uppercase tracking-[2px] mb-4">System</h3>
           <div className="space-y-2">
             <div className="flex items-center justify-between py-2 border-b border-white/[0.02]">
@@ -116,7 +116,7 @@ export default function Settings() {
         </div>
       </div>
 
-      <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-5">
+      <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-4 sm:p-5">
         <h3 className="text-[10px] font-semibold text-slate-500 uppercase tracking-[2px] mb-4 flex items-center gap-2">
           <MessageCircle className="w-3.5 h-3.5 text-emerald-400" /> WhatsApp
         </h3>
@@ -127,8 +127,8 @@ export default function Settings() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
+        <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-4 sm:p-5">
           <h3 className="text-[10px] font-semibold text-slate-500 uppercase tracking-[2px] mb-2">Export</h3>
           <p className="text-[12px] text-slate-600 mb-3">Download all data as JSON.</p>
           <button onClick={handleExport} className="px-4 py-2 bg-dark-700 hover:bg-dark-600 text-slate-400 text-[12px] font-medium rounded transition-colors flex items-center gap-2">
@@ -136,7 +136,7 @@ export default function Settings() {
           </button>
         </div>
 
-        <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-5">
+        <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-4 sm:p-5">
           <h3 className="text-[10px] font-semibold text-slate-500 uppercase tracking-[2px] mb-2">Import</h3>
           <p className="text-[12px] text-slate-600 mb-3">Restore from a JSON backup.</p>
           <label className="px-4 py-2 bg-dark-700 hover:bg-dark-600 text-slate-400 text-[12px] font-medium rounded transition-colors inline-flex items-center gap-2 cursor-pointer">
@@ -147,7 +147,7 @@ export default function Settings() {
         </div>
       </div>
 
-      <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-5">
+      <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-4 sm:p-5">
         <h3 className="text-[10px] font-semibold text-slate-500 uppercase tracking-[2px] mb-2">Reset</h3>
         <p className="text-[12px] text-slate-600 mb-3">Replace all data with demo data.</p>
         <button onClick={() => setConfirmReset(true)} className="px-4 py-2 bg-dark-700 hover:bg-dark-600 text-slate-400 text-[12px] font-medium rounded transition-colors flex items-center gap-2">

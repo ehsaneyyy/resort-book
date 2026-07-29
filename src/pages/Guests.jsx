@@ -44,14 +44,14 @@ export default function Guests() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <p className="text-[12px] text-slate-600">{guests.length} guests</p>
         <div className="flex gap-2">
-          <div className="relative">
+          <div className="relative flex-1 sm:flex-none">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-600" />
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search..." className="pl-8 pr-3 py-1.5 bg-dark-800/50 border border-white/[0.02] rounded text-sm text-white w-48 focus:outline-none focus:border-white/10 placeholder-slate-600" />
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search..." className="w-full sm:w-48 pl-8 pr-3 py-2 bg-dark-800/50 border border-white/[0.02] rounded text-sm text-white focus:outline-none focus:border-white/10 placeholder-slate-600" />
           </div>
-          <button onClick={openAdd} className="px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-[12px] font-medium rounded transition-colors flex items-center gap-1.5">
+          <button onClick={openAdd} className="px-3 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-[12px] font-medium rounded transition-colors flex items-center gap-1.5">
             <UserPlus className="w-3.5 h-3.5" /> Add Guest
           </button>
         </div>

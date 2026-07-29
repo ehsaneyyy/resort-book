@@ -86,7 +86,7 @@ export default function Pricing() {
       <div className="space-y-2">
         {seasonal.map(rule => (
           <div key={rule.id} className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-4 hover:border-white/[0.05] transition-colors">
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex items-start sm:items-center justify-between gap-3 flex-wrap">
               <div className="flex items-center gap-3">
                 <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${rule.isActive ? 'bg-emerald-500/10' : 'bg-dark-700/50'}`}>
                   <Calendar className={`w-4 h-4 ${rule.isActive ? 'text-emerald-400/70' : 'text-slate-600'}`} />
@@ -99,12 +99,12 @@ export default function Pricing() {
                   <p className="text-[11px] text-slate-600">{formatPeriod(rule.startDate, rule.endDate)}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 flex-shrink-0">
                 <p className={`text-base font-medium ${rule.adjustment >= 0 ? 'text-white' : 'text-red-400/70'}`}>{rule.adjustment > 0 ? '+' : ''}{rule.adjustment}%</p>
                 <div className="flex gap-1">
                   <button onClick={() => toggle(rule)} className={`px-2 py-1 text-[10px] font-medium rounded transition-colors ${rule.isActive ? 'bg-amber-500/10 text-amber-400 hover:bg-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'}`}>{rule.isActive ? 'Off' : 'On'}</button>
-                  <button onClick={() => openEdit(rule)} className="p-1 text-slate-600 hover:text-amber-400 transition-colors"><Edit3 className="w-3.5 h-3.5" /></button>
-                  <button onClick={() => del(rule.id)} className="p-1 text-slate-600 hover:text-red-400 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => openEdit(rule)} className="p-1.5 text-slate-600 hover:text-amber-400 transition-colors"><Edit3 className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => del(rule.id)} className="p-1.5 text-slate-600 hover:text-red-400 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
                 </div>
               </div>
             </div>

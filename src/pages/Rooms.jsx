@@ -45,9 +45,9 @@ export default function Rooms() {
         </button>
       </div>
 
-      <div className="flex gap-1">
+      <div className="flex gap-1 overflow-x-auto pb-1">
         {types.map(t => (
-          <button key={t} onClick={() => setFilter(t)} className={`px-3 py-1.5 rounded text-[12px] font-medium transition-colors ${filter === t ? 'text-white' : 'text-slate-600 hover:text-slate-400'}`}>{t === 'all' ? 'All' : t}</button>
+          <button key={t} onClick={() => setFilter(t)} className={`px-3 py-1.5 rounded text-[12px] font-medium transition-colors whitespace-nowrap ${filter === t ? 'text-white' : 'text-slate-600 hover:text-slate-400'}`}>{t === 'all' ? 'All' : t}</button>
         ))}
       </div>
 

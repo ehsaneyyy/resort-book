@@ -90,77 +90,118 @@ export default function Bookings() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex gap-1">
+        <div className="flex gap-1 overflow-x-auto pb-1">
           {['all', 'Confirmed', 'Pending', 'Checked Out', 'Cancelled'].map(s => (
-            <button key={s} onClick={() => setFilter(s)} className={`px-3 py-1.5 rounded text-[12px] font-medium transition-colors ${filter === s ? 'text-white' : 'text-slate-600 hover:text-slate-400'}`}>
+            <button key={s} onClick={() => setFilter(s)} className={`px-3 py-1.5 rounded text-[12px] font-medium transition-colors whitespace-nowrap ${filter === s ? 'text-white' : 'text-slate-600 hover:text-slate-400'}`}>
               {s === 'all' ? `All (${stats.total})` : `${s} (${stats[s]})`}
             </button>
           ))}
         </div>
         <div className="flex gap-2">
-          <div className="relative">
+          <div className="relative flex-1 sm:flex-none">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-600" />
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search..." className="pl-8 pr-3 py-1.5 bg-dark-800/50 border border-white/[0.02] rounded text-sm text-white w-48 focus:outline-none focus:border-white/10 placeholder-slate-600" />
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search..." className="w-full sm:w-48 pl-8 pr-3 py-2 bg-dark-800/50 border border-white/[0.02] rounded text-sm text-white focus:outline-none focus:border-white/10 placeholder-slate-600" />
           </div>
-          <button onClick={openAdd} className="px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-[12px] font-medium rounded transition-colors flex items-center gap-1.5">
+          <button onClick={openAdd} className="px-3 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-[12px] font-medium rounded transition-colors flex items-center gap-1.5">
             <Plus className="w-3.5 h-3.5" /> New
           </button>
         </div>
       </div>
 
-      <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-white/[0.02]">
-                {['ID', 'Guest', 'Room', 'Dates', 'Amount', 'Status', ''].map(h => (
-                  <th key={h} className="text-left py-3 px-4 text-[10px] font-semibold text-slate-600 uppercase tracking-[1.5px]">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/[0.02]">
-              {filtered.length === 0 ? (
-                <tr><td colSpan={7} className="py-12 text-center text-sm text-slate-600">No bookings</td></tr>
-              ) : filtered.map(b => {
-                const g = getGuest(b.guestId);
-                const r = getRoom(b.roomId);
-                return (
-                  <tr key={b.id} className="hover:bg-white/[0.01] transition-colors">
-                    <td className="py-3 px-4 text-[12px] font-mono text-slate-600">{b.id}</td>
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-amber-500/15 to-amber-600/5 flex items-center justify-center text-amber-400/70 text-[10px] font-medium flex-shrink-0">{g?.name.charAt(0) || '?'}</div>
-                        <span className="text-sm text-white">{g?.name || 'Unknown'}</span>
-                      </div>
-                    </td>
-                    <td className="py-3 px-4 text-sm text-slate-500">{r?.name || b.roomId}</td>
-                    <td className="py-3 px-4">
-                      <p className="text-sm text-slate-300">{formatDate(b.checkIn)}</p>
-                      <p className="text-[11px] text-slate-600">{b.nights}N · {b.adults}A{b.children ? `, ${b.children}C` : ''}</p>
-                    </td>
-                    <td className="py-3 px-4">
-                      <p className="text-sm text-white font-medium">{formatCurrency(b.total)}</p>
-                      <p className={`text-[11px] ${b.paymentStatus === 'Paid' ? 'text-emerald-500/70' : b.paymentStatus === 'Refunded' ? 'text-red-500/70' : 'text-amber-500/70'}`}>{b.paymentStatus}</p>
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className={`px-2 py-0.5 text-[10px] font-medium rounded ${statusColor(b.status)}`}>{b.status}</span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex gap-1">
-                        <button onClick={() => setDetail(b)} className="p-1 text-slate-600 hover:text-amber-400 transition-colors"><Eye className="w-3.5 h-3.5" /></button>
-                        <button onClick={() => sendWhatsApp(b, 'confirm')} className="p-1 text-slate-600 hover:text-emerald-400 transition-colors"><MessageCircle className="w-3.5 h-3.5" /></button>
-                        {b.status === 'Pending' && <><button onClick={() => update(b.id, 'Confirmed')} className="p-1 text-emerald-500/60 hover:text-emerald-400 transition-colors"><CheckCircle className="w-3.5 h-3.5" /></button><button onClick={() => update(b.id, 'Cancelled')} className="p-1 text-red-500/60 hover:text-red-400 transition-colors"><XCircle className="w-3.5 h-3.5" /></button></>}
-                        {b.status === 'Confirmed' && <><button onClick={() => update(b.id, 'Checked Out')} className="p-1 text-blue-500/60 hover:text-blue-400 transition-colors"><LogOut className="w-3.5 h-3.5" /></button><button onClick={() => update(b.id, 'Cancelled')} className="p-1 text-red-500/60 hover:text-red-400 transition-colors"><XCircle className="w-3.5 h-3.5" /></button></>}
-                        {(b.status === 'Checked Out' || b.status === 'Cancelled') && <button onClick={() => del(b.id)} className="p-1 text-slate-600 hover:text-red-400 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>}
-                      </div>
-                    </td>
+      {filtered.length === 0 ? (
+        <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] py-12 text-center text-sm text-slate-600">No bookings</div>
+      ) : (
+        <>
+          <div className="hidden lg:block bg-dark-800/50 rounded-lg border border-white/[0.02] overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-white/[0.02]">
+                    {['ID', 'Guest', 'Room', 'Dates', 'Amount', 'Status', ''].map(h => (
+                      <th key={h} className="text-left py-3 px-4 text-[10px] font-semibold text-slate-600 uppercase tracking-[1.5px]">{h}</th>
+                    ))}
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                </thead>
+                <tbody className="divide-y divide-white/[0.02]">
+                  {filtered.map(b => {
+                    const g = getGuest(b.guestId);
+                    const r = getRoom(b.roomId);
+                    return (
+                      <tr key={b.id} className="hover:bg-white/[0.01] transition-colors">
+                        <td className="py-3 px-4 text-[12px] font-mono text-slate-600">{b.id}</td>
+                        <td className="py-3 px-4">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-amber-500/15 to-amber-600/5 flex items-center justify-center text-amber-400/70 text-[10px] font-medium flex-shrink-0">{g?.name.charAt(0) || '?'}</div>
+                            <span className="text-sm text-white">{g?.name || 'Unknown'}</span>
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 text-sm text-slate-500">{r?.name || b.roomId}</td>
+                        <td className="py-3 px-4">
+                          <p className="text-sm text-slate-300">{formatDate(b.checkIn)}</p>
+                          <p className="text-[11px] text-slate-600">{b.nights}N · {b.adults}A{b.children ? `, ${b.children}C` : ''}</p>
+                        </td>
+                        <td className="py-3 px-4">
+                          <p className="text-sm text-white font-medium">{formatCurrency(b.total)}</p>
+                          <p className={`text-[11px] ${b.paymentStatus === 'Paid' ? 'text-emerald-500/70' : b.paymentStatus === 'Refunded' ? 'text-red-500/70' : 'text-amber-500/70'}`}>{b.paymentStatus}</p>
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className={`px-2 py-0.5 text-[10px] font-medium rounded ${statusColor(b.status)}`}>{b.status}</span>
+                        </td>
+                        <td className="py-3 px-4">
+                          <div className="flex gap-1">
+                            <button onClick={() => setDetail(b)} className="p-1.5 text-slate-600 hover:text-amber-400 transition-colors"><Eye className="w-3.5 h-3.5" /></button>
+                            <button onClick={() => sendWhatsApp(b, 'confirm')} className="p-1.5 text-slate-600 hover:text-emerald-400 transition-colors"><MessageCircle className="w-3.5 h-3.5" /></button>
+                            {b.status === 'Pending' && <><button onClick={() => update(b.id, 'Confirmed')} className="p-1.5 text-emerald-500/60 hover:text-emerald-400 transition-colors"><CheckCircle className="w-3.5 h-3.5" /></button><button onClick={() => update(b.id, 'Cancelled')} className="p-1.5 text-red-500/60 hover:text-red-400 transition-colors"><XCircle className="w-3.5 h-3.5" /></button></>}
+                            {b.status === 'Confirmed' && <><button onClick={() => update(b.id, 'Checked Out')} className="p-1.5 text-blue-500/60 hover:text-blue-400 transition-colors"><LogOut className="w-3.5 h-3.5" /></button><button onClick={() => update(b.id, 'Cancelled')} className="p-1.5 text-red-500/60 hover:text-red-400 transition-colors"><XCircle className="w-3.5 h-3.5" /></button></>}
+                            {(b.status === 'Checked Out' || b.status === 'Cancelled') && <button onClick={() => del(b.id)} className="p-1.5 text-slate-600 hover:text-red-400 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="lg:hidden space-y-3">
+            {filtered.map(b => {
+              const g = getGuest(b.guestId);
+              const r = getRoom(b.roomId);
+              return (
+                <div key={b.id} className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-500/15 to-amber-600/5 flex items-center justify-center text-amber-400/70 text-xs font-medium flex-shrink-0">{g?.name.charAt(0) || '?'}</div>
+                      <div>
+                        <p className="text-sm font-medium text-white">{g?.name || 'Unknown'}</p>
+                        <p className="text-[11px] font-mono text-slate-600">{b.id}</p>
+                      </div>
+                    </div>
+                    <span className={`px-2 py-0.5 text-[10px] font-medium rounded ${statusColor(b.status)}`}>{b.status}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-[13px] mb-3">
+                    <div><span className="text-slate-600">Room</span><p className="text-white">{r?.name || b.roomId}</p></div>
+                    <div><span className="text-slate-600">Amount</span><p className="text-white font-medium">{formatCurrency(b.total)}</p></div>
+                    <div><span className="text-slate-600">Dates</span><p className="text-white">{formatDate(b.checkIn)} → {formatDate(b.checkOut)}</p></div>
+                    <div><span className="text-slate-600">Nights</span><p className="text-white">{b.nights}N · {b.adults}A{b.children ? `, ${b.children}C` : ''}</p></div>
+                    <div><span className="text-slate-600">Payment</span><p className={`${b.paymentStatus === 'Paid' ? 'text-emerald-400' : b.paymentStatus === 'Refunded' ? 'text-red-400' : 'text-amber-400'}`}>{b.paymentStatus}</p></div>
+                  </div>
+                  <div className="flex gap-2 pt-2 border-t border-white/[0.02]">
+                    <button onClick={() => setDetail(b)} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-[12px] text-slate-600 hover:text-amber-400 bg-white/[0.02] hover:bg-white/[0.04] rounded transition-colors"><Eye className="w-3.5 h-3.5" /> View</button>
+                    <button onClick={() => sendWhatsApp(b, 'confirm')} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-[12px] text-slate-600 hover:text-emerald-400 bg-white/[0.02] hover:bg-white/[0.04] rounded transition-colors"><MessageCircle className="w-3.5 h-3.5" /> WhatsApp</button>
+                    {b.status === 'Pending' && <button onClick={() => update(b.id, 'Confirmed')} className="flex-1 py-2.5 text-[12px] text-emerald-500/70 hover:text-emerald-400 bg-white/[0.02] hover:bg-white/[0.04] rounded transition-colors flex items-center justify-center gap-1"><CheckCircle className="w-3.5 h-3.5" /> Confirm</button>}
+                    {b.status === 'Pending' && <button onClick={() => update(b.id, 'Cancelled')} className="py-2.5 px-3 text-[12px] text-red-500/60 hover:text-red-400 bg-white/[0.02] hover:bg-white/[0.04] rounded transition-colors"><XCircle className="w-3.5 h-3.5" /></button>}
+                    {b.status === 'Confirmed' && <button onClick={() => update(b.id, 'Checked Out')} className="flex-1 py-2.5 text-[12px] text-blue-500/70 hover:text-blue-400 bg-white/[0.02] hover:bg-white/[0.04] rounded transition-colors flex items-center justify-center gap-1"><LogOut className="w-3.5 h-3.5" /> Check Out</button>}
+                    {b.status === 'Confirmed' && <button onClick={() => update(b.id, 'Cancelled')} className="py-2.5 px-3 text-[12px] text-red-500/60 hover:text-red-400 bg-white/[0.02] hover:bg-white/[0.04] rounded transition-colors"><XCircle className="w-3.5 h-3.5" /></button>}
+                    {(b.status === 'Checked Out' || b.status === 'Cancelled') && <button onClick={() => del(b.id)} className="flex-1 py-2.5 text-[12px] text-slate-600 hover:text-red-400 bg-white/[0.02] hover:bg-white/[0.04] rounded transition-colors flex items-center justify-center gap-1"><Trash2 className="w-3.5 h-3.5" /> Delete</button>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
 
       {detail && (
         <Modal title={`Booking ${detail.id}`} onClose={() => setDetail(null)}>

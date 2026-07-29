@@ -24,7 +24,7 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-7">
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
         {[
           { label: 'Total Bookings', value: bookings.length, sub: `${confirmed.length} confirmed` },
           { label: "Today's Revenue", value: formatCurrency(todayRevenue), sub: `${todayCheckins.length} check-ins` },
@@ -34,14 +34,14 @@ export default function Dashboard() {
         ].map((s, i) => (
           <div key={i} className="border-l-2 border-amber-500/30 pl-3">
             <p className="text-[10px] font-medium text-slate-500 uppercase tracking-[1.5px]">{s.label}</p>
-            <p className="text-2xl font-medium text-white mt-1 tracking-tight">{s.value}</p>
+            <p className="text-xl sm:text-2xl font-medium text-white mt-1 tracking-tight">{s.value}</p>
             <p className="text-[12px] text-slate-600 mt-0.5">{s.sub}</p>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
           <div className="bg-dark-800/50 rounded-lg border border-white/[0.02]">
             <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.02]">
               <h2 className="text-[10px] font-semibold text-slate-500 uppercase tracking-[2px]">Recent Bookings</h2>
