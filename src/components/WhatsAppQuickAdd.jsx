@@ -34,6 +34,7 @@ export default function WhatsAppQuickAdd({ onClose }) {
     e.preventDefault();
     const roomObj = rooms.find(r => r.id === form.roomId);
     if (!roomObj || !form.name.trim() || !form.phone.trim()) return;
+    if (form.checkIn < today()) { toast('Check-in cannot be in the past', 'warning'); return; }
 
     let guestId = form.guestId;
     if (!guestId) {
@@ -106,7 +107,7 @@ export default function WhatsAppQuickAdd({ onClose }) {
               </div>
               <div>
                 <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1">Check-in</label>
-                <input required type="date" value={form.checkIn} onChange={e => setForm({ ...form, checkIn: e.target.value })} className="w-full px-3 py-2 bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10" />
+                <input required type="date" min={today()} value={form.checkIn} onChange={e => setForm({ ...form, checkIn: e.target.value })} className="w-full px-3 py-2 bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10" />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
