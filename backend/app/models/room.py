@@ -1,4 +1,5 @@
-from sqlmodel import SQLModel, Field, Column, ARRAY, String
+from sqlmodel import SQLModel, Field, Column
+from sqlalchemy import JSON
 from datetime import datetime, timezone
 import uuid
 
@@ -24,7 +25,7 @@ class Room(SQLModel, table=True):
     size: int = Field(default=0, ge=0)
     floor: int = Field(default=1)
     status: str = Field(default='available', max_length=20)
-    amenities: list[str] = Field(default_factory=list, sa_column=Column(ARRAY(String)))
+    amenities: list[str] = Field(default_factory=list, sa_column=Column(JSON))
     description: str = Field(default='')
     created_at: datetime = Field(default_factory=now)
     updated_at: datetime = Field(default_factory=now, sa_column_kwargs={'onupdate': now})

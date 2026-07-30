@@ -1,4 +1,5 @@
-from sqlmodel import SQLModel, Field
+from sqlmodel import SQLModel, Field, Column
+from sqlalchemy import JSON
 from datetime import datetime, timezone
 import uuid
 
@@ -20,7 +21,7 @@ class SeasonalRule(SQLModel, table=True):
     end_date: str = Field(max_length=10)
     adjustment: int = Field(default=0)
     type: str = Field(default='percentage', max_length=20)
-    room_types: list[str] | None = Field(default=None)
+    room_types: list[str] | None = Field(default=None, sa_column=Column(JSON))
     is_active: bool = Field(default=True)
     created_at: datetime = Field(default_factory=now)
     updated_at: datetime = Field(default_factory=now, sa_column_kwargs={'onupdate': now})
