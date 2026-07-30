@@ -2,14 +2,16 @@ services:
   - type: web
     name: resortbook-api
     runtime: python
-    repo: https://github.com/anomalyco/resort-book
+    repo: https://github.com/ehsaneyyy/resort-book
     plan: free
     region: oregon
     branch: main
     buildCommand: pip install -r backend/requirements.txt
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /api/v1/health
     envVars:
       - key: DATABASE_URL
         sync: false
+      - key: CORS_ORIGINS
+        value: https://resort-book-two.vercel.app
     autoDeploy: true
