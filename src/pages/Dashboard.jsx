@@ -1,10 +1,11 @@
 import { useMemo } from 'react';
-import { useBookings, useRooms, useGuests, useResort, useUpdateBookingStatus } from '../api/hooks';
+import { useStats, useBookings, useRooms, useGuests, useResort, useUpdateBookingStatus } from '../api/hooks';
 import { formatCurrency, formatDate, today } from '../data/utils';
 import { useToast } from '../components/Toast';
-import { CheckCircle, ArrowRight, Loader2 } from 'lucide-react';
+import { CheckCircle, ArrowRight } from 'lucide-react';
 
 export function Dashboard() {
+  const { data: stats } = useStats();
   const { data: bookings = [] } = useBookings();
   const { data: rooms = [] } = useRooms();
   const { data: guests = [] } = useGuests();
@@ -16,13 +17,10 @@ export function Dashboard() {
   const roomsById = useMemo(() => Object.fromEntries(rooms.map(r => [r.id, r])), [rooms]);
   const guestsById = useMemo(() => Object.fromEntries(guests.map(g => [g.id, g])), [guests]);
 
-  const confirmed = bookings.filter(b => b.status === 'Confirmed');
   const pending = bookings.filter(b => b.status === 'Pending');
-  const occupied = confirmed.filter(b => todayStr >= b.checkIn && todayStr < b.checkOut).length;
-  const occupancy = rooms.length ? Math.round((occupied / rooms.length) * 100) : 0;
+  const confirmed = bookings.filter(b => b.status === 'Confirmed');
   const todayCheckins = bookings.filter(b => b.checkIn === todayStr && (b.status === 'Confirmed' || b.status === 'Pending'));
   const todayCheckouts = bookings.filter(b => b.checkOut === todayStr && b.status === 'Confirmed');
-  const todayRevenue = todayCheckins.reduce((s, b) => s + b.total, 0);
   const recentBookings = [...bookings].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 6);
   const upcomingArrivals = confirmed.filter(b => b.checkIn > todayStr).sort((a, b) => a.checkIn.localeCompare(b.checkIn)).slice(0, 4);
 
@@ -38,11 +36,11 @@ export function Dashboard() {
     <div className="space-y-7">
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
         {[
-          { label: 'Total Bookings', value: bookings.length, sub: `${confirmed.length} confirmed` },
-          { label: "Today's Revenue", value: formatCurrency(todayRevenue, curr), sub: `${todayCheckins.length} check-ins` },
-          { label: 'Occupancy', value: `${occupancy}%`, sub: `${occupied}/${rooms.length} rooms` },
-          { label: 'Pending', value: pending.length, sub: pending.length > 0 ? 'Needs attention' : 'All clear' },
-          { label: 'Guests', value: guests.length, sub: `${guests.filter(g => g.vip).length} VIP` },
+          { label: 'Total Bookings', value: stats?.totalBookings ?? bookings.length, sub: `${stats?.confirmed ?? confirmed.length} confirmed` },
+          { label: "Today's Revenue", value: formatCurrency(stats?.todayRevenue ?? 0, curr), sub: `${todayCheckins.length} check-ins` },
+          { label: 'Occupancy', value: `${stats?.occupancyPct ?? 0}%`, sub: `${stats?.occupied ?? '-'}/${rooms.length} rooms` },
+          { label: 'Pending', value: stats?.pending ?? pending.length, sub: (stats?.pending ?? pending.length) > 0 ? 'Needs attention' : 'All clear' },
+          { label: 'Guests', value: stats?.totalGuests ?? guests.length, sub: `${guests.filter(g => g.vip).length} VIP` },
         ].map((s, i) => (
           <div key={i} className="border-l-2 border-amber-500/30 pl-3">
             <p className="text-xs font-medium text-slate-500 uppercase tracking-[1.5px]">{s.label}</p>
