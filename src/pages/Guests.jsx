@@ -4,7 +4,8 @@ import { formatCurrency, formatDate } from '../data/utils';
 import { useToast } from '../components/Toast';
 import { Modal } from '../components/Modal';
 import { GuestTimeline } from '../components/GuestTimeline';
-import { Search, Eye, Star, UserPlus, MessageCircle, Loader2 } from 'lucide-react';
+import { Search, Eye, Star, UserPlus, MessageCircle } from 'lucide-react';
+import { Skeleton } from '../components/Skeleton';
 import { whatsappLink } from '../data/templates';
 import { PHONE_REGEX, EMAIL_REGEX } from '../data/constants';
 
@@ -41,7 +42,23 @@ export function Guests() {
   };
 
   if (isLoading) {
-    return <div className="flex items-center justify-center py-20"><Loader2 className="w-6 h-6 text-amber-400/70 animate-spin" /></div>;
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between"><Skeleton className="h-4 w-20" /><Skeleton className="h-11 w-48 rounded" /></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-4 space-y-3">
+              <div className="flex items-center gap-3">
+                <Skeleton className="w-9 h-9 rounded-full" />
+                <div className="space-y-1.5 flex-1"><Skeleton className="h-4 w-28" /><Skeleton className="h-3 w-20" /></div>
+              </div>
+              <div className="flex gap-3"><Skeleton className="h-14 flex-1 rounded" /><Skeleton className="h-14 flex-1 rounded" /><Skeleton className="h-14 flex-1 rounded" /></div>
+              <div className="flex justify-between"><Skeleton className="h-3 w-16" /><Skeleton className="h-3 w-24" /></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   }
 
   return (

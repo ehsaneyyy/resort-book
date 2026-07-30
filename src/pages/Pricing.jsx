@@ -3,7 +3,8 @@ import { useSeasonalRules, useCreateSeasonalRule, useUpdateSeasonalRule, useDele
 import { useToast } from '../components/Toast';
 import { Modal } from '../components/Modal';
 import { ConfirmDialog } from '../components/ConfirmDialog';
-import { Calendar, Plus, Edit3, Trash2, Loader2 } from 'lucide-react';
+import { Calendar, Plus, Edit3, Trash2 } from 'lucide-react';
+import { Skeleton } from '../components/Skeleton';
 import { MONTHS_SHORT } from '../data/constants';
 
 function formatPeriod(start, end) {
@@ -72,7 +73,22 @@ export function Pricing() {
   };
 
   if (isLoading) {
-    return <div className="flex items-center justify-center py-20"><Loader2 className="w-6 h-6 text-amber-400/70 animate-spin" /></div>;
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between"><Skeleton className="h-4 w-24" /><Skeleton className="h-11 w-28 rounded" /></div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+          {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-lg" />)}
+        </div>
+        <div className="space-y-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-4">
+              <div className="flex items-center justify-between"><Skeleton className="h-5 w-40" /><Skeleton className="h-5 w-20" /></div>
+              <Skeleton className="h-3 w-48 mt-2" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   }
 
   return (

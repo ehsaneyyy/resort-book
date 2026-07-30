@@ -3,7 +3,8 @@ import { useResort, useUpdateResort, useSeedDemo, useStats } from '../api/hooks'
 import { useToast } from '../components/Toast';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { CURRENCIES, PHONE_REGEX, EMAIL_REGEX } from '../data/constants';
-import { RefreshCw, Download, Database, MessageCircle, Building2, Loader2 } from 'lucide-react';
+import { RefreshCw, Download, Database, MessageCircle, Building2 } from 'lucide-react';
+import { Skeleton } from '../components/Skeleton';
 
 const CURRENCY_OPTIONS = CURRENCIES;
 
@@ -125,8 +126,14 @@ export function Settings() {
 
   if (resortLoading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-6 h-6 text-amber-400/70 animate-spin" />
+      <div className="max-w-3xl mx-auto space-y-5">
+        <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-5 space-y-4">
+          <Skeleton className="h-4 w-36" />
+          <div className="grid grid-cols-2 gap-4"><Skeleton className="h-[88px] rounded" /><Skeleton className="h-[88px] rounded" /></div>
+          <div className="grid grid-cols-3 gap-4"><Skeleton className="h-[88px] rounded" /><Skeleton className="h-[88px] rounded" /><Skeleton className="h-[88px] rounded" /></div>
+          <Skeleton className="h-[88px] rounded" />
+          <div className="grid grid-cols-3 gap-4"><Skeleton className="h-[88px] rounded" /><Skeleton className="h-[88px] rounded" /><Skeleton className="h-[88px] rounded" /></div>
+        </div>
       </div>
     );
   }

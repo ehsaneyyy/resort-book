@@ -2,13 +2,14 @@ import { useState, useMemo } from 'react';
 import { useBookings, useSeasonalRules, useRooms, useResort } from '../api/hooks';
 import { formatCurrency, today } from '../data/utils';
 import { MONTHS_SHORT } from '../data/constants';
-import { Loader2 } from 'lucide-react';
+import { Skeleton } from '../components/Skeleton';
 
 export function Reports() {
-  const { data: bookings = [] } = useBookings();
-  const { data: seasonal = [] } = useSeasonalRules();
-  const { data: rooms = [] } = useRooms();
+  const { data: bookings = [], isLoading: bookingsLoading } = useBookings();
+  const { data: seasonal = [], isLoading: seasonalLoading } = useSeasonalRules();
+  const { data: rooms = [], isLoading: roomsLoading } = useRooms();
   const { data: resort } = useResort();
+  const loading = bookingsLoading || seasonalLoading || roomsLoading;
   const todayStr = today();
   const [range, setRange] = useState('month');
   const curr = resort?.currency;
@@ -75,6 +76,18 @@ export function Reports() {
   }, [bookings, todayStr]);
 
   const maxRevenue = Math.max(...yearlyRevenue, 1);
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex gap-1"><Skeleton className="h-11 w-16 rounded" /><Skeleton className="h-11 w-24 rounded" /></div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+          {Array.from({ length: 4 }).map((_, i) => <div key={i} className="border-l-2 border-white/[0.03] pl-3 space-y-2"><Skeleton className="h-3 w-16" /><Skeleton className="h-7 w-24" /><Skeleton className="h-3 w-12" /></div>)}
+        </div>
+        <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-5"><Skeleton className="h-4 w-32 mb-4" />{Array.from({ length: 12 }).map((_, i) => <div key={i} className="flex items-center gap-2.5 mb-1.5"><Skeleton className="h-3 w-7" /><Skeleton className="h-5 flex-1 rounded" /></div>)}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

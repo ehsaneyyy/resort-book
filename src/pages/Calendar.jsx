@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react';
 import { useRooms, useBookings, useGuests } from '../api/hooks';
 import { formatDate, today } from '../data/utils';
-import { ChevronLeft, ChevronRight, BedDouble, Loader2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, BedDouble } from 'lucide-react';
+import { Skeleton } from '../components/Skeleton';
 import { MONTHS_LONG as MONTH_NAMES } from '../data/constants';
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -10,10 +11,11 @@ function getFirstDayOfMonth(y, m) { return new Date(y, m, 1).getDay(); }
 function isInRange(dateStr, start, end) { return dateStr >= start && dateStr < end; }
 
 export function Calendar() {
-  const { data: rooms = [] } = useRooms();
-  const { data: bookings = [] } = useBookings();
+  const { data: rooms = [], isLoading: roomsLoading } = useRooms();
+  const { data: bookings = [], isLoading: bookingsLoading } = useBookings();
   const { data: guests = [] } = useGuests();
   const [viewDate, setViewDate] = useState(new Date());
+  const loading = roomsLoading || bookingsLoading;
   const [selected, setSelected] = useState(null);
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
@@ -58,6 +60,21 @@ export function Calendar() {
   const roomColors = {};
   const palette = ['bg-amber-500/40', 'bg-emerald-500/40', 'bg-blue-500/40', 'bg-purple-500/40', 'bg-rose-500/40', 'bg-teal-500/40', 'bg-sky-500/40'];
   rooms.forEach((r, i) => { roomColors[r.id] = palette[i % palette.length]; });
+
+  if (loading) {
+    return (
+      <div className="space-y-5">
+        <div className="flex items-center justify-between"><Skeleton className="h-4 w-24" /><Skeleton className="h-8 w-8 rounded" /></div>
+        <Skeleton className="h-4 w-64" />
+        <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] overflow-hidden">
+          <div className="grid grid-cols-7 gap-px">
+            {Array.from({ length: 7 }).map((_, i) => <div key={i} className="bg-dark-800/50 text-center py-2"><Skeleton className="h-3 w-8 mx-auto" /></div>)}
+            {Array.from({ length: 35 }).map((_, i) => <div key={i} className="bg-dark-800/50 min-h-[80px] lg:min-h-[110px] p-1.5"><Skeleton className="h-3 w-6 mb-1" /><Skeleton className="h-4 w-full rounded" /><Skeleton className="h-4 w-3/4 rounded mt-0.5" /></div>)}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5">

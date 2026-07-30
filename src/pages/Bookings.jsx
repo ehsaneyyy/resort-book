@@ -5,7 +5,8 @@ import { useToast } from '../components/Toast';
 import { Modal } from '../components/Modal';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { PrintInvoice } from '../components/PrintInvoice';
-import { Search, Eye, CheckCircle, XCircle, LogOut, Trash2, Printer, Plus, MessageCircle, Loader2 } from 'lucide-react';
+import { Search, Eye, CheckCircle, XCircle, LogOut, Trash2, Printer, Plus, MessageCircle } from 'lucide-react';
+import { Skeleton, SkeletonTable } from '../components/Skeleton';
 import { whatsappLink, confirmationMsg, preArrivalMsg, postStayMsg } from '../data/templates';
 import { PHONE_REGEX, EMAIL_REGEX } from '../data/constants';
 
@@ -116,7 +117,12 @@ export function Bookings() {
   };
 
   if (isLoading) {
-    return <div className="flex items-center justify-center py-20"><Loader2 className="w-6 h-6 text-amber-400/70 animate-spin" /></div>;
+    return (
+      <div className="space-y-6">
+        <div className="flex gap-1"><Skeleton className="h-11 w-16 rounded" /><Skeleton className="h-11 w-24 rounded" /><Skeleton className="h-11 w-24 rounded" /></div>
+        <SkeletonTable rows={6} />
+      </div>
+    );
   }
 
   return (

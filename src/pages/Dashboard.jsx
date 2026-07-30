@@ -3,16 +3,18 @@ import { useStats, useBookings, useRooms, useGuests, useResort, useUpdateBooking
 import { formatCurrency, formatDate, today } from '../data/utils';
 import { useToast } from '../components/Toast';
 import { CheckCircle, ArrowRight } from 'lucide-react';
+import { Skeleton, SkeletonStatRow, SkeletonTable } from '../components/Skeleton';
 
 export function Dashboard() {
-  const { data: stats } = useStats();
-  const { data: bookings = [] } = useBookings();
-  const { data: rooms = [] } = useRooms();
+  const { data: stats, isLoading: statsLoading } = useStats();
+  const { data: bookings = [], isLoading: bookingsLoading } = useBookings();
+  const { data: rooms = [], isLoading: roomsLoading } = useRooms();
   const { data: guests = [] } = useGuests();
   const { data: resort } = useResort();
   const updateBookingStatus = useUpdateBookingStatus();
   const toast = useToast();
   const todayStr = today();
+  const loading = statsLoading || bookingsLoading || roomsLoading;
 
   const roomsById = useMemo(() => Object.fromEntries(rooms.map(r => [r.id, r])), [rooms]);
   const guestsById = useMemo(() => Object.fromEntries(guests.map(g => [g.id, g])), [guests]);
@@ -25,6 +27,29 @@ export function Dashboard() {
   const upcomingArrivals = confirmed.filter(b => b.checkIn > todayStr).sort((a, b) => a.checkIn.localeCompare(b.checkIn)).slice(0, 4);
 
   const curr = resort?.currency;
+
+  if (loading) {
+    return (
+      <div className="space-y-7">
+        <SkeletonStatRow />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6"><SkeletonTable rows={5} /><SkeletonTable rows={3} /></div>
+          <div className="space-y-6">
+            <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-5 space-y-4">
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-3/4" />
+            </div>
+            <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-5 space-y-4">
+              <Skeleton className="h-4 w-20" />
+              <div className="grid grid-cols-3 gap-2"><Skeleton className="h-8 rounded" /><Skeleton className="h-8 rounded" /><Skeleton className="h-8 rounded" /></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const confirmBooking = (id) => {
     updateBookingStatus.mutate({ id, status: 'Confirmed' }, {
       onSuccess: () => toast('Booking confirmed', 'success'),

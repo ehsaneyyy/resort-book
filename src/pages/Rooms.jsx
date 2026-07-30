@@ -4,7 +4,8 @@ import { formatCurrency, today } from '../data/utils';
 import { useToast } from '../components/Toast';
 import { Modal } from '../components/Modal';
 import { ConfirmDialog } from '../components/ConfirmDialog';
-import { Plus, Edit3, Trash2, BedDouble, Loader2 } from 'lucide-react';
+import { Plus, Edit3, Trash2, BedDouble } from 'lucide-react';
+import { Skeleton, SkeletonCard } from '../components/Skeleton';
 
 export function Rooms() {
   const { data: rooms = [], isLoading } = useRooms();
@@ -43,7 +44,13 @@ export function Rooms() {
   const del = (id) => setConfirmId(id);
 
   if (isLoading) {
-    return <div className="flex items-center justify-center py-20"><Loader2 className="w-6 h-6 text-amber-400/70 animate-spin" /></div>;
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between"><Skeleton className="h-4 w-32" /><Skeleton className="h-11 w-28 rounded" /></div>
+        <div className="flex gap-1"><Skeleton className="h-11 w-16 rounded" /><Skeleton className="h-11 w-20 rounded" /><Skeleton className="h-11 w-20 rounded" /></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">{Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}</div>
+      </div>
+    );
   }
 
   return (
