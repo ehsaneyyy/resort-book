@@ -1,15 +1,17 @@
 import { useState } from 'react';
-import { useStore } from '../hooks/useStore';
+import { useGuests, useCreateGuest, useResort } from '../api/hooks';
 import { formatCurrency, formatDate } from '../data/utils';
 import { useToast } from '../components/Toast';
 import { Modal } from '../components/Modal';
 import { GuestTimeline } from '../components/GuestTimeline';
-import { Search, Eye, Star, UserPlus, MessageCircle } from 'lucide-react';
+import { Search, Eye, Star, UserPlus, MessageCircle, Loader2 } from 'lucide-react';
 import { whatsappLink } from '../data/templates';
 import { PHONE_REGEX, EMAIL_REGEX } from '../data/constants';
 
 export function Guests() {
-  const { guests, updateGuests, resort } = useStore();
+  const { data: guests = [], isLoading } = useGuests();
+  const { data: resort } = useResort();
+  const createGuest = useCreateGuest();
   const toast = useToast();
   const [search, setSearch] = useState('');
   const [detail, setDetail] = useState(null);
@@ -17,7 +19,7 @@ export function Guests() {
   const [form, setForm] = useState({});
   const curr = resort?.currency;
   const filtered = search
-    ? guests.filter(g => g.name.toLowerCase().includes(search.toLowerCase()) || g.email.toLowerCase().includes(search.toLowerCase()) || g.phone.includes(search))
+    ? guests.filter(g => g.name.toLowerCase().includes(search.toLowerCase()) || g.email?.toLowerCase().includes(search.toLowerCase()) || g.phone?.includes(search))
     : guests;
 
   const openAdd = () => {
@@ -29,22 +31,18 @@ export function Guests() {
     e.preventDefault();
     if (!PHONE_REGEX.test(form.phone)) { toast('Invalid phone format', 'warning'); return; }
     if (form.email && !EMAIL_REGEX.test(form.email)) { toast('Invalid email format', 'warning'); return; }
-    const maxNum = guests.reduce((max, g) => {
-      const n = parseInt(g.id.replace(/\D/g, ''), 10);
-      return n > max ? n : max;
-    }, 0);
-    const newGuest = {
-      ...form,
-      id: 'G' + String(maxNum + 1).padStart(3, '0'),
-      totalBookings: 0,
-      totalSpent: 0,
-      lastStay: null,
+    createGuest.mutate({
+      ...form, totalBookings: 0, totalSpent: 0, lastStay: null,
       createdAt: new Date().toISOString(),
-    };
-    updateGuests(prev => [...prev, newGuest]);
-    toast('Guest added', 'success');
-    setModal(null);
+    }, {
+      onSuccess: () => { toast('Guest added', 'success'); setModal(null); },
+      onError: () => toast('Failed to add guest', 'error'),
+    });
   };
+
+  if (isLoading) {
+    return <div className="flex items-center justify-center py-20"><Loader2 className="w-6 h-6 text-amber-400/70 animate-spin" /></div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -72,7 +70,7 @@ export function Guests() {
                 <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-500/15 to-amber-600/5 flex items-center justify-center text-amber-400/70 text-sm font-medium flex-shrink-0">{(g.name || '?').charAt(0)}</div>
                 <div>
                   <div className="flex items-center gap-1.5">
-                    <h3 className="text-sm font-medium text-white">{g.name || '—'}</h3>
+                    <h3 className="text-sm font-medium text-white">{g.name || '\u2014'}</h3>
                     {g.vip && <Star className="w-3 h-3 text-amber-400/70" fill="currentColor" />}
                   </div>
                   <p className="text-xs text-slate-500">{g.id}</p>
@@ -93,13 +91,13 @@ export function Guests() {
                 <p className="text-[9px] text-slate-500 uppercase tracking-[1px]">Spent</p>
               </div>
               <div className="flex-1 bg-dark-700/30 rounded px-2.5 py-2">
-                <p className="text-sm text-slate-300 font-medium">{g.lastStay ? formatDate(g.lastStay).split(',')[0] : '—'}</p>
+                <p className="text-sm text-slate-300 font-medium">{g.lastStay ? formatDate(g.lastStay).split(',')[0] : '\u2014'}</p>
                 <p className="text-[9px] text-slate-500 uppercase tracking-[1px]">Last</p>
               </div>
             </div>
             <div className="flex items-center justify-between text-xs text-slate-500">
-              <span>{g.city || '—'}</span>
-              <span>{g.phone || '—'}</span>
+              <span>{g.city || '\u2014'}</span>
+              <span>{g.phone || '\u2014'}</span>
             </div>
           </div>
         ))}

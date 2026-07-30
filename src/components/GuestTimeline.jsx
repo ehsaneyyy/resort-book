@@ -1,9 +1,12 @@
-import { useStore } from '../hooks/useStore';
+import { useMemo } from 'react';
+import { useBookings, useRooms } from '../api/hooks';
 import { formatDate, formatCurrency, statusColor } from '../data/utils';
 import { Calendar, CreditCard, LogIn, LogOut, BookOpen } from 'lucide-react';
 
 export function GuestTimeline({ guestId }) {
-  const { bookings, getRoom } = useStore();
+  const { data: bookings = [] } = useBookings();
+  const { data: rooms = [] } = useRooms();
+  const roomsById = useMemo(() => Object.fromEntries(rooms.map(r => [r.id, r])), [rooms]);
   const guestBookings = bookings
     .filter(b => b.guestId === guestId)
     .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
@@ -13,9 +16,9 @@ export function GuestTimeline({ guestId }) {
   }
 
   const getEvents = (booking) => {
-    const room = getRoom(booking.roomId);
+    const room = roomsById[booking.roomId];
     const events = [
-      { icon: BookOpen, color: 'text-blue-400', bg: 'bg-blue-500/20', label: 'Booked', date: booking.createdAt, detail: `${room?.name || booking.roomId} · ${booking.nights}N · ${formatCurrency(booking.total)}` },
+      { icon: BookOpen, color: 'text-blue-400', bg: 'bg-blue-500/20', label: 'Booked', date: booking.createdAt, detail: `${room?.name || booking.roomId} \u00B7 ${booking.nights}N \u00B7 ${formatCurrency(booking.total)}` },
     ];
 
     if (booking.status !== 'Cancelled') {

@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
-import { useStore } from '../hooks/useStore';
+import { useRooms, useBookings, useGuests } from '../api/hooks';
 import { formatDate, today } from '../data/utils';
-import { ChevronLeft, ChevronRight, BedDouble } from 'lucide-react';
+import { ChevronLeft, ChevronRight, BedDouble, Loader2 } from 'lucide-react';
 import { MONTHS_LONG as MONTH_NAMES } from '../data/constants';
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -10,7 +10,9 @@ function getFirstDayOfMonth(y, m) { return new Date(y, m, 1).getDay(); }
 function isInRange(dateStr, start, end) { return dateStr >= start && dateStr < end; }
 
 export function Calendar() {
-  const { rooms, bookings, getGuest } = useStore();
+  const { data: rooms = [] } = useRooms();
+  const { data: bookings = [] } = useBookings();
+  const { data: guests = [] } = useGuests();
   const [viewDate, setViewDate] = useState(new Date());
   const [selected, setSelected] = useState(null);
   const year = viewDate.getFullYear();
@@ -18,6 +20,9 @@ export function Calendar() {
   const todayStr = today();
   const daysInMonth = getDaysInMonth(year, month);
   const firstDay = getFirstDayOfMonth(year, month);
+
+  const guestsById = useMemo(() => Object.fromEntries(guests.map(g => [g.id, g])), [guests]);
+  const roomsById = useMemo(() => Object.fromEntries(rooms.map(r => [r.id, r])), [rooms]);
 
   const prev = () => setViewDate(new Date(year, month - 1, 1));
   const next = () => setViewDate(new Date(year, month + 1, 1));
@@ -31,13 +36,13 @@ export function Calendar() {
       bookings.forEach(b => {
         if (b.status === 'Cancelled') return;
         if (isInRange(dateStr, b.checkIn, b.checkOut)) {
-          events.push({ ...b, isCheckin: dateStr === b.checkIn, isCheckout: dateStr === b.checkOut, guest: getGuest(b.guestId) });
+          events.push({ ...b, isCheckin: dateStr === b.checkIn, isCheckout: dateStr === b.checkOut, guest: guestsById[b.guestId] });
         }
       });
       cells.push({ day: d, dateStr, events, isToday: dateStr === todayStr });
     }
     return cells;
-  }, [year, month, daysInMonth, firstDay, bookings, todayStr]);
+  }, [year, month, daysInMonth, firstDay, bookings, todayStr, guestsById]);
 
   const selectedEvents = useMemo(() => {
     if (!selected) return [];
@@ -45,10 +50,10 @@ export function Calendar() {
       ...b,
       isCheckin: selected === b.checkIn,
       isCheckout: selected === b.checkOut,
-      guest: getGuest(b.guestId),
-      room: rooms.find(r => r.id === b.roomId),
+      guest: guestsById[b.guestId],
+      room: roomsById[b.roomId],
     }));
-  }, [selected, bookings, rooms]);
+  }, [selected, bookings, roomsById, guestsById]);
 
   const roomColors = {};
   const palette = ['bg-amber-500/40', 'bg-emerald-500/40', 'bg-blue-500/40', 'bg-purple-500/40', 'bg-rose-500/40', 'bg-teal-500/40', 'bg-sky-500/40'];
@@ -92,7 +97,7 @@ export function Calendar() {
                 <div className="space-y-px">
                   {cell.events.slice(0, 3).map((ev, j) => (
                     <div key={j} className={`px-1 py-px rounded text-[10px] lg:text-[11px] font-medium truncate ${roomColors[ev.roomId] || 'bg-slate-600/30'} text-white/80`}>
-                      {ev.isCheckin ? '→ ' : ev.isCheckout ? '← ' : ''}{ev.guest?.name?.split(' ')[0] || ev.guestId}
+                      {ev.isCheckin ? '\u2192 ' : ev.isCheckout ? '\u2190 ' : ''}{ev.guest?.name?.split(' ')[0] || ev.guestId}
                     </div>
                   ))}
                   {cell.events.length > 3 && <p className="text-[11px] text-slate-500 text-center">+{cell.events.length - 3}</p>}
@@ -124,7 +129,7 @@ export function Calendar() {
                       {ev.isCheckin && <span className="px-1.5 py-0.5 bg-emerald-500/10 text-emerald-400/80 text-xs font-medium rounded">IN</span>}
                       {ev.isCheckout && <span className="px-1.5 py-0.5 bg-blue-500/10 text-blue-400/80 text-xs font-medium rounded">OUT</span>}
                     </div>
-                    <p className="text-xs text-slate-500">{ev.guest?.name || ev.guestId} · {ev.checkIn} → {ev.checkOut}</p>
+                    <p className="text-xs text-slate-500">{ev.guest?.name || ev.guestId} &middot; {ev.checkIn} \u2192 {ev.checkOut}</p>
                   </div>
                   <span className={`px-2.5 py-1 text-xs font-medium rounded ${ev.status === 'Confirmed' ? 'bg-emerald-500/10 text-emerald-400/80' : 'bg-amber-500/10 text-amber-400/80'}`}>{ev.status}</span>
                 </div>

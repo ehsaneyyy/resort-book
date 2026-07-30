@@ -1,13 +1,18 @@
 import { useState, useMemo } from 'react';
-import { useStore } from '../hooks/useStore';
+import { useBookings, useSeasonalRules, useRooms, useResort } from '../api/hooks';
 import { formatCurrency, today } from '../data/utils';
 import { MONTHS_SHORT } from '../data/constants';
+import { Loader2 } from 'lucide-react';
 
 export function Reports() {
-  const { bookings, seasonal, getRoom, resort } = useStore();
+  const { data: bookings = [] } = useBookings();
+  const { data: seasonal = [] } = useSeasonalRules();
+  const { data: rooms = [] } = useRooms();
+  const { data: resort } = useResort();
   const todayStr = today();
   const [range, setRange] = useState('month');
   const curr = resort?.currency;
+  const roomsById = useMemo(() => Object.fromEntries(rooms.map(r => [r.id, r])), [rooms]);
 
   const dateRange = useMemo(() => {
     const now = new Date(todayStr);
@@ -43,17 +48,17 @@ export function Reports() {
     const avgNights = confirmed.length ? (totalNights / confirmed.length).toFixed(1) : 0;
     const revenueByRoomType = {};
     confirmed.forEach(b => {
-      const r = getRoom(b.roomId);
+      const r = roomsById[b.roomId];
       const type = r?.type || 'Unknown';
       revenueByRoomType[type] = (revenueByRoomType[type] || 0) + b.total;
     });
     const topRooms = {};
     confirmed.forEach(b => { topRooms[b.roomId] = (topRooms[b.roomId] || 0) + 1; });
-    const sortedRooms = Object.entries(topRooms).sort((a, b) => b[1] - a[1]).map(([id, count]) => ({ room: getRoom(id), count }));
+    const sortedRooms = Object.entries(topRooms).sort((a, b) => b[1] - a[1]).map(([id, count]) => ({ room: roomsById[id], count }));
     const sourceStats = {};
     confirmed.forEach(b => { sourceStats[b.source] = (sourceStats[b.source] || 0) + 1; });
     return { revenue, avgRate, avgNights, totalBookings: relevant.length, confirmedBookings: confirmed.length, totalGuests: new Set(confirmed.map(b => b.guestId)).size, revenueByRoomType, sortedRooms, sourceStats };
-  }, [relevant, getRoom]);
+  }, [relevant, roomsById]);
 
   const yearlyRevenue = useMemo(() => {
     const now = new Date(todayStr);
@@ -167,7 +172,7 @@ export function Reports() {
                   <span className="text-white font-medium">{s.name}</span>
                   <span className={`text-xs font-medium ${s.isActive ? 'text-emerald-400/70' : 'text-slate-500'}`}>{s.isActive ? 'Active' : 'Off'}</span>
                 </div>
-                <p className="text-xs text-slate-500">{s.startDate} → {s.endDate} · {s.adjustment > 0 ? '+' : ''}{s.adjustment}%</p>
+                <p className="text-xs text-slate-500">{s.startDate} \u2192 {s.endDate} &middot; {s.adjustment > 0 ? '+' : ''}{s.adjustment}%</p>
               </div>
             ))}
           </div>

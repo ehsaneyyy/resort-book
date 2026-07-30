@@ -1,16 +1,25 @@
-import { useStore } from '../hooks/useStore';
+import { useMemo } from 'react';
+import { useBookings, useRooms, useGuests, useResort, useUpdateBookingStatus } from '../api/hooks';
 import { formatCurrency, formatDate, today } from '../data/utils';
 import { useToast } from '../components/Toast';
-import { CheckCircle, ArrowRight } from 'lucide-react';
+import { CheckCircle, ArrowRight, Loader2 } from 'lucide-react';
 
 export function Dashboard() {
-  const { bookings, rooms, guests, getGuest, getRoom, updateBookings, resort } = useStore();
+  const { data: bookings = [] } = useBookings();
+  const { data: rooms = [] } = useRooms();
+  const { data: guests = [] } = useGuests();
+  const { data: resort } = useResort();
+  const updateBookingStatus = useUpdateBookingStatus();
   const toast = useToast();
   const todayStr = today();
+
+  const roomsById = useMemo(() => Object.fromEntries(rooms.map(r => [r.id, r])), [rooms]);
+  const guestsById = useMemo(() => Object.fromEntries(guests.map(g => [g.id, g])), [guests]);
+
   const confirmed = bookings.filter(b => b.status === 'Confirmed');
   const pending = bookings.filter(b => b.status === 'Pending');
   const occupied = confirmed.filter(b => todayStr >= b.checkIn && todayStr < b.checkOut).length;
-  const occupancy = Math.round((occupied / rooms.length) * 100);
+  const occupancy = rooms.length ? Math.round((occupied / rooms.length) * 100) : 0;
   const todayCheckins = bookings.filter(b => b.checkIn === todayStr && (b.status === 'Confirmed' || b.status === 'Pending'));
   const todayCheckouts = bookings.filter(b => b.checkOut === todayStr && b.status === 'Confirmed');
   const todayRevenue = todayCheckins.reduce((s, b) => s + b.total, 0);
@@ -19,8 +28,10 @@ export function Dashboard() {
 
   const curr = resort?.currency;
   const confirmBooking = (id) => {
-    updateBookings(prev => prev.map(b => b.id === id ? { ...b, status: 'Confirmed' } : b));
-    toast('Booking confirmed', 'success');
+    updateBookingStatus.mutate({ id, status: 'Confirmed' }, {
+      onSuccess: () => toast('Booking confirmed', 'success'),
+      onError: () => toast('Failed to confirm', 'error'),
+    });
   };
 
   return (
@@ -50,8 +61,8 @@ export function Dashboard() {
             </div>
             <div className="divide-y divide-white/[0.02]">
               {recentBookings.map(b => {
-                const guest = getGuest(b.guestId);
-                const room = getRoom(b.roomId);
+                const guest = guestsById[b.guestId];
+                const room = roomsById[b.roomId];
                 return (
                   <div key={b.id} className="flex items-center gap-3 px-5 py-3 hover:bg-white/[0.01] focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors">
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-500/20 to-amber-600/10 flex items-center justify-center text-amber-400/80 text-xs font-medium flex-shrink-0">
@@ -59,7 +70,7 @@ export function Dashboard() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-white truncate">{guest?.name || 'Unknown'}</p>
-                      <p className="text-xs text-slate-500">{room?.name || b.roomId} · {formatDate(b.checkIn)}</p>
+                      <p className="text-xs text-slate-500">{room?.name || b.roomId} &middot; {formatDate(b.checkIn)}</p>
                     </div>
                     <div className="text-right flex-shrink-0">
                       <p className="text-sm text-white font-medium">{formatCurrency(b.total, curr)}</p>
@@ -78,8 +89,8 @@ export function Dashboard() {
               </div>
               <div className="divide-y divide-white/[0.02]">
                 {upcomingArrivals.map(b => {
-                  const guest = getGuest(b.guestId);
-                  const room = getRoom(b.roomId);
+                  const guest = guestsById[b.guestId];
+                  const room = roomsById[b.roomId];
                   const daysUntil = Math.ceil((new Date(b.checkIn) - new Date(todayStr)) / 864e5);
                   return (
                     <div key={b.id} className="flex items-center gap-3 px-5 py-3">
@@ -88,7 +99,7 @@ export function Dashboard() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-white truncate">{guest?.name || 'Unknown'}</p>
-                        <p className="text-xs text-slate-500">{room?.name || b.roomId} · {b.nights}N</p>
+                        <p className="text-xs text-slate-500">{room?.name || b.roomId} &middot; {b.nights}N</p>
                       </div>
                       <div className="text-right flex-shrink-0">
                         <p className="text-xs text-slate-500">{daysUntil === 1 ? 'Tomorrow' : `${daysUntil} days`}</p>
@@ -111,17 +122,17 @@ export function Dashboard() {
               <div>
                 <p className="text-xs font-medium text-slate-500 uppercase tracking-[1.5px] mb-2.5">Check-ins ({todayCheckins.length})</p>
                 {todayCheckins.length === 0 ? (
-                  <p className="text-xs text-slate-500">—</p>
+                  <p className="text-xs text-slate-500">\u2014</p>
                 ) : (
                   <div className="space-y-2">
                     {todayCheckins.map(b => {
-                      const guest = getGuest(b.guestId);
-                      const room = getRoom(b.roomId);
+                      const guest = guestsById[b.guestId];
+                      const room = roomsById[b.roomId];
                       return (
                         <div key={b.id} className="flex items-center gap-2.5 text-xs">
                           <span className="w-1.5 h-1.5 bg-emerald-500/60 rounded-full flex-shrink-0" />
                           <span className="text-slate-300">{guest?.name}</span>
-                          <span className="text-slate-500">·</span>
+                          <span className="text-slate-500">&middot;</span>
                           <span className="text-slate-500">{room?.name}</span>
                         </div>
                       );
@@ -132,17 +143,17 @@ export function Dashboard() {
               <div>
                 <p className="text-xs font-medium text-slate-500 uppercase tracking-[1.5px] mb-2.5">Check-outs ({todayCheckouts.length})</p>
                 {todayCheckouts.length === 0 ? (
-                  <p className="text-xs text-slate-500">—</p>
+                  <p className="text-xs text-slate-500">\u2014</p>
                 ) : (
                   <div className="space-y-2">
                     {todayCheckouts.map(b => {
-                      const guest = getGuest(b.guestId);
-                      const room = getRoom(b.roomId);
+                      const guest = guestsById[b.guestId];
+                      const room = roomsById[b.roomId];
                       return (
                         <div key={b.id} className="flex items-center gap-2.5 text-xs">
                           <span className="w-1.5 h-1.5 bg-blue-500/60 rounded-full flex-shrink-0" />
                           <span className="text-slate-300">{guest?.name}</span>
-                          <span className="text-slate-500">·</span>
+                          <span className="text-slate-500">&middot;</span>
                           <span className="text-slate-500">{room?.name}</span>
                         </div>
                       );
@@ -160,13 +171,13 @@ export function Dashboard() {
               </div>
               <div className="divide-y divide-white/[0.02]">
                 {pending.map(b => {
-                  const guest = getGuest(b.guestId);
-                  const room = getRoom(b.roomId);
+                  const guest = guestsById[b.guestId];
+                  const room = roomsById[b.roomId];
                   return (
                     <div key={b.id} className="flex items-center gap-3 px-5 py-3">
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-white truncate">{guest?.name || 'Unknown'}</p>
-                        <p className="text-xs text-slate-500">{room?.name || b.roomId} · {formatDate(b.checkIn)}</p>
+                        <p className="text-xs text-slate-500">{room?.name || b.roomId} &middot; {formatDate(b.checkIn)}</p>
                       </div>
                       <button onClick={() => confirmBooking(b.id)} className="px-3 py-2 min-h-[44px] bg-amber-500/10 text-amber-400 text-xs font-medium rounded hover:bg-amber-500/20 focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors flex items-center gap-1.5">
                         <CheckCircle className="w-3 h-3" /> Confirm

@@ -1,13 +1,18 @@
-import { useState } from 'react';
-import { useStore } from '../hooks/useStore';
+import { useState, useMemo } from 'react';
+import { useRooms, useBookings, useCreateRoom, useUpdateRoom, useDeleteRoom, useResort } from '../api/hooks';
 import { formatCurrency, today } from '../data/utils';
 import { useToast } from '../components/Toast';
 import { Modal } from '../components/Modal';
 import { ConfirmDialog } from '../components/ConfirmDialog';
-import { Plus, Edit3, Trash2, BedDouble } from 'lucide-react';
+import { Plus, Edit3, Trash2, BedDouble, Loader2 } from 'lucide-react';
 
 export function Rooms() {
-  const { rooms, updateRooms, bookings, resort } = useStore();
+  const { data: rooms = [], isLoading } = useRooms();
+  const { data: bookings = [] } = useBookings();
+  const { data: resort } = useResort();
+  const createRoom = useCreateRoom();
+  const updateRoom = useUpdateRoom();
+  const deleteRoom = useDeleteRoom();
   const toast = useToast();
   const [filter, setFilter] = useState('all');
   const [modal, setModal] = useState(null);
@@ -24,23 +29,27 @@ export function Rooms() {
     e.preventDefault();
     const data = { ...form, price: Number(form.price), weekendPrice: Number(form.weekendPrice), capacity: Number(form.capacity), size: Number(form.size), floor: Number(form.floor), amenities: form.amenities.split(',').map(a => a.trim()).filter(Boolean) };
     if (modal === 'edit') {
-      updateRooms(prev => prev.map(r => r.id === form.id ? { ...r, ...data } : r));
-      toast('Room updated', 'success');
+      updateRoom.mutate({ id: form.id, ...data }, {
+        onSuccess: () => { toast('Room updated', 'success'); setModal(null); },
+        onError: () => toast('Failed to update', 'error'),
+      });
     } else {
-      const maxNum = rooms.reduce((max, r) => { const n = parseInt(r.id.replace(/\D/g, ''), 10); return n > max ? n : max; }, 0);
-      data.id = 'RM' + String(maxNum + 1).padStart(3, '0');
-      data.status = 'available';
-      updateRooms(prev => [...prev, data]);
-      toast('Room added', 'success');
+      createRoom.mutate(data, {
+        onSuccess: () => { toast('Room added', 'success'); setModal(null); },
+        onError: () => toast('Failed to add', 'error'),
+      });
     }
-    setModal(null);
   };
   const del = (id) => setConfirmId(id);
+
+  if (isLoading) {
+    return <div className="flex items-center justify-center py-20"><Loader2 className="w-6 h-6 text-amber-400/70 animate-spin" /></div>;
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <p className="text-xs text-slate-500">{rooms.length} rooms · {occupied.length} occupied</p>
+        <p className="text-xs text-slate-500">{rooms.length} rooms &middot; {occupied.length} occupied</p>
         <button onClick={openAdd} className="px-3 py-2 min-h-[44px] bg-amber-500/10 text-amber-400 text-xs font-medium rounded hover:bg-amber-500/20 focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors flex items-center gap-1.5">
           <Plus className="w-4 h-4" /> Add Room
         </button>
@@ -68,7 +77,7 @@ export function Rooms() {
                     </div>
                     <div>
                       <h3 className="text-sm font-medium text-white">{r.name}</h3>
-                      <p className="text-xs text-slate-500">{r.type} · Floor {r.floor}</p>
+                      <p className="text-xs text-slate-500">{r.type} &middot; Floor {r.floor}</p>
                     </div>
                   </div>
                   <span className={`px-2.5 py-1 text-xs font-medium rounded ${isOcc ? 'bg-red-500/8 text-red-400/70' : 'bg-emerald-500/8 text-emerald-400/70'}`}>{isOcc ? 'Occupied' : 'Available'}</span>
@@ -110,8 +119,8 @@ export function Rooms() {
               <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Type</label><select value={form.type || ''} onChange={e => setForm({ ...form, type: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50"><option>Standard</option><option>Deluxe</option><option>Suite</option><option>Premium Suite</option><option>Villa</option></select></div>
             </div>
             <div className="grid grid-cols-3 gap-3">
-              <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Weekday (₹)</label><input required type="number" min="0" value={form.price || ''} onChange={e => setForm({ ...form, price: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" /></div>
-              <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Weekend (₹)</label><input required type="number" min="0" value={form.weekendPrice || ''} onChange={e => setForm({ ...form, weekendPrice: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" /></div>
+              <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Weekday (\u20B9)</label><input required type="number" min="0" value={form.price || ''} onChange={e => setForm({ ...form, price: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" /></div>
+              <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Weekend (\u20B9)</label><input required type="number" min="0" value={form.weekendPrice || ''} onChange={e => setForm({ ...form, weekendPrice: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" /></div>
               <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Capacity</label><input required type="number" min="1" value={form.capacity || ''} onChange={e => setForm({ ...form, capacity: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" /></div>
             </div>
             <div className="grid grid-cols-3 gap-3">
@@ -133,7 +142,7 @@ export function Rooms() {
         <ConfirmDialog
           title="Delete Room"
           message="This will permanently remove this room."
-          onConfirm={() => { updateRooms(prev => prev.filter(r => r.id !== confirmId)); toast('Room deleted', 'info'); setConfirmId(null); }}
+          onConfirm={() => { deleteRoom.mutate(confirmId); toast('Room deleted', 'info'); setConfirmId(null); }}
           onCancel={() => setConfirmId(null)}
         />
       )}

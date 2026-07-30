@@ -1,15 +1,15 @@
 import { useState } from 'react';
-import { useStore } from '../hooks/useStore';
+import { useSeasonalRules, useCreateSeasonalRule, useUpdateSeasonalRule, useDeleteSeasonalRule } from '../api/hooks';
 import { useToast } from '../components/Toast';
 import { Modal } from '../components/Modal';
 import { ConfirmDialog } from '../components/ConfirmDialog';
-import { Calendar, Plus, Edit3, Trash2 } from 'lucide-react';
+import { Calendar, Plus, Edit3, Trash2, Loader2 } from 'lucide-react';
 import { MONTHS_SHORT } from '../data/constants';
 
 function formatPeriod(start, end) {
   const s = new Date(start + 'T00:00:00');
   const e = new Date(end + 'T00:00:00');
-  return `${MONTHS_SHORT[s.getMonth()]} ${s.getDate()} → ${MONTHS_SHORT[e.getMonth()]} ${e.getDate()}`;
+  return `${MONTHS_SHORT[s.getMonth()]} ${s.getDate()} \u2192 ${MONTHS_SHORT[e.getMonth()]} ${e.getDate()}`;
 }
 
 function getMonthRange(months) {
@@ -22,7 +22,10 @@ function getMonthRange(months) {
 }
 
 export function Pricing() {
-  const { seasonal, updateSeasonal } = useStore();
+  const { data: seasonal = [], isLoading } = useSeasonalRules();
+  const createRule = useCreateSeasonalRule();
+  const updateRule = useUpdateSeasonalRule();
+  const deleteRule = useDeleteSeasonalRule();
   const toast = useToast();
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState({});
@@ -48,26 +51,34 @@ export function Pricing() {
     e.preventDefault();
     const data = { ...form, adjustment: Number(form.adjustment) };
     if (modal === 'edit') {
-      updateSeasonal(prev => prev.map(r => r.id === form.id ? { ...r, ...data } : r));
-      toast('Rule updated', 'success');
+      updateRule.mutate({ id: form.id, ...data }, {
+        onSuccess: () => { toast('Rule updated', 'success'); setModal(null); },
+        onError: () => toast('Failed to update', 'error'),
+      });
     } else {
-      data.id = 'SE' + String(Date.now()).slice(-4);
-      updateSeasonal(prev => [...prev, data]);
-      toast('Rule created', 'success');
+      createRule.mutate(data, {
+        onSuccess: () => { toast('Rule created', 'success'); setModal(null); },
+        onError: () => toast('Failed to create', 'error'),
+      });
     }
-    setModal(null);
   };
 
   const del = (id) => setConfirmId(id);
   const toggle = (rule) => {
-    updateSeasonal(prev => prev.map(r => r.id === rule.id ? { ...r, isActive: !r.isActive } : r));
-    toast(rule.isActive ? 'Deactivated' : 'Activated', 'info');
+    updateRule.mutate({ id: rule.id, isActive: !rule.isActive }, {
+      onSuccess: () => toast(rule.isActive ? 'Deactivated' : 'Activated', 'info'),
+      onError: () => toast('Failed to toggle', 'error'),
+    });
   };
+
+  if (isLoading) {
+    return <div className="flex items-center justify-center py-20"><Loader2 className="w-6 h-6 text-amber-400/70 animate-spin" /></div>;
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <p className="text-xs text-slate-500">{seasonal.length} rules · {seasonal.filter(s => s.isActive).length} active</p>
+        <p className="text-xs text-slate-500">{seasonal.length} rules &middot; {seasonal.filter(s => s.isActive).length} active</p>
         <button onClick={openAdd} className="px-3 py-2 min-h-[44px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors flex items-center gap-1.5">
           <Plus className="w-4 h-4" /> Add Rule
         </button>
@@ -121,7 +132,7 @@ export function Pricing() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Adjustment</label><input required type="number" value={form.adjustment ?? ''} onChange={e => setForm({ ...form, adjustment: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" placeholder="+20 or -10" /></div>
-              <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Type</label><select value={form.type || ''} onChange={e => setForm({ ...form, type: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50"><option value="percentage">Percentage (%)</option><option value="fixed">Fixed (₹)</option></select></div>
+              <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Type</label><select value={form.type || ''} onChange={e => setForm({ ...form, type: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50"><option value="percentage">Percentage (%)</option><option value="fixed">Fixed (\u20B9)</option></select></div>
             </div>
             <div className="flex items-center gap-2">
               <input type="checkbox" id="active" checked={form.isActive ?? true} onChange={e => setForm({ ...form, isActive: e.target.checked })} className="w-4 h-4 accent-amber-500" />
@@ -139,7 +150,7 @@ export function Pricing() {
         <ConfirmDialog
           title="Delete Rule"
           message="This will remove this pricing rule."
-          onConfirm={() => { updateSeasonal(prev => prev.filter(r => r.id !== confirmId)); toast('Deleted', 'info'); setConfirmId(null); }}
+          onConfirm={() => { deleteRule.mutate(confirmId); toast('Deleted', 'info'); setConfirmId(null); }}
           onCancel={() => setConfirmId(null)}
         />
       )}

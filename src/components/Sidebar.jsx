@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { LayoutDashboard, BedDouble, CalendarDays, Users, BarChart3, DollarSign, Settings, CalendarCheck, Menu, X, MessageCircle, Plus } from 'lucide-react';
 import { useState } from 'react';
-import { useStore } from '../hooks/useStore';
+import { useBookings } from '../api/hooks';
 import { WhatsAppQuickAdd } from './WhatsAppQuickAdd';
 
 const navItems = [
@@ -18,7 +18,7 @@ const navItems = [
 export function Sidebar({ sidebarOpen, onToggle }) {
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const location = useLocation();
-  const { bookings } = useStore();
+  const { data: bookings = [] } = useBookings();
   const pending = bookings.filter(b => b.status === 'Pending').length;
 
   return (

@@ -1,16 +1,24 @@
-import { useState } from 'react';
-import { useStore } from '../hooks/useStore';
+import { useState, useMemo } from 'react';
+import { useBookings, useRooms, useGuests, useResort, useCreateBooking, useUpdateBooking, useUpdateBookingStatus, useDeleteBooking, useCreateGuest } from '../api/hooks';
 import { formatCurrency, formatDate, statusColor, today } from '../data/utils';
 import { useToast } from '../components/Toast';
 import { Modal } from '../components/Modal';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { PrintInvoice } from '../components/PrintInvoice';
-import { Search, Eye, CheckCircle, XCircle, LogOut, Trash2, Printer, Plus, MessageCircle } from 'lucide-react';
+import { Search, Eye, CheckCircle, XCircle, LogOut, Trash2, Printer, Plus, MessageCircle, Loader2 } from 'lucide-react';
 import { whatsappLink, confirmationMsg, preArrivalMsg, postStayMsg } from '../data/templates';
 import { PHONE_REGEX, EMAIL_REGEX } from '../data/constants';
 
 export function Bookings() {
-  const { bookings, updateBookings, getGuest, getRoom, resort, rooms, guests, updateGuests } = useStore();
+  const { data: bookings = [], isLoading } = useBookings();
+  const { data: rooms = [] } = useRooms();
+  const { data: guests = [] } = useGuests();
+  const { data: resort } = useResort();
+  const createBooking = useCreateBooking();
+  const updateBooking = useUpdateBooking();
+  const updateBookingStatus = useUpdateBookingStatus();
+  const deleteBooking = useDeleteBooking();
+  const createGuest = useCreateGuest();
   const toast = useToast();
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
@@ -18,23 +26,36 @@ export function Bookings() {
   const [confirmId, setConfirmId] = useState(null);
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState({});
+  const [printBooking, setPrintBooking] = useState(null);
+
+  const roomsById = useMemo(() => Object.fromEntries(rooms.map(r => [r.id, r])), [rooms]);
+  const guestsById = useMemo(() => Object.fromEntries(guests.map(g => [g.id, g])), [guests]);
 
   let filtered = filter === 'all' ? bookings : bookings.filter(b => b.status === filter);
   if (search) {
     const q = search.toLowerCase();
-    filtered = filtered.filter(b => { const g = getGuest(b.guestId); return (g && g.name.toLowerCase().includes(q)) || b.id.toLowerCase().includes(q); });
+    filtered = filtered.filter(b => { const g = guestsById[b.guestId]; return (g && g.name.toLowerCase().includes(q)) || b.id.toLowerCase().includes(q); });
   }
 
   const update = (id, status) => {
-    updateBookings(prev => prev.map(b => b.id === id ? { ...b, status, ...(status === 'Checked Out' ? { paymentStatus: 'Paid' } : {}) } : b));
-    toast(`Booking ${status.toLowerCase()}`, status === 'Cancelled' ? 'warning' : 'success');
+    if (status === 'Checked Out') {
+      updateBooking.mutate({ id, status, paymentStatus: 'Paid' }, {
+        onSuccess: () => toast('Booking checked out', 'success'),
+        onError: () => toast('Failed to update', 'error'),
+      });
+    } else {
+      updateBookingStatus.mutate({ id, status }, {
+        onSuccess: () => toast(`Booking ${status.toLowerCase()}`, status === 'Cancelled' ? 'warning' : 'success'),
+        onError: () => toast('Failed to update', 'error'),
+      });
+    }
   };
 
   const del = (id) => setConfirmId(id);
 
   const sendWhatsApp = (booking, type) => {
-    const g = getGuest(booking.guestId);
-    const r = getRoom(booking.roomId);
+    const g = guestsById[booking.guestId];
+    const r = roomsById[booking.roomId];
     let msg;
     if (type === 'confirm') msg = confirmationMsg(booking, g, r, resort);
     else if (type === 'arrival') msg = preArrivalMsg(booking, g, r, resort);
@@ -43,11 +64,8 @@ export function Bookings() {
     if (link !== '#') window.open(link, '_blank');
   };
 
-  const [printBooking, setPrintBooking] = useState(null);
-  const printGuest = printBooking ? getGuest(printBooking.guestId) : null;
-  const printRoom = printBooking ? getRoom(printBooking.roomId) : null;
-
-  const printInvoice = (booking) => setPrintBooking(booking);
+  const printGuest = printBooking ? guestsById[printBooking.guestId] : null;
+  const printRoom = printBooking ? roomsById[printBooking.roomId] : null;
 
   const stats = { total: bookings.length, Confirmed: bookings.filter(b => b.status === 'Confirmed').length, Pending: bookings.filter(b => b.status === 'Pending').length, Cancelled: bookings.filter(b => b.status === 'Cancelled').length, 'Checked Out': bookings.filter(b => b.status === 'Checked Out').length };
 
@@ -58,9 +76,9 @@ export function Bookings() {
     setModal('add');
   };
 
-  const saveBooking = (e) => {
+  const saveBooking = async (e) => {
     e.preventDefault();
-    const room = rooms.find(r => r.id === form.roomId);
+    const room = roomsById[form.roomId];
     if (!room || !form.checkIn || !form.checkOut) return;
 
     if (form.checkIn < today()) { toast('Check-in cannot be in the past', 'warning'); return; }
@@ -70,28 +88,36 @@ export function Bookings() {
       if (form.email && !EMAIL_REGEX.test(form.email)) { toast('Invalid email format', 'warning'); return; }
     }
 
-    let guestId = form.guestId;
-    if (form.newGuest) {
-      const maxNum = guests.reduce((max, g) => { const n = parseInt(g.id.replace(/\D/g, ''), 10); return n > max ? n : max; }, 0);
-      guestId = 'G' + String(maxNum + 1).padStart(3, '0');
-      updateGuests(prev => [...prev, { id: guestId, name: form.name, phone: form.phone, email: form.email, city: form.city, totalBookings: 0, totalSpent: 0, lastStay: null, vip: false, notes: '' }]);
+    try {
+      let guestId = form.guestId;
+      if (form.newGuest) {
+        const newGuest = await createGuest.mutateAsync({
+          name: form.name, phone: form.phone, email: form.email, city: form.city,
+          totalBookings: 0, totalSpent: 0, lastStay: null, vip: false, notes: '',
+        });
+        guestId = newGuest.id;
+      }
+
+      const nights = Math.ceil((new Date(form.checkOut) - new Date(form.checkIn)) / 864e5);
+      const total = room.price * nights;
+
+      await createBooking.mutateAsync({
+        guestId, roomId: form.roomId, checkIn: form.checkIn, checkOut: form.checkOut,
+        nights, adults: Number(form.adults), children: Number(form.children),
+        total, status: 'Pending', paymentStatus: 'Pending', paymentMethod: 'Pay at Hotel',
+        source: form.source, specialRequests: form.specialRequests,
+        createdAt: new Date().toISOString().split('T')[0],
+      });
+      toast('Booking created', 'success');
+      setModal(null);
+    } catch {
+      toast('Failed to create booking', 'error');
     }
-
-    const nights = Math.ceil((new Date(form.checkOut) - new Date(form.checkIn)) / 864e5);
-    const total = room.price * nights;
-    const maxBNum = bookings.reduce((max, b) => { const n = parseInt(b.id.replace(/\D/g, ''), 10); return n > max ? n : max; }, 0);
-
-    updateBookings(prev => [...prev, {
-      id: 'RB' + String(maxBNum + 1).padStart(3, '0'),
-      guestId, roomId: form.roomId, checkIn: form.checkIn, checkOut: form.checkOut,
-      nights, adults: Number(form.adults), children: Number(form.children),
-      total, status: 'Pending', paymentStatus: 'Pending', paymentMethod: 'Pay at Hotel',
-      source: form.source, specialRequests: form.specialRequests,
-      createdAt: new Date().toISOString().split('T')[0]
-    }]);
-    toast('Booking created', 'success');
-    setModal(null);
   };
+
+  if (isLoading) {
+    return <div className="flex items-center justify-center py-20"><Loader2 className="w-6 h-6 text-amber-400/70 animate-spin" /></div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -130,8 +156,8 @@ export function Bookings() {
                 </thead>
                 <tbody className="divide-y divide-white/[0.02]">
                   {filtered.map(b => {
-                    const g = getGuest(b.guestId);
-                    const r = getRoom(b.roomId);
+                    const g = guestsById[b.guestId];
+                    const r = roomsById[b.roomId];
                     return (
                       <tr key={b.id} className="hover:bg-white/[0.01] focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors">
                         <td className="py-3 px-4 text-xs font-mono text-slate-500">{b.id}</td>
@@ -144,7 +170,7 @@ export function Bookings() {
                         <td className="py-3 px-4 text-sm text-slate-500">{r?.name || b.roomId}</td>
                         <td className="py-3 px-4">
                           <p className="text-sm text-slate-300">{formatDate(b.checkIn)}</p>
-                          <p className="text-xs text-slate-500">{b.nights}N · {b.adults}A{b.children ? `, ${b.children}C` : ''}</p>
+                          <p className="text-xs text-slate-500">{b.nights}N &middot; {b.adults}A{b.children ? `, ${b.children}C` : ''}</p>
                         </td>
                         <td className="py-3 px-4">
                           <p className="text-sm text-white font-medium">{formatCurrency(b.total, curr)}</p>
@@ -172,8 +198,8 @@ export function Bookings() {
 
           <div className="lg:hidden space-y-3">
             {filtered.map(b => {
-              const g = getGuest(b.guestId);
-              const r = getRoom(b.roomId);
+              const g = guestsById[b.guestId];
+              const r = roomsById[b.roomId];
               return (
                 <div key={b.id} className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-4">
                   <div className="flex items-start justify-between mb-3">
@@ -189,8 +215,8 @@ export function Bookings() {
                   <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-sm mb-3">
                     <div><span className="text-slate-500">Room</span><p className="text-white">{r?.name || b.roomId}</p></div>
                     <div><span className="text-slate-500">Amount</span><p className="text-white font-medium">{formatCurrency(b.total, curr)}</p></div>
-                    <div><span className="text-slate-500">Dates</span><p className="text-white">{formatDate(b.checkIn)} → {formatDate(b.checkOut)}</p></div>
-                    <div><span className="text-slate-500">Nights</span><p className="text-white">{b.nights}N · {b.adults}A{b.children ? `, ${b.children}C` : ''}</p></div>
+                    <div><span className="text-slate-500">Dates</span><p className="text-white">{formatDate(b.checkIn)} \u2192 {formatDate(b.checkOut)}</p></div>
+                    <div><span className="text-slate-500">Nights</span><p className="text-white">{b.nights}N &middot; {b.adults}A{b.children ? `, ${b.children}C` : ''}</p></div>
                     <div><span className="text-slate-500">Payment</span><p className={`${b.paymentStatus === 'Paid' ? 'text-emerald-400' : b.paymentStatus === 'Refunded' ? 'text-red-400' : 'text-amber-400'}`}>{b.paymentStatus}</p></div>
                   </div>
                   <div className="flex gap-2 pt-2 border-t border-white/[0.02]">
@@ -212,7 +238,7 @@ export function Bookings() {
       {detail && (
         <Modal title={`Booking ${detail.id}`} onClose={() => setDetail(null)}>
           <div className="space-y-4">
-            {(() => { const g = getGuest(detail.guestId); const r = getRoom(detail.roomId); return (<>
+            {(() => { const g = guestsById[detail.guestId]; const r = roomsById[detail.roomId]; return (<>
               <div>
                 <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-2">Guest</h4>
                 <div className="grid grid-cols-2 gap-2 text-sm">
@@ -235,7 +261,7 @@ export function Bookings() {
               </div>
               {detail.specialRequests && <div className="text-sm text-slate-500 bg-dark-700/50 rounded p-3 border border-white/[0.02]"><p className="text-slate-500 text-xs font-semibold uppercase tracking-[1.5px] mb-1">Special Requests</p>{detail.specialRequests}</div>}
               <div className="flex gap-2 pt-1">
-                <button onClick={() => printInvoice(detail)} className="px-3 py-2 min-h-[44px] bg-dark-700 hover:bg-dark-600 text-slate-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors flex items-center gap-1.5"><Printer className="w-4 h-4" /> Print</button>
+                <button onClick={() => setPrintBooking(detail)} className="px-3 py-2 min-h-[44px] bg-dark-700 hover:bg-dark-600 text-slate-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors flex items-center gap-1.5"><Printer className="w-4 h-4" /> Print</button>
                 <button onClick={() => sendWhatsApp(detail, 'confirm')} className="px-3 py-2 min-h-[44px] bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors flex items-center gap-1.5"><MessageCircle className="w-4 h-4" /> WhatsApp</button>
                 {detail.status === 'Pending' && <button onClick={() => { update(detail.id, 'Confirmed'); setDetail(null); }} className="flex-1 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors">Confirm</button>}
                 {detail.status === 'Confirmed' && <button onClick={() => { update(detail.id, 'Checked Out'); setDetail(null); }} className="flex-1 py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors">Check Out</button>}
@@ -249,7 +275,7 @@ export function Bookings() {
         <ConfirmDialog
           title="Delete Booking"
           message="This will permanently delete this booking record."
-          onConfirm={() => { updateBookings(prev => prev.filter(b => b.id !== confirmId)); toast('Deleted', 'info'); setConfirmId(null); }}
+          onConfirm={() => { deleteBooking.mutate(confirmId); toast('Deleted', 'info'); setConfirmId(null); }}
           onCancel={() => setConfirmId(null)}
         />
       )}
@@ -261,7 +287,7 @@ export function Bookings() {
               <label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Room</label>
               <select required value={form.roomId || ''} onChange={e => setForm({ ...form, roomId: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50">
                 <option value="">Select...</option>
-                {rooms.map(r => <option key={r.id} value={r.id}>{r.name} — {formatCurrency(r.price, curr)}/night</option>)}
+                {rooms.map(r => <option key={r.id} value={r.id}>{r.name} \u2014 {formatCurrency(r.price, curr)}/night</option>)}
               </select>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -291,7 +317,7 @@ export function Bookings() {
               ) : (
                 <select required value={form.guestId || ''} onChange={e => setForm({ ...form, guestId: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50">
                   <option value="">Select...</option>
-                  {guests.map(g => <option key={g.id} value={g.id}>{g.name} — {g.phone}</option>)}
+                  {guests.map(g => <option key={g.id} value={g.id}>{g.name} \u2014 {g.phone}</option>)}
                 </select>
               )}
             </div>

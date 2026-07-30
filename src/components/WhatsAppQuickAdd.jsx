@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { useStore } from '../hooks/useStore';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { useRooms, useGuests, useResort, useCreateBooking, useCreateGuest } from '../api/hooks';
 import { useToast } from './Toast';
 import { formatCurrency, today } from '../data/utils';
 import { whatsappLink, confirmationMsg } from '../data/templates';
@@ -7,14 +7,22 @@ import { PHONE_REGEX } from '../data/constants';
 import { MessageCircle, Send, Plus } from 'lucide-react';
 
 export function WhatsAppQuickAdd({ onClose }) {
-  const { rooms, guests, bookings, updateBookings, updateGuests, resort, getRoom } = useStore();
+  const { data: rooms = [] } = useRooms();
+  const { data: guests = [] } = useGuests();
+  const { data: resort } = useResort();
+  const createBooking = useCreateBooking();
+  const createGuest = useCreateGuest();
   const toast = useToast();
   const [step, setStep] = useState('form');
-  const [form, setForm] = useState({ name: '', phone: '+91', roomId: rooms[0]?.id || '', checkIn: today(), nights: 2, adults: 2 });
+  const [form, setForm] = useState({ name: '', phone: '+91', roomId: '', checkIn: today(), nights: 2, adults: 2 });
   const [booking, setBooking] = useState(null);
   const inputRef = useRef(null);
 
+  useEffect(() => { if (rooms.length > 0 && !form.roomId) setForm(prev => ({ ...prev, roomId: rooms[0].id })); }, [rooms]);
+
   useEffect(() => { inputRef.current?.focus(); }, []);
+
+  const roomsById = useMemo(() => Object.fromEntries(rooms.map(r => [r.id, r])), [rooms]);
 
   const calcCheckOut = () => {
     const d = new Date(form.checkIn);
@@ -23,49 +31,51 @@ export function WhatsAppQuickAdd({ onClose }) {
   };
 
   const curr = resort?.currency;
-  const room = getRoom(form.roomId);
+  const room = roomsById[form.roomId];
   const checkOut = calcCheckOut();
   const nights = Number(form.nights);
   const total = room ? room.price * nights : 0;
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
-    const roomObj = rooms.find(r => r.id === form.roomId);
-    if (!roomObj || !form.name.trim() || !form.phone.trim()) return;
+    if (!room || !form.name.trim() || !form.phone.trim()) return;
     if (!PHONE_REGEX.test(form.phone)) { toast('Invalid phone format', 'warning'); return; }
     if (form.checkIn < today()) { toast('Check-in cannot be in the past', 'warning'); return; }
 
-    let guestId = form.guestId;
-    if (!guestId) {
-      const existing = guests.find(g => g.phone.replace(/\D/g, '').slice(-10) === form.phone.replace(/\D/g, '').slice(-10));
-      if (existing) {
-        guestId = existing.id;
-      } else {
-        const maxNum = guests.reduce((max, g) => Math.max(max, parseInt(g.id.replace(/\D/g, ''), 10) || 0), 0);
-        guestId = 'G' + String(maxNum + 1).padStart(3, '0');
-        updateGuests(prev => [...prev, { id: guestId, name: form.name.trim(), email: '', phone: form.phone.trim(), city: '', totalBookings: 0, totalSpent: 0, lastStay: null, vip: false, notes: '' }]);
+    try {
+      let guestId = form.guestId;
+      if (!guestId) {
+        const existing = guests.find(g => g.phone?.replace(/\D/g, '').slice(-10) === form.phone.replace(/\D/g, '').slice(-10));
+        if (existing) {
+          guestId = existing.id;
+        } else {
+          const newGuest = await createGuest.mutateAsync({
+            name: form.name.trim(), email: '', phone: form.phone.trim(), city: '',
+            totalBookings: 0, totalSpent: 0, lastStay: null, vip: false, notes: '',
+          });
+          guestId = newGuest.id;
+        }
       }
+
+      const newBooking = await createBooking.mutateAsync({
+        guestId, roomId: form.roomId, checkIn: form.checkIn, checkOut,
+        nights, adults: Number(form.adults), children: 0,
+        total, status: 'Pending', paymentStatus: 'Pending', paymentMethod: 'Pay at Hotel',
+        source: 'WhatsApp', specialRequests: '',
+        createdAt: today(),
+      });
+
+      setBooking(newBooking);
+      toast('Booking created', 'success');
+      setStep('done');
+    } catch {
+      toast('Failed to create booking', 'error');
     }
-
-    const maxBNum = bookings.reduce((max, b) => Math.max(max, parseInt(b.id.replace(/\D/g, ''), 10) || 0), 0);
-    const newBooking = {
-      id: 'RB' + String(maxBNum + 1).padStart(3, '0'),
-      guestId, roomId: form.roomId, checkIn: form.checkIn, checkOut,
-      nights, adults: Number(form.adults), children: 0,
-      total, status: 'Pending', paymentStatus: 'Pending', paymentMethod: 'Pay at Hotel',
-      source: 'WhatsApp', specialRequests: '',
-      createdAt: today(),
-    };
-
-    updateBookings(prev => [...prev, newBooking]);
-    setBooking(newBooking);
-    toast('Booking created', 'success');
-    setStep('done');
   };
 
   const openWhatsApp = () => {
     const guest = booking ? { name: form.name, phone: form.phone } : null;
-    const roomObj = booking ? getRoom(booking.roomId) : null;
+    const roomObj = booking ? roomsById[booking.roomId] : null;
     const msg = confirmationMsg(booking, guest, roomObj, resort);
     const link = whatsappLink(form.phone, msg);
     if (link !== '#') window.open(link, '_blank');
@@ -126,11 +136,11 @@ export function WhatsAppQuickAdd({ onClose }) {
 
             <div className="bg-dark-700/30 rounded p-3 space-y-1">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-500">{room?.name || 'Select room'} · {nights}N</span>
+                <span className="text-slate-500">{room?.name || 'Select room'} \u00B7 {nights}N</span>
                 <span className="text-white font-medium">{formatCurrency(total, curr)}</span>
               </div>
               <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-500">{form.checkIn} → {checkOut}</span>
+                <span className="text-slate-500">{form.checkIn} \u2192 {checkOut}</span>
                 <span className="text-xs text-slate-500">Source: WhatsApp</span>
               </div>
             </div>
@@ -148,7 +158,7 @@ export function WhatsAppQuickAdd({ onClose }) {
                 <MessageCircle className="w-5 h-5 text-emerald-400" />
               </div>
               <p className="text-sm text-white font-medium mb-1">Booking Created</p>
-              <p className="text-xs text-slate-500">{booking?.id} · {form.name} · {formatCurrency(total, curr)}</p>
+              <p className="text-xs text-slate-500">{booking?.id} \u00B7 {form.name} \u00B7 {formatCurrency(total, curr)}</p>
             </div>
 
             <button onClick={openWhatsApp} className="w-full py-2.5 min-h-[44px] bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors flex items-center justify-center gap-2">

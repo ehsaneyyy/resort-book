@@ -1,31 +1,50 @@
 import { useState, useRef } from 'react';
-import { useStore } from '../hooks/useStore';
+import { useResort, useUpdateResort, useSeedDemo, useStats } from '../api/hooks';
 import { useToast } from '../components/Toast';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { CURRENCIES, PHONE_REGEX, EMAIL_REGEX } from '../data/constants';
-import { RefreshCw, Download, Database, MessageCircle, Building2, Globe } from 'lucide-react';
+import { RefreshCw, Download, Database, MessageCircle, Building2, Loader2 } from 'lucide-react';
 
 const CURRENCY_OPTIONS = CURRENCIES;
 
 export function Settings() {
-  const store = useStore();
+  const { data: resort, isLoading: resortLoading } = useResort();
+  const { data: stats } = useStats();
+  const updateResort = useUpdateResort();
+  const seedDemo = useSeedDemo();
   const toast = useToast();
   const [confirmReset, setConfirmReset] = useState(false);
   const [confirmImport, setConfirmImport] = useState(false);
   const [importData, setImportData] = useState('');
   const [importError, setImportError] = useState('');
 
-  const initial = useRef({ resortName: store.resort?.name || '', currency: store.resort?.currency || '\u20B9', phone: store.resort?.phone || '', email: store.resort?.email || '', address: store.resort?.address || '', checkInTime: store.resort?.checkInTime || '14:00', checkOutTime: store.resort?.checkOutTime || '11:00', taxRate: store.resort?.taxRate ?? 0, whatsappPhone: store.resort?.whatsappPhone || '' });
+  const initial = useRef({ resortName: '', currency: '\u20B9', phone: '', email: '', address: '', checkInTime: '14:00', checkOutTime: '11:00', taxRate: 0, whatsappPhone: '' });
 
-  const [resortName, setResortName] = useState(initial.current.resortName);
-  const [currency, setCurrency] = useState(initial.current.currency);
-  const [phone, setPhone] = useState(initial.current.phone);
-  const [email, setEmail] = useState(initial.current.email);
-  const [address, setAddress] = useState(initial.current.address);
-  const [checkInTime, setCheckInTime] = useState(initial.current.checkInTime);
-  const [checkOutTime, setCheckOutTime] = useState(initial.current.checkOutTime);
-  const [taxRate, setTaxRate] = useState(initial.current.taxRate);
-  const [whatsappPhone, setWhatsappPhone] = useState(initial.current.whatsappPhone);
+  const [resortName, setResortName] = useState('');
+  const [currency, setCurrency] = useState('\u20B9');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [address, setAddress] = useState('');
+  const [checkInTime, setCheckInTime] = useState('14:00');
+  const [checkOutTime, setCheckOutTime] = useState('11:00');
+  const [taxRate, setTaxRate] = useState(0);
+  const [whatsappPhone, setWhatsappPhone] = useState('');
+
+  if (resort && initial.current.resortName === '') {
+    const r = resort;
+    initial.current = { resortName: r.name || '', currency: r.currency || '\u20B9', phone: r.phone || '', email: r.email || '', address: r.address || '', checkInTime: r.checkInTime || '14:00', checkOutTime: r.checkOutTime || '11:00', taxRate: r.taxRate ?? 0, whatsappPhone: r.whatsappPhone || '' };
+    if (resortName === '') {
+      setResortName(initial.current.resortName);
+      setCurrency(initial.current.currency);
+      setPhone(initial.current.phone);
+      setEmail(initial.current.email);
+      setAddress(initial.current.address);
+      setCheckInTime(initial.current.checkInTime);
+      setCheckOutTime(initial.current.checkOutTime);
+      setTaxRate(initial.current.taxRate);
+      setWhatsappPhone(initial.current.whatsappPhone);
+    }
+  }
 
   const hasChanges = resortName !== initial.current.resortName || currency !== initial.current.currency || phone !== initial.current.phone || email !== initial.current.email || address !== initial.current.address || checkInTime !== initial.current.checkInTime || checkOutTime !== initial.current.checkOutTime || taxRate !== initial.current.taxRate || whatsappPhone !== initial.current.whatsappPhone;
 
@@ -34,9 +53,13 @@ export function Settings() {
     if (phone && !PHONE_REGEX.test(phone)) { toast('Invalid phone format', 'warning'); return; }
     if (email && !EMAIL_REGEX.test(email)) { toast('Invalid email format', 'warning'); return; }
     if (whatsappPhone && !PHONE_REGEX.test(whatsappPhone)) { toast('Invalid WhatsApp number format', 'warning'); return; }
-    store.updateResort({ ...store.resort, name: resortName, currency, phone, email, address, checkInTime, checkOutTime, taxRate: Number(taxRate), whatsappPhone });
-    initial.current = { resortName, currency, phone, email, address, checkInTime, checkOutTime, taxRate: Number(taxRate), whatsappPhone };
-    toast('Settings saved', 'success');
+    updateResort.mutate({ name: resortName, currency, phone, email, address, checkInTime, checkOutTime, taxRate: Number(taxRate), whatsappPhone }, {
+      onSuccess: () => {
+        initial.current = { resortName, currency, phone, email, address, checkInTime, checkOutTime, taxRate: Number(taxRate), whatsappPhone };
+        toast('Settings saved', 'success');
+      },
+      onError: () => toast('Failed to save', 'error'),
+    });
   };
 
   const handleExport = () => {
@@ -91,14 +114,22 @@ export function Settings() {
   };
 
   const resetData = () => {
-    store.resetAll();
-    toast('Demo data loaded. Reloading...', 'info');
-    setTimeout(() => window.location.reload(), 500);
+    seedDemo.mutate(undefined, {
+      onSuccess: (result) => {
+        toast(`Demo data loaded: ${result.counts.rooms} rooms, ${result.counts.guests} guests, ${result.counts.bookings} bookings`, 'success');
+        setConfirmReset(false);
+      },
+      onError: () => toast('Failed to load demo data', 'error'),
+    });
   };
 
-  const totalRooms = store.rooms.length;
-  const totalBookings = store.bookings.length;
-  const totalGuests = store.guests.length;
+  if (resortLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-6 h-6 text-amber-400/70 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-3xl mx-auto space-y-5">
@@ -149,7 +180,7 @@ export function Settings() {
             </div>
           </div>
           {hasChanges && <div className="flex justify-end pt-2">
-            <button type="submit" className="px-5 py-2 min-h-[44px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors">Save Settings</button>
+            <button type="submit" className="px-5 py-2 min-h-[44px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors">{updateResort.isPending ? 'Saving...' : 'Save Settings'}</button>
           </div>}
         </form>
       </div>
@@ -177,19 +208,19 @@ export function Settings() {
           <div className="p-5 space-y-3">
             <div className="flex items-center justify-between py-2 border-b border-white/[0.02]">
               <span className="text-sm text-slate-500">Rooms</span>
-              <span className="text-sm text-white font-medium">{totalRooms}</span>
+              <span className="text-sm text-white font-medium">{stats?.totalRooms ?? 0}</span>
             </div>
             <div className="flex items-center justify-between py-2 border-b border-white/[0.02]">
               <span className="text-sm text-slate-500">Bookings</span>
-              <span className="text-sm text-white font-medium">{totalBookings}</span>
+              <span className="text-sm text-white font-medium">{stats?.totalBookings ?? 0}</span>
             </div>
             <div className="flex items-center justify-between py-2 border-b border-white/[0.02]">
               <span className="text-sm text-slate-500">Guests</span>
-              <span className="text-sm text-white font-medium">{totalGuests}</span>
+              <span className="text-sm text-white font-medium">{stats?.totalGuests ?? 0}</span>
             </div>
             <div className="flex items-center justify-between py-2">
               <span className="text-sm text-slate-500">Storage</span>
-              <span className="text-sm text-white font-medium">localStorage</span>
+              <span className="text-sm text-white font-medium">API + localStorage</span>
             </div>
           </div>
         </div>
@@ -216,8 +247,8 @@ export function Settings() {
           <div className="bg-dark-800/50 rounded-lg border border-white/[0.02] p-5">
             <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-[2px] mb-3">Reset</h3>
             <p className="text-xs text-slate-500 mb-3">Replace all data with fresh demo data.</p>
-            <button onClick={() => setConfirmReset(true)} className="px-4 py-2 min-h-[44px] bg-dark-700 hover:bg-dark-600 text-slate-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors flex items-center gap-2">
-              <RefreshCw className="w-4 h-4" /> Load Demo Data
+            <button onClick={() => setConfirmReset(true)} disabled={seedDemo.isPending} className="px-4 py-2 min-h-[44px] bg-dark-700 hover:bg-dark-600 disabled:opacity-50 text-slate-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors flex items-center gap-2">
+              {seedDemo.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />} {seedDemo.isPending ? 'Loading...' : 'Load Demo Data'}
             </button>
           </div>
         </div>
