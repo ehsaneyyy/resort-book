@@ -36,5 +36,6 @@ app.include_router(stats.router)
 
 
 @app.get('/api/v1/health')
+@app.head('/api/v1/health')
 async def health_check():
     return {'status': 'ok'}
