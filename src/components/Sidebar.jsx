@@ -50,6 +50,7 @@ export function Sidebar({ sidebarOpen, onToggle }) {
               <NavLink
                 key={item.to}
                 to={item.to}
+                viewTransition
                 onClick={onToggle}
                 className={`flex items-center gap-3 px-3 py-2.5 min-h-[44px] text-sm focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors rounded-lg ${isActive ? 'text-white bg-white/[0.04]' : 'text-slate-500 hover:text-slate-300 hover:bg-white/[0.02]'}`}
               >

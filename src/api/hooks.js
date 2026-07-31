@@ -41,7 +41,16 @@ export function useUpdateRoom() {
       const { data } = await client.put(`/api/v1/rooms/${id}`, toSnakeCase(room));
       return toCamelCase(data);
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['rooms'] }),
+    onMutate: async ({ id, ...room }) => {
+      await qc.cancelQueries({ queryKey: ['rooms'] });
+      const prev = qc.getQueryData(['rooms']);
+      qc.setQueryData(['rooms'], (old) =>
+        Array.isArray(old) ? old.map((r) => (r.id === id ? { ...r, ...room } : r)) : old
+      );
+      return { prev };
+    },
+    onError: (_e, _v, ctx) => { if (ctx?.prev) qc.setQueryData(['rooms'], ctx.prev); },
+    onSettled: () => qc.invalidateQueries({ queryKey: ['rooms'] }),
   });
 }
 
@@ -49,7 +58,16 @@ export function useDeleteRoom() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id) => { await client.delete(`/api/v1/rooms/${id}`); },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['rooms'] }),
+    onMutate: async (id) => {
+      await qc.cancelQueries({ queryKey: ['rooms'] });
+      const prev = qc.getQueryData(['rooms']);
+      qc.setQueryData(['rooms'], (old) =>
+        Array.isArray(old) ? old.filter((r) => r.id !== id) : old
+      );
+      return { prev };
+    },
+    onError: (_e, _v, ctx) => { if (ctx?.prev) qc.setQueryData(['rooms'], ctx.prev); },
+    onSettled: () => qc.invalidateQueries({ queryKey: ['rooms'] }),
   });
 }
 
@@ -103,7 +121,16 @@ export function useUpdateGuest() {
       const { data } = await client.put(`/api/v1/guests/${id}`, toSnakeCase(guest));
       return toCamelCase(data);
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['guests'] }),
+    onMutate: async ({ id, ...guest }) => {
+      await qc.cancelQueries({ queryKey: ['guests'] });
+      const prev = qc.getQueryData(['guests']);
+      qc.setQueryData(['guests'], (old) =>
+        Array.isArray(old) ? old.map((g) => (g.id === id ? { ...g, ...guest } : g)) : old
+      );
+      return { prev };
+    },
+    onError: (_e, _v, ctx) => { if (ctx?.prev) qc.setQueryData(['guests'], ctx.prev); },
+    onSettled: () => qc.invalidateQueries({ queryKey: ['guests'] }),
   });
 }
 
@@ -111,7 +138,16 @@ export function useDeleteGuest() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id) => { await client.delete(`/api/v1/guests/${id}`); },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['guests'] }),
+    onMutate: async (id) => {
+      await qc.cancelQueries({ queryKey: ['guests'] });
+      const prev = qc.getQueryData(['guests']);
+      qc.setQueryData(['guests'], (old) =>
+        Array.isArray(old) ? old.filter((g) => g.id !== id) : old
+      );
+      return { prev };
+    },
+    onError: (_e, _v, ctx) => { if (ctx?.prev) qc.setQueryData(['guests'], ctx.prev); },
+    onSettled: () => qc.invalidateQueries({ queryKey: ['guests'] }),
   });
 }
 
@@ -157,7 +193,16 @@ export function useUpdateBooking() {
       const { data } = await client.put(`/api/v1/bookings/${id}`, toSnakeCase(booking));
       return toCamelCase(data);
     },
-    onSuccess: () => {
+    onMutate: async ({ id, ...booking }) => {
+      await qc.cancelQueries({ queryKey: ['bookings'] });
+      const prev = qc.getQueryData(['bookings']);
+      qc.setQueryData(['bookings'], (old) =>
+        Array.isArray(old) ? old.map((b) => (b.id === id ? { ...b, ...booking } : b)) : old
+      );
+      return { prev };
+    },
+    onError: (_e, _v, ctx) => { if (ctx?.prev) qc.setQueryData(['bookings'], ctx.prev); },
+    onSettled: () => {
       qc.invalidateQueries({ queryKey: ['bookings'] });
       qc.invalidateQueries({ queryKey: ['stats'] });
     },
@@ -171,7 +216,16 @@ export function useUpdateBookingStatus() {
       const { data } = await client.patch(`/api/v1/bookings/${id}/status`, { status });
       return toCamelCase(data);
     },
-    onSuccess: () => {
+    onMutate: async ({ id, status }) => {
+      await qc.cancelQueries({ queryKey: ['bookings'] });
+      const prev = qc.getQueryData(['bookings']);
+      qc.setQueryData(['bookings'], (old) =>
+        Array.isArray(old) ? old.map((b) => (b.id === id ? { ...b, status } : b)) : old
+      );
+      return { prev };
+    },
+    onError: (_e, _v, ctx) => { if (ctx?.prev) qc.setQueryData(['bookings'], ctx.prev); },
+    onSettled: () => {
       qc.invalidateQueries({ queryKey: ['bookings'] });
       qc.invalidateQueries({ queryKey: ['stats'] });
     },
@@ -182,7 +236,16 @@ export function useDeleteBooking() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id) => { await client.delete(`/api/v1/bookings/${id}`); },
-    onSuccess: () => {
+    onMutate: async (id) => {
+      await qc.cancelQueries({ queryKey: ['bookings'] });
+      const prev = qc.getQueryData(['bookings']);
+      qc.setQueryData(['bookings'], (old) =>
+        Array.isArray(old) ? old.filter((b) => b.id !== id) : old
+      );
+      return { prev };
+    },
+    onError: (_e, _v, ctx) => { if (ctx?.prev) qc.setQueryData(['bookings'], ctx.prev); },
+    onSettled: () => {
       qc.invalidateQueries({ queryKey: ['bookings'] });
       qc.invalidateQueries({ queryKey: ['stats'] });
     },
@@ -217,7 +280,16 @@ export function useUpdateSeasonalRule() {
       const { data } = await client.put(`/api/v1/seasonal-rules/${id}`, toSnakeCase(rule));
       return toCamelCase(data);
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['seasonal'] }),
+    onMutate: async ({ id, ...rule }) => {
+      await qc.cancelQueries({ queryKey: ['seasonal'] });
+      const prev = qc.getQueryData(['seasonal']);
+      qc.setQueryData(['seasonal'], (old) =>
+        Array.isArray(old) ? old.map((r) => (r.id === id ? { ...r, ...rule } : r)) : old
+      );
+      return { prev };
+    },
+    onError: (_e, _v, ctx) => { if (ctx?.prev) qc.setQueryData(['seasonal'], ctx.prev); },
+    onSettled: () => qc.invalidateQueries({ queryKey: ['seasonal'] }),
   });
 }
 
@@ -225,7 +297,16 @@ export function useDeleteSeasonalRule() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id) => { await client.delete(`/api/v1/seasonal-rules/${id}`); },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['seasonal'] }),
+    onMutate: async (id) => {
+      await qc.cancelQueries({ queryKey: ['seasonal'] });
+      const prev = qc.getQueryData(['seasonal']);
+      qc.setQueryData(['seasonal'], (old) =>
+        Array.isArray(old) ? old.filter((r) => r.id !== id) : old
+      );
+      return { prev };
+    },
+    onError: (_e, _v, ctx) => { if (ctx?.prev) qc.setQueryData(['seasonal'], ctx.prev); },
+    onSettled: () => qc.invalidateQueries({ queryKey: ['seasonal'] }),
   });
 }
 

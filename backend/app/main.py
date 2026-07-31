@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.gzip import GZipMiddleware
 from sqlmodel import SQLModel
 from .database import engine
 from .routers import rooms, guests, bookings, seasonal, resort, seed, stats
@@ -22,6 +23,8 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
+
+app.add_middleware(GZipMiddleware, minimum_size=500)
 
 app.include_router(rooms.router)
 app.include_router(guests.router)
