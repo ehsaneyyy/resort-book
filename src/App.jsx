@@ -8,14 +8,14 @@ import { SkeletonCard } from './components/Skeleton';
 import client from './api/client';
 import { toCamelCase } from './api/transform';
 
-const Dashboard = lazy(() => import('./pages/Dashboard'));
-const Rooms = lazy(() => import('./pages/Rooms'));
-const Bookings = lazy(() => import('./pages/Bookings'));
-const Guests = lazy(() => import('./pages/Guests'));
-const Calendar = lazy(() => import('./pages/Calendar'));
-const Reports = lazy(() => import('./pages/Reports'));
-const Pricing = lazy(() => import('./pages/Pricing'));
-const Settings = lazy(() => import('./pages/Settings'));
+const Dashboard = lazy(() => import('./pages/Dashboard').then(m => ({ default: m.Dashboard })));
+const Rooms = lazy(() => import('./pages/Rooms').then(m => ({ default: m.Rooms })));
+const Bookings = lazy(() => import('./pages/Bookings').then(m => ({ default: m.Bookings })));
+const Guests = lazy(() => import('./pages/Guests').then(m => ({ default: m.Guests })));
+const Calendar = lazy(() => import('./pages/Calendar').then(m => ({ default: m.Calendar })));
+const Reports = lazy(() => import('./pages/Reports').then(m => ({ default: m.Reports })));
+const Pricing = lazy(() => import('./pages/Pricing').then(m => ({ default: m.Pricing })));
+const Settings = lazy(() => import('./pages/Settings').then(m => ({ default: m.Settings })));
 
 const prefetch = {
   rooms: async () => (await client.get('/api/v1/rooms')).data,
