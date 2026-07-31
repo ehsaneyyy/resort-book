@@ -145,7 +145,7 @@ export function Dashboard() {
               <div>
                 <p className="text-xs font-medium text-slate-500 uppercase tracking-[1.5px] mb-2.5">Check-ins ({todayCheckins.length})</p>
                 {todayCheckins.length === 0 ? (
-                  <p className="text-xs text-slate-500">\u2014</p>
+                  <p className="text-xs text-slate-500">—</p>
                 ) : (
                   <div className="space-y-2">
                     {todayCheckins.map(b => {
@@ -166,7 +166,7 @@ export function Dashboard() {
               <div>
                 <p className="text-xs font-medium text-slate-500 uppercase tracking-[1.5px] mb-2.5">Check-outs ({todayCheckouts.length})</p>
                 {todayCheckouts.length === 0 ? (
-                  <p className="text-xs text-slate-500">\u2014</p>
+                  <p className="text-xs text-slate-500">—</p>
                 ) : (
                   <div className="space-y-2">
                     {todayCheckouts.map(b => {

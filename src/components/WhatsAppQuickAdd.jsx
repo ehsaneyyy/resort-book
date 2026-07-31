@@ -136,11 +136,11 @@ export function WhatsAppQuickAdd({ onClose }) {
 
             <div className="bg-dark-700/30 rounded p-3 space-y-1">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-500">{room?.name || 'Select room'} \u00B7 {nights}N</span>
+                <span className="text-slate-500">{room?.name || 'Select room'} · {nights}N</span>
                 <span className="text-white font-medium">{formatCurrency(total, curr)}</span>
               </div>
               <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-500">{form.checkIn} \u2192 {checkOut}</span>
+                <span className="text-slate-500">{form.checkIn} → {checkOut}</span>
                 <span className="text-xs text-slate-500">Source: WhatsApp</span>
               </div>
             </div>
@@ -158,7 +158,7 @@ export function WhatsAppQuickAdd({ onClose }) {
                 <MessageCircle className="w-5 h-5 text-emerald-400" />
               </div>
               <p className="text-sm text-white font-medium mb-1">Booking Created</p>
-              <p className="text-xs text-slate-500">{booking?.id} \u00B7 {form.name} \u00B7 {formatCurrency(total, curr)}</p>
+              <p className="text-xs text-slate-500">{booking?.id} · {form.name} · {formatCurrency(total, curr)}</p>
             </div>
 
             <button onClick={openWhatsApp} className="w-full py-2.5 min-h-[44px] bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors flex items-center justify-center gap-2">

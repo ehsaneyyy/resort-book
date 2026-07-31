@@ -146,7 +146,7 @@ export function Calendar() {
                       {ev.isCheckin && <span className="px-1.5 py-0.5 bg-emerald-500/10 text-emerald-400/80 text-xs font-medium rounded">IN</span>}
                       {ev.isCheckout && <span className="px-1.5 py-0.5 bg-blue-500/10 text-blue-400/80 text-xs font-medium rounded">OUT</span>}
                     </div>
-                    <p className="text-xs text-slate-500">{ev.guest?.name || ev.guestId} &middot; {ev.checkIn} \u2192 {ev.checkOut}</p>
+                    <p className="text-xs text-slate-500">{ev.guest?.name || ev.guestId} &middot; {ev.checkIn} → {ev.checkOut}</p>
                   </div>
                   <span className={`px-2.5 py-1 text-xs font-medium rounded ${ev.status === 'Confirmed' ? 'bg-emerald-500/10 text-emerald-400/80' : 'bg-amber-500/10 text-amber-400/80'}`}>{ev.status}</span>
                 </div>

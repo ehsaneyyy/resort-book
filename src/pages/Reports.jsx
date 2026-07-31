@@ -185,7 +185,7 @@ export function Reports() {
                   <span className="text-white font-medium">{s.name}</span>
                   <span className={`text-xs font-medium ${s.isActive ? 'text-emerald-400/70' : 'text-slate-500'}`}>{s.isActive ? 'Active' : 'Off'}</span>
                 </div>
-                <p className="text-xs text-slate-500">{s.startDate} \u2192 {s.endDate} &middot; {s.adjustment > 0 ? '+' : ''}{s.adjustment}%</p>
+                <p className="text-xs text-slate-500">{s.startDate} → {s.endDate} &middot; {s.adjustment > 0 ? '+' : ''}{s.adjustment}%</p>
               </div>
             ))}
           </div>
