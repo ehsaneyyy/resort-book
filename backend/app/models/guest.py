@@ -10,7 +10,7 @@ import uuid
 
 
 def now():
-    return datetime.now(timezone.utc)
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 class Guest(SQLModel, table=True):

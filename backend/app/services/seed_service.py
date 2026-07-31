@@ -75,7 +75,7 @@ async def seed_demo_data(session: AsyncSession) -> dict:
         bd['room_id'] = room.id
         bd.pop('guest_index')
         bd.pop('room_index')
-        bd['created_at'] = datetime.fromisoformat(bd.pop('created') + 'T00:00:00+00:00')
+        bd['created_at'] = datetime.fromisoformat(bd.pop('created') + 'T00:00:00+00:00').replace(tzinfo=None)
         await booking_repo.create_booking(session, bd)
 
     for sd in seasonal_data:

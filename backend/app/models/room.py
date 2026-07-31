@@ -9,7 +9,7 @@ def new_id():
 
 
 def now():
-    return datetime.now(timezone.utc)
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 class Room(SQLModel, table=True):
