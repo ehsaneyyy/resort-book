@@ -3,7 +3,7 @@ import { useResort, useUpdateResort, useSeedDemo, useStats } from '../api/hooks'
 import { useToast } from '../components/Toast';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { CURRENCIES, PHONE_REGEX, EMAIL_REGEX } from '../data/constants';
-import { RefreshCw, Download, Database, MessageCircle, Building2 } from 'lucide-react';
+import { RefreshCw, Download, Database, MessageCircle, Building2, Globe, Loader2 } from 'lucide-react';
 import { Skeleton } from '../components/Skeleton';
 
 const CURRENCY_OPTIONS = CURRENCIES;
