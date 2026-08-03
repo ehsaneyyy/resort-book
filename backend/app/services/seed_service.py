@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from ..models.room import Room
 from ..models.guest import Guest
@@ -19,6 +20,12 @@ def add_days(d, n):
 async def seed_demo_data(session: AsyncSession) -> dict:
     now_dt = datetime.now(timezone.utc)
     today_str = fmt(now_dt)
+
+    await session.execute(delete(Booking))
+    await session.execute(delete(Guest))
+    await session.execute(delete(Room))
+    await session.execute(delete(SeasonalRule))
+    await session.execute(delete(Resort))
 
     rooms_data = [
         {'name': 'Standard Double', 'type': 'Standard', 'floor': 1, 'price': 3500, 'weekend_price': 4000, 'capacity': 2, 'beds': '1 Queen Bed', 'size': 280, 'amenities': ['AC', 'WiFi', 'TV', 'Hot Water', 'Desk'], 'description': 'Cozy room with queen bed, perfect for couples.'},
