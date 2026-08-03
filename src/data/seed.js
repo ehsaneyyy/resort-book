@@ -15,14 +15,14 @@ const ROOMS = [
 ];
 
 const GUESTS = [
-  { id: "G001", name: "Demo Guest 1", email: "g1@demo.com", phone: "1111111111", city: "Demo City 1", totalBookings: 3, totalSpent: 34650, lastStay: today, vip: true, notes: "" },
-  { id: "G002", name: "Demo Guest 2", email: "g2@demo.com", phone: "2222222222", city: "Demo City 2", totalBookings: 2, totalSpent: 15750, lastStay: fmt(addDays(now, -2)), vip: false, notes: "" },
-  { id: "G003", name: "Demo Guest 3", email: "g3@demo.com", phone: "3333333333", city: "Demo City 3", totalBookings: 5, totalSpent: 89200, lastStay: fmt(addDays(now, -5)), vip: true, notes: "" },
-  { id: "G004", name: "Demo Guest 4", email: "g4@demo.com", phone: "4444444444", city: "Demo City 4", totalBookings: 1, totalSpent: 11550, lastStay: fmt(addDays(now, 3)), vip: false, notes: "" },
-  { id: "G005", name: "Demo Guest 5", email: "g5@demo.com", phone: "5555555555", city: "Demo City 5", totalBookings: 4, totalSpent: 52800, lastStay: fmt(addDays(now, 2)), vip: true, notes: "" },
-  { id: "G006", name: "Demo Guest 6", email: "g6@demo.com", phone: "6666666666", city: "Demo City 6", totalBookings: 2, totalSpent: 29925, lastStay: fmt(addDays(now, -10)), vip: false, notes: "" },
-  { id: "G007", name: "Demo Guest 7", email: "g7@demo.com", phone: "7777777777", city: "Demo City 7", totalBookings: 1, totalSpent: 15000, lastStay: fmt(addDays(now, 1)), vip: false, notes: "" },
-  { id: "G008", name: "Demo Guest 8", email: "g8@demo.com", phone: "8888888888", city: "Demo City 8", totalBookings: 6, totalSpent: 78400, lastStay: fmt(addDays(now, -1)), vip: true, notes: "" },
+  { id: "G001", name: "Arjun Menon", email: "arjun@demo.com", phone: "1111111111", city: "Kochi", totalBookings: 3, totalSpent: 34650, lastStay: today, vip: true, notes: "" },
+  { id: "G002", name: "Lakshmi Nair", email: "lakshmi@demo.com", phone: "2222222222", city: "Thrissur", totalBookings: 2, totalSpent: 15750, lastStay: fmt(addDays(now, -2)), vip: false, notes: "" },
+  { id: "G003", name: "Rohan Shetty", email: "rohan@demo.com", phone: "3333333333", city: "Kozhikode", totalBookings: 5, totalSpent: 89200, lastStay: fmt(addDays(now, -5)), vip: true, notes: "" },
+  { id: "G004", name: "Anjali Pillai", email: "anjali@demo.com", phone: "4444444444", city: "Thiruvananthapuram", totalBookings: 1, totalSpent: 11550, lastStay: fmt(addDays(now, 3)), vip: false, notes: "" },
+  { id: "G005", name: "Vikram Rao", email: "vikram@demo.com", phone: "5555555555", city: "Palakkad", totalBookings: 4, totalSpent: 52800, lastStay: fmt(addDays(now, 2)), vip: true, notes: "" },
+  { id: "G006", name: "Meera Krishnan", email: "meera@demo.com", phone: "6666666666", city: "Kottayam", totalBookings: 2, totalSpent: 29925, lastStay: fmt(addDays(now, -10)), vip: false, notes: "" },
+  { id: "G007", name: "Aditya Nambiar", email: "aditya@demo.com", phone: "7777777777", city: "Alappuzha", totalBookings: 1, totalSpent: 15000, lastStay: fmt(addDays(now, 1)), vip: false, notes: "" },
+  { id: "G008", name: "Sneha Kurup", email: "sneha@demo.com", phone: "8888888888", city: "Kannur", totalBookings: 6, totalSpent: 78400, lastStay: fmt(addDays(now, -1)), vip: true, notes: "" },
 ];
 
 const BOOKINGS = [
@@ -46,12 +46,12 @@ const SEASONAL = [
 ];
 
 const RESORT = {
-  name: "resort-demo/admin",
+  name: "DoGuest Demo Resort",
   currency: "\u20B9",
-  phone: "+91 11111 11111",
+  phone: "+91 99999 99999",
   whatsappPhone: "+919999999999",
   email: "resort@demo.com",
-  address: "123, Demo Road, Demo City",
+  address: "Beach Road, Fort Kochi, Kerala 682001",
   checkInTime: "14:00",
   checkOutTime: "11:00",
   taxRate: 5,

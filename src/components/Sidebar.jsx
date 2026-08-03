@@ -31,9 +31,9 @@ export function Sidebar({ sidebarOpen, onToggle }) {
 
       <aside className={`fixed top-0 left-0 bottom-0 w-56 bg-dark-800 border-r border-white/[0.02] z-50 transition-all duration-200 ease-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
         <div className="px-5 h-14 flex items-center gap-3 border-b border-white/[0.02]">
-          <img src="/favicon.svg" alt="resort-demo" className="w-8 h-8 flex-shrink-0" />
+          <img src="/favicon.svg" alt="DoGuest" className="w-8 h-8 flex-shrink-0" />
           <div className="min-w-0">
-            <p className="text-sm font-medium text-white truncate">resort-demo</p>
+            <p className="text-sm font-medium text-white truncate">DoGuest</p>
             <p className="text-[9px] text-slate-500 tracking-wide uppercase">Admin Panel</p>
           </div>
           <button onClick={onToggle} className="lg:hidden ml-auto flex items-center justify-center w-8 h-8 text-slate-500 hover:text-white rounded-lg focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors">

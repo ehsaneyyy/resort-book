@@ -29,14 +29,14 @@ async def seed_demo_data(session: AsyncSession) -> dict:
         {'name': 'Beachfront Villa', 'type': 'Villa', 'floor': 0, 'price': 11000, 'weekend_price': 13000, 'capacity': 6, 'beds': '2 King Beds', 'size': 900, 'amenities': ['AC', 'WiFi', 'Pool Access', 'Kitchen', '2 Bedrooms', 'Living Room', 'Patio'], 'description': 'Spacious 2-bedroom villa with beachfront access.'},
     ]
     guests_data = [
-        {'name': 'Demo Guest 1', 'email': 'g1@demo.com', 'phone': '1111111111', 'city': 'Demo City 1', 'total_bookings': 3, 'total_spent': 34650, 'last_stay': today_str, 'vip': True},
-        {'name': 'Demo Guest 2', 'email': 'g2@demo.com', 'phone': '2222222222', 'city': 'Demo City 2', 'total_bookings': 2, 'total_spent': 15750, 'last_stay': fmt(add_days(now_dt, -2)), 'vip': False},
-        {'name': 'Demo Guest 3', 'email': 'g3@demo.com', 'phone': '3333333333', 'city': 'Demo City 3', 'total_bookings': 5, 'total_spent': 89200, 'last_stay': fmt(add_days(now_dt, -5)), 'vip': True},
-        {'name': 'Demo Guest 4', 'email': 'g4@demo.com', 'phone': '4444444444', 'city': 'Demo City 4', 'total_bookings': 1, 'total_spent': 11550, 'last_stay': fmt(add_days(now_dt, 3))},
-        {'name': 'Demo Guest 5', 'email': 'g5@demo.com', 'phone': '5555555555', 'city': 'Demo City 5', 'total_bookings': 4, 'total_spent': 52800, 'last_stay': fmt(add_days(now_dt, 2)), 'vip': True},
-        {'name': 'Demo Guest 6', 'email': 'g6@demo.com', 'phone': '6666666666', 'city': 'Demo City 6', 'total_bookings': 2, 'total_spent': 29925, 'last_stay': fmt(add_days(now_dt, -10))},
-        {'name': 'Demo Guest 7', 'email': 'g7@demo.com', 'phone': '7777777777', 'city': 'Demo City 7', 'total_bookings': 1, 'total_spent': 15000, 'last_stay': fmt(add_days(now_dt, 1))},
-        {'name': 'Demo Guest 8', 'email': 'g8@demo.com', 'phone': '8888888888', 'city': 'Demo City 8', 'total_bookings': 6, 'total_spent': 78400, 'last_stay': fmt(add_days(now_dt, -1)), 'vip': True},
+        {'name': 'Arjun Menon', 'email': 'arjun@demo.com', 'phone': '1111111111', 'city': 'Kochi', 'total_bookings': 3, 'total_spent': 34650, 'last_stay': today_str, 'vip': True},
+        {'name': 'Lakshmi Nair', 'email': 'lakshmi@demo.com', 'phone': '2222222222', 'city': 'Thrissur', 'total_bookings': 2, 'total_spent': 15750, 'last_stay': fmt(add_days(now_dt, -2)), 'vip': False},
+        {'name': 'Rohan Shetty', 'email': 'rohan@demo.com', 'phone': '3333333333', 'city': 'Kozhikode', 'total_bookings': 5, 'total_spent': 89200, 'last_stay': fmt(add_days(now_dt, -5)), 'vip': True},
+        {'name': 'Anjali Pillai', 'email': 'anjali@demo.com', 'phone': '4444444444', 'city': 'Thiruvananthapuram', 'total_bookings': 1, 'total_spent': 11550, 'last_stay': fmt(add_days(now_dt, 3))},
+        {'name': 'Vikram Rao', 'email': 'vikram@demo.com', 'phone': '5555555555', 'city': 'Palakkad', 'total_bookings': 4, 'total_spent': 52800, 'last_stay': fmt(add_days(now_dt, 2)), 'vip': True},
+        {'name': 'Meera Krishnan', 'email': 'meera@demo.com', 'phone': '6666666666', 'city': 'Kottayam', 'total_bookings': 2, 'total_spent': 29925, 'last_stay': fmt(add_days(now_dt, -10))},
+        {'name': 'Aditya Nambiar', 'email': 'aditya@demo.com', 'phone': '7777777777', 'city': 'Alappuzha', 'total_bookings': 1, 'total_spent': 15000, 'last_stay': fmt(add_days(now_dt, 1))},
+        {'name': 'Sneha Kurup', 'email': 'sneha@demo.com', 'phone': '8888888888', 'city': 'Kannur', 'total_bookings': 6, 'total_spent': 78400, 'last_stay': fmt(add_days(now_dt, -1)), 'vip': True},
     ]
     bookings_data = [
         {'guest_index': 0, 'room_index': 1, 'check_in': today_str, 'check_out': fmt(add_days(now_dt, 2)), 'nights': 2, 'adults': 2, 'total': 11550, 'status': 'Confirmed', 'payment_status': 'Pending', 'payment_method': 'Pay at Hotel', 'source': 'Direct', 'special_requests': 'Late check-in please', 'created': fmt(add_days(now_dt, -7))},
@@ -84,12 +84,12 @@ async def seed_demo_data(session: AsyncSession) -> dict:
     existing = await resort_repo.get_resort(session)
     if not existing:
         await resort_repo.create_resort(session, {
-            'name': 'resort-demo/admin',
+            'name': 'DoGuest Demo Resort',
             'currency': '\u20B9',
-            'phone': '+91 11111 11111',
+            'phone': '+91 99999 99999',
             'whatsapp_phone': '+919999999999',
             'email': 'resort@demo.com',
-            'address': '123, Demo Road, Demo City',
+            'address': 'Beach Road, Fort Kochi, Kerala 682001',
             'check_in_time': '14:00',
             'check_out_time': '11:00',
             'tax_rate': 5,
