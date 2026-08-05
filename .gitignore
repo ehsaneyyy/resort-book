@@ -21,6 +21,11 @@ dist-ssr
 __pycache__/
 *.py[cod]
 
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
