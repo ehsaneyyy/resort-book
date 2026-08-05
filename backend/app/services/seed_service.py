@@ -8,6 +8,9 @@ from ..models.seasonal import SeasonalRule
 from ..models.resort import Resort
 from ..repositories import room_repo, guest_repo, booking_repo, seasonal_repo, resort_repo
 
+WEEKEND_WEEKDAYS = {4, 5}
+TAX_RATE = 5
+
 
 def fmt(d):
     return d.strftime('%Y-%m-%d')
@@ -17,9 +20,21 @@ def add_days(d, n):
     return d + timedelta(days=n)
 
 
+def compute_total(price, weekend_price, check_in, check_out):
+    base = 0
+    for i in range((check_out - check_in).days):
+        day = check_in + timedelta(days=i)
+        if weekend_price and day.weekday() in WEEKEND_WEEKDAYS:
+            base += weekend_price
+        else:
+            base += price
+    return round(base * (1 + TAX_RATE / 100))
+
+
 async def seed_demo_data(session: AsyncSession) -> dict:
     now_dt = datetime.now(timezone.utc)
-    today_str = fmt(now_dt)
+    today = now_dt.date()
+    today_str = fmt(today)
 
     await session.execute(delete(Booking))
     await session.execute(delete(Guest))
@@ -36,26 +51,33 @@ async def seed_demo_data(session: AsyncSession) -> dict:
         {'name': 'Beachfront Villa', 'type': 'Villa', 'floor': 0, 'price': 11000, 'weekend_price': 13000, 'capacity': 6, 'beds': '2 King Beds', 'size': 900, 'amenities': ['AC', 'WiFi', 'Pool Access', 'Kitchen', '2 Bedrooms', 'Living Room', 'Patio'], 'description': 'Spacious 2-bedroom villa with beachfront access.'},
     ]
     guests_data = [
-        {'name': 'Arjun Menon', 'email': 'arjun@demo.com', 'phone': '1111111111', 'city': 'Kochi', 'total_bookings': 3, 'total_spent': 34650, 'last_stay': today_str, 'vip': True},
-        {'name': 'Lakshmi Nair', 'email': 'lakshmi@demo.com', 'phone': '2222222222', 'city': 'Thrissur', 'total_bookings': 2, 'total_spent': 15750, 'last_stay': fmt(add_days(now_dt, -2)), 'vip': False},
-        {'name': 'Rohan Shetty', 'email': 'rohan@demo.com', 'phone': '3333333333', 'city': 'Kozhikode', 'total_bookings': 5, 'total_spent': 89200, 'last_stay': fmt(add_days(now_dt, -5)), 'vip': True},
-        {'name': 'Anjali Pillai', 'email': 'anjali@demo.com', 'phone': '4444444444', 'city': 'Thiruvananthapuram', 'total_bookings': 1, 'total_spent': 11550, 'last_stay': fmt(add_days(now_dt, 3))},
-        {'name': 'Vikram Rao', 'email': 'vikram@demo.com', 'phone': '5555555555', 'city': 'Palakkad', 'total_bookings': 4, 'total_spent': 52800, 'last_stay': fmt(add_days(now_dt, 2)), 'vip': True},
-        {'name': 'Meera Krishnan', 'email': 'meera@demo.com', 'phone': '6666666666', 'city': 'Kottayam', 'total_bookings': 2, 'total_spent': 29925, 'last_stay': fmt(add_days(now_dt, -10))},
-        {'name': 'Aditya Nambiar', 'email': 'aditya@demo.com', 'phone': '7777777777', 'city': 'Alappuzha', 'total_bookings': 1, 'total_spent': 15000, 'last_stay': fmt(add_days(now_dt, 1))},
-        {'name': 'Sneha Kurup', 'email': 'sneha@demo.com', 'phone': '8888888888', 'city': 'Kannur', 'total_bookings': 6, 'total_spent': 78400, 'last_stay': fmt(add_days(now_dt, -1)), 'vip': True},
+        {'name': 'Arjun Menon', 'email': 'arjun@demo.com', 'phone': '1111111111', 'city': 'Kochi', 'total_bookings': 5, 'total_spent': 63600, 'last_stay': today_str, 'vip': True},
+        {'name': 'Lakshmi Nair', 'email': 'lakshmi@demo.com', 'phone': '2222222222', 'city': 'Thrissur', 'total_bookings': 3, 'total_spent': 27150, 'last_stay': fmt(add_days(today, 2)), 'vip': False},
+        {'name': 'Rohan Shetty', 'email': 'rohan@demo.com', 'phone': '3333333333', 'city': 'Kozhikode', 'total_bookings': 6, 'total_spent': 100050, 'last_stay': fmt(add_days(today, -3)), 'vip': True},
+        {'name': 'Anjali Pillai', 'email': 'anjali@demo.com', 'phone': '4444444444', 'city': 'Thiruvananthapuram', 'total_bookings': 1, 'total_spent': 7875, 'last_stay': fmt(add_days(today, 3))},
+        {'name': 'Vikram Rao', 'email': 'vikram@demo.com', 'phone': '5555555555', 'city': 'Palakkad', 'total_bookings': 2, 'total_spent': 12600, 'last_stay': fmt(add_days(today, 5)), 'vip': True},
+        {'name': 'Meera Krishnan', 'email': 'meera@demo.com', 'phone': '6666666666', 'city': 'Kottayam', 'total_bookings': 3, 'total_spent': 45600, 'last_stay': fmt(add_days(today, -10))},
+        {'name': 'Aditya Nambiar', 'email': 'aditya@demo.com', 'phone': '7777777777', 'city': 'Alappuzha', 'total_bookings': 2, 'total_spent': 40950, 'last_stay': fmt(add_days(today, -5))},
+        {'name': 'Sneha Kurup', 'email': 'sneha@demo.com', 'phone': '8888888888', 'city': 'Kannur', 'total_bookings': 4, 'total_spent': 74650, 'last_stay': fmt(add_days(today, -1)), 'vip': True},
+        {'name': 'Divya Warrier', 'email': 'divya@demo.com', 'phone': '9999999999', 'city': 'Ernakulam', 'total_bookings': 1, 'total_spent': 7350, 'last_stay': fmt(add_days(today, 7))},
+        {'name': 'Aparna Das', 'email': 'aparna@demo.com', 'phone': '1212121212', 'city': 'Kasargod', 'total_bookings': 1, 'total_spent': 20475, 'last_stay': fmt(add_days(today, 9))},
+        {'name': 'Rahul Dev', 'email': 'rahul@demo.com', 'phone': '1313131313', 'city': 'Wayanad', 'total_bookings': 1, 'total_spent': 15750, 'last_stay': fmt(add_days(today, -6))},
     ]
     bookings_data = [
-        {'guest_index': 0, 'room_index': 1, 'check_in': today_str, 'check_out': fmt(add_days(now_dt, 2)), 'nights': 2, 'adults': 2, 'total': 11550, 'status': 'Confirmed', 'payment_status': 'Pending', 'payment_method': 'Pay at Hotel', 'source': 'Direct', 'special_requests': 'Late check-in please', 'created': fmt(add_days(now_dt, -7))},
-        {'guest_index': 1, 'room_index': 3, 'check_in': today_str, 'check_out': fmt(add_days(now_dt, 2)), 'nights': 2, 'adults': 2, 'total': 15750, 'status': 'Confirmed', 'payment_status': 'Paid', 'payment_method': 'Online', 'source': 'Website', 'created': fmt(add_days(now_dt, -10))},
-        {'guest_index': 2, 'room_index': 5, 'check_in': fmt(add_days(now_dt, -2)), 'check_out': fmt(add_days(now_dt, 1)), 'nights': 3, 'adults': 4, 'children': 1, 'total': 34650, 'status': 'Confirmed', 'payment_status': 'Paid', 'payment_method': 'Online', 'source': 'Direct', 'special_requests': 'Need extra towels', 'created': fmt(add_days(now_dt, -14))},
-        {'guest_index': 3, 'room_index': 1, 'check_in': fmt(add_days(now_dt, 3)), 'check_out': fmt(add_days(now_dt, 5)), 'nights': 2, 'adults': 2, 'total': 11550, 'status': 'Pending', 'payment_status': 'Pending', 'payment_method': 'Pay at Hotel', 'source': 'Phone', 'special_requests': 'Anniversary celebration', 'created': fmt(add_days(now_dt, -2))},
-        {'guest_index': 4, 'room_index': 0, 'check_in': fmt(add_days(now_dt, 2)), 'check_out': fmt(add_days(now_dt, 4)), 'nights': 2, 'adults': 2, 'total': 7350, 'status': 'Confirmed', 'payment_status': 'Paid', 'payment_method': 'Online', 'source': 'Website', 'created': fmt(add_days(now_dt, -5))},
-        {'guest_index': 5, 'room_index': 4, 'check_in': fmt(add_days(now_dt, 7)), 'check_out': fmt(add_days(now_dt, 10)), 'nights': 3, 'adults': 2, 'children': 1, 'total': 29925, 'status': 'Cancelled', 'payment_status': 'Refunded', 'payment_method': 'Online', 'source': 'Website', 'special_requests': 'Early check-in', 'created': fmt(add_days(now_dt, -20))},
-        {'guest_index': 6, 'room_index': 3, 'check_in': fmt(add_days(now_dt, 1)), 'check_out': fmt(add_days(now_dt, 4)), 'nights': 3, 'adults': 2, 'total': 22500, 'status': 'Confirmed', 'payment_status': 'Paid', 'payment_method': 'Online', 'source': 'Booking.com', 'special_requests': 'Airport transfer', 'created': fmt(add_days(now_dt, -12))},
-        {'guest_index': 7, 'room_index': 5, 'check_in': fmt(add_days(now_dt, -3)), 'check_out': today_str, 'nights': 3, 'adults': 3, 'total': 33000, 'status': 'Confirmed', 'payment_status': 'Paid', 'payment_method': 'Cash', 'source': 'Direct', 'created': fmt(add_days(now_dt, -15))},
-        {'guest_index': 0, 'room_index': 4, 'check_in': fmt(add_days(now_dt, -20)), 'check_out': fmt(add_days(now_dt, -18)), 'nights': 2, 'adults': 2, 'total': 19000, 'status': 'Checked Out', 'payment_status': 'Paid', 'payment_method': 'Online', 'source': 'Direct', 'created': fmt(add_days(now_dt, -30))},
-        {'guest_index': 2, 'room_index': 5, 'check_in': fmt(add_days(now_dt, -30)), 'check_out': fmt(add_days(now_dt, -26)), 'nights': 4, 'adults': 5, 'children': 1, 'total': 44000, 'status': 'Checked Out', 'payment_status': 'Paid', 'payment_method': 'Online', 'source': 'Direct', 'special_requests': 'Conference setup', 'created': fmt(add_days(now_dt, -40))},
+        {'guest_index': 0, 'room_index': 0, 'check_in': fmt(add_days(today, -3)), 'check_out': fmt(add_days(today, -1)), 'adults': 2, 'status': 'Checked Out', 'payment_status': 'Paid', 'payment_method': 'Online', 'source': 'Website', 'created': fmt(add_days(today, -25))},
+        {'guest_index': 3, 'room_index': 0, 'check_in': fmt(add_days(today, 1)), 'check_out': fmt(add_days(today, 3)), 'adults': 2, 'status': 'Confirmed', 'payment_status': 'Paid', 'payment_method': 'Online', 'source': 'Website', 'created': fmt(add_days(today, -5))},
+        {'guest_index': 8, 'room_index': 0, 'check_in': fmt(add_days(today, 5)), 'check_out': fmt(add_days(today, 7)), 'adults': 2, 'status': 'Pending', 'payment_status': 'Pending', 'payment_method': 'Pay at Hotel', 'source': 'WhatsApp', 'created': fmt(add_days(today, -1))},
+        {'guest_index': 1, 'room_index': 1, 'check_in': today_str, 'check_out': fmt(add_days(today, 2)), 'adults': 2, 'status': 'Confirmed', 'payment_status': 'Pending', 'payment_method': 'Pay at Hotel', 'source': 'Direct', 'special_requests': 'Late check-in please', 'created': fmt(add_days(today, -7))},
+        {'guest_index': 4, 'room_index': 1, 'check_in': fmt(add_days(today, 3)), 'check_out': fmt(add_days(today, 5)), 'adults': 2, 'status': 'Pending', 'payment_status': 'Pending', 'payment_method': 'Pay at Hotel', 'source': 'Phone', 'special_requests': 'Anniversary celebration', 'created': fmt(add_days(today, -2))},
+        {'guest_index': 5, 'room_index': 2, 'check_in': fmt(add_days(today, 2)), 'check_out': fmt(add_days(today, 4)), 'adults': 2, 'status': 'Confirmed', 'payment_status': 'Paid', 'payment_method': 'Online', 'source': 'Booking.com', 'special_requests': 'Airport transfer', 'created': fmt(add_days(today, -12))},
+        {'guest_index': 9, 'room_index': 2, 'check_in': fmt(add_days(today, 6)), 'check_out': fmt(add_days(today, 9)), 'adults': 2, 'children': 1, 'status': 'Pending', 'payment_status': 'Pending', 'payment_method': 'Pay at Hotel', 'source': 'WhatsApp', 'created': fmt(add_days(today, -1))},
+        {'guest_index': 2, 'room_index': 3, 'check_in': today_str, 'check_out': fmt(add_days(today, 2)), 'adults': 2, 'status': 'Confirmed', 'payment_status': 'Paid', 'payment_method': 'Online', 'source': 'Website', 'created': fmt(add_days(today, -10))},
+        {'guest_index': 6, 'room_index': 3, 'check_in': fmt(add_days(today, 3)), 'check_out': fmt(add_days(today, 6)), 'adults': 2, 'children': 1, 'status': 'Confirmed', 'payment_status': 'Paid', 'payment_method': 'Online', 'source': 'Booking.com', 'created': fmt(add_days(today, -8))},
+        {'guest_index': 10, 'room_index': 3, 'check_in': fmt(add_days(today, -8)), 'check_out': fmt(add_days(today, -6)), 'adults': 2, 'status': 'Checked Out', 'payment_status': 'Paid', 'payment_method': 'Cash', 'source': 'Direct', 'created': fmt(add_days(today, -30))},
+        {'guest_index': 0, 'room_index': 4, 'check_in': fmt(add_days(today, -20)), 'check_out': fmt(add_days(today, -18)), 'adults': 2, 'status': 'Checked Out', 'payment_status': 'Paid', 'payment_method': 'Online', 'source': 'Direct', 'created': fmt(add_days(today, -40))},
+        {'guest_index': 5, 'room_index': 4, 'check_in': fmt(add_days(today, 7)), 'check_out': fmt(add_days(today, 10)), 'adults': 2, 'children': 1, 'status': 'Cancelled', 'payment_status': 'Refunded', 'payment_method': 'Online', 'source': 'Website', 'special_requests': 'Early check-in', 'created': fmt(add_days(today, -15))},
+        {'guest_index': 7, 'room_index': 5, 'check_in': fmt(add_days(today, -3)), 'check_out': today_str, 'adults': 3, 'status': 'Confirmed', 'payment_status': 'Paid', 'payment_method': 'Cash', 'source': 'Direct', 'special_requests': 'Need extra towels', 'created': fmt(add_days(today, -14))},
+        {'guest_index': 2, 'room_index': 5, 'check_in': fmt(add_days(today, 1)), 'check_out': fmt(add_days(today, 4)), 'adults': 5, 'children': 1, 'status': 'Confirmed', 'payment_status': 'Paid', 'payment_method': 'Online', 'source': 'Direct', 'special_requests': 'Conference setup', 'created': fmt(add_days(today, -6))},
     ]
     seasonal_data = [
         {'name': 'Peak Season', 'start_date': '2026-03-01', 'end_date': '2026-06-30', 'adjustment': 30, 'type': 'percentage', 'is_active': True},
@@ -78,11 +100,17 @@ async def seed_demo_data(session: AsyncSession) -> dict:
     for bd in bookings_data:
         guest = created_guests[bd['guest_index']]
         room = created_rooms[bd['room_index']]
+        check_in = datetime.strptime(bd['check_in'], '%Y-%m-%d').date()
+        check_out = datetime.strptime(bd['check_out'], '%Y-%m-%d').date()
         bd['guest_id'] = guest.id
         bd['room_id'] = room.id
+        bd['nights'] = (check_out - check_in).days
+        bd['total'] = compute_total(room.price, room.weekend_price, check_in, check_out)
+        bd['children'] = bd.get('children', 0)
+        bd['special_requests'] = bd.get('special_requests', '')
+        bd['created_at'] = datetime.fromisoformat(bd.pop('created') + 'T00:00:00+00:00').replace(tzinfo=None)
         bd.pop('guest_index')
         bd.pop('room_index')
-        bd['created_at'] = datetime.fromisoformat(bd.pop('created') + 'T00:00:00+00:00').replace(tzinfo=None)
         await booking_repo.create_booking(session, bd)
 
     for sd in seasonal_data:
@@ -99,7 +127,7 @@ async def seed_demo_data(session: AsyncSession) -> dict:
             'address': 'Beach Road, Fort Kochi, Kerala 682001',
             'check_in_time': '14:00',
             'check_out_time': '11:00',
-            'tax_rate': 5,
+            'tax_rate': TAX_RATE,
             'total_rooms': 6,
         })
 
