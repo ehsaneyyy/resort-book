@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useBookings, useRooms, useGuests, useResort, useCreateBooking, useUpdateBooking, useUpdateBookingStatus, useDeleteBooking, useCreateGuest } from '../api/hooks';
-import { formatCurrency, formatDate, statusColor, today } from '../data/utils';
+import { formatCurrency, formatDate, statusColor, today, computeBookingTotal } from '../data/utils';
 import { useToast } from '../components/Toast';
 import { Modal } from '../components/Modal';
 import { ConfirmDialog } from '../components/ConfirmDialog';
@@ -100,7 +100,7 @@ export function Bookings() {
       }
 
       const nights = Math.ceil((new Date(form.checkOut) - new Date(form.checkIn)) / 864e5);
-      const total = room.price * nights;
+      const total = computeBookingTotal(room, form.checkIn, nights, resort?.taxRate);
 
       await createBooking.mutateAsync({
         guestId, roomId: form.roomId, checkIn: form.checkIn, checkOut: form.checkOut,

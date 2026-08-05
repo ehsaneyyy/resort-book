@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useRooms, useGuests, useResort, useCreateBooking, useCreateGuest } from '../api/hooks';
 import { useToast } from './Toast';
-import { formatCurrency, today } from '../data/utils';
+import { formatCurrency, today, computeBookingTotal } from '../data/utils';
 import { whatsappLink, confirmationMsg } from '../data/templates';
 import { PHONE_REGEX } from '../data/constants';
 import { MessageCircle, Send, Plus } from 'lucide-react';
@@ -34,7 +34,7 @@ export function WhatsAppQuickAdd({ onClose }) {
   const room = roomsById[form.roomId];
   const checkOut = calcCheckOut();
   const nights = Number(form.nights);
-  const total = room ? room.price * nights : 0;
+  const total = room ? computeBookingTotal(room, form.checkIn, nights, resort?.taxRate) : 0;
 
   const submit = async (e) => {
     e.preventDefault();

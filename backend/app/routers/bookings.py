@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..database import get_session
 from ..repositories import booking_repo, guest_repo, room_repo
 from ..schemas.booking import BookingCreate, BookingUpdate, BookingStatusUpdate
+from ..services import booking_service
 
 router = APIRouter(prefix='/api/v1/bookings', tags=['bookings'])
 
@@ -29,7 +30,11 @@ async def create_booking(data: BookingCreate, session: AsyncSession = Depends(ge
     room = await room_repo.get_room_by_id(session, data.room_id)
     if not room:
         raise HTTPException(400, 'Room not found')
-    booking = await booking_repo.create_booking(session, data.model_dump())
+    nights, total = await booking_service.validate_booking(session, room, data.check_in, data.check_out)
+    payload = data.model_dump()
+    payload['nights'] = nights
+    payload['total'] = total
+    booking = await booking_repo.create_booking(session, payload)
     return booking
 
 
@@ -38,7 +43,21 @@ async def update_booking(booking_id: str, data: BookingUpdate, session: AsyncSes
     booking = await booking_repo.get_booking_by_id(session, booking_id)
     if not booking:
         raise HTTPException(404, 'Booking not found')
-    updated = await booking_repo.update_booking(session, booking, data.model_dump(exclude_unset=True))
+    room = await room_repo.get_room_by_id(session, booking.room_id)
+    payload = data.model_dump(exclude_unset=True)
+    payload.pop('total', None)
+    dates_changed = 'check_in' in payload or 'check_out' in payload
+    if dates_changed:
+        check_in = payload.get('check_in', booking.check_in)
+        check_out = payload.get('check_out', booking.check_out)
+        if not room:
+            raise HTTPException(400, 'Room not found')
+        nights, total = await booking_service.validate_booking(
+            session, room, check_in, check_out, exclude_booking_id=booking.id
+        )
+        payload['nights'] = nights
+        payload['total'] = total
+    updated = await booking_repo.update_booking(session, booking, payload)
     return updated
 
 

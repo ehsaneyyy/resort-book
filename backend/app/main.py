@@ -1,9 +1,10 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.gzip import GZipMiddleware
 from sqlmodel import SQLModel
 from .database import engine
+from .auth import require_admin
 from .routers import rooms, guests, bookings, seasonal, resort, seed, stats
 
 
@@ -14,11 +15,13 @@ async def lifespan(app: FastAPI):
     yield
 
 
+from .config import settings
+
 app = FastAPI(title='ResortBook API', version='1.0.0', lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=['*'],
+    allow_origins=settings.origins,
     allow_credentials=True,
     allow_methods=['*'],
     allow_headers=['*'],
@@ -26,13 +29,13 @@ app.add_middleware(
 
 app.add_middleware(GZipMiddleware, minimum_size=500)
 
-app.include_router(rooms.router)
-app.include_router(guests.router)
-app.include_router(bookings.router)
-app.include_router(seasonal.router)
-app.include_router(resort.router)
-app.include_router(seed.router)
-app.include_router(stats.router)
+app.include_router(rooms.router, dependencies=[Depends(require_admin)])
+app.include_router(guests.router, dependencies=[Depends(require_admin)])
+app.include_router(bookings.router, dependencies=[Depends(require_admin)])
+app.include_router(seasonal.router, dependencies=[Depends(require_admin)])
+app.include_router(resort.router, dependencies=[Depends(require_admin)])
+app.include_router(seed.router, dependencies=[Depends(require_admin)])
+app.include_router(stats.router, dependencies=[Depends(require_admin)])
 
 
 @app.get('/api/v1/health')

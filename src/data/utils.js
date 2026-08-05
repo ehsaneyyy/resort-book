@@ -18,6 +18,22 @@ export function today() {
   return new Date().toISOString().split('T')[0];
 }
 
+export function nightPrice(room, checkIn, nights) {
+  let total = 0;
+  for (let i = 0; i < nights; i++) {
+    const d = new Date(checkIn + 'T00:00:00');
+    d.setDate(d.getDate() + i);
+    const weekend = d.getDay() === 5 || d.getDay() === 6;
+    total += weekend && room.weekendPrice ? room.weekendPrice : room.price;
+  }
+  return total;
+}
+
+export function computeBookingTotal(room, checkIn, nights, taxRate) {
+  const base = nightPrice(room, checkIn, nights);
+  return Math.round(base * (1 + (Number(taxRate) || 0) / 100));
+}
+
 export function statusColor(status) {
   switch (status) {
     case 'Confirmed': return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';

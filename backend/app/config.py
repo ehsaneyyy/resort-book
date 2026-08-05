@@ -5,6 +5,7 @@ class Settings(BaseSettings):
     database_url: str = 'sqlite+aiosqlite:///./resort.db'
     cors_origins: str = 'http://localhost:5173'
     app_name: str = 'Resort Admin API'
+    admin_token: str = ''
 
     @property
     def origins(self) -> list[str]:
