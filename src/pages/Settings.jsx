@@ -37,44 +37,40 @@ export function Settings() {
   const toast = useToast();
   const [saved, setSaved] = useState(false);
 
-  const initial = useRef({ resortName: '', currency: '\u20B9', phone: '', email: '', address: '', checkInTime: '14:00', checkOutTime: '11:00', taxRate: 0, whatsappPhone: '' });
+  const initial = useRef({ resortName: '', currency: '\u20B9', phone: '', email: '', address: '', taxRate: 0, whatsappPhone: '' });
 
   const [resortName, setResortName] = useState('');
   const [currency, setCurrency] = useState('\u20B9');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [address, setAddress] = useState('');
-  const [checkInTime, setCheckInTime] = useState('14:00');
-  const [checkOutTime, setCheckOutTime] = useState('11:00');
   const [taxRate, setTaxRate] = useState(0);
   const [whatsappPhone, setWhatsappPhone] = useState('');
 
   if (resort && initial.current.resortName === '') {
     const r = resort;
-    initial.current = { resortName: r.name || '', currency: r.currency || '\u20B9', phone: r.phone || '', email: r.email || '', address: r.address || '', checkInTime: r.checkInTime || '14:00', checkOutTime: r.checkOutTime || '11:00', taxRate: r.taxRate ?? 0, whatsappPhone: r.whatsappPhone || '' };
+    initial.current = { resortName: r.name || '', currency: r.currency || '\u20B9', phone: r.phone || '', email: r.email || '', address: r.address || '', taxRate: r.taxRate ?? 0, whatsappPhone: r.whatsappPhone || '' };
     if (resortName === '') {
       setResortName(initial.current.resortName);
       setCurrency(initial.current.currency);
       setPhone(initial.current.phone);
       setEmail(initial.current.email);
       setAddress(initial.current.address);
-      setCheckInTime(initial.current.checkInTime);
-      setCheckOutTime(initial.current.checkOutTime);
       setTaxRate(initial.current.taxRate);
       setWhatsappPhone(initial.current.whatsappPhone);
     }
   }
 
-  const hasChanges = resortName !== initial.current.resortName || currency !== initial.current.currency || phone !== initial.current.phone || email !== initial.current.email || address !== initial.current.address || checkInTime !== initial.current.checkInTime || checkOutTime !== initial.current.checkOutTime || taxRate !== initial.current.taxRate || whatsappPhone !== initial.current.whatsappPhone;
+  const hasChanges = resortName !== initial.current.resortName || currency !== initial.current.currency || phone !== initial.current.phone || email !== initial.current.email || address !== initial.current.address || taxRate !== initial.current.taxRate || whatsappPhone !== initial.current.whatsappPhone;
 
   const saveResort = (e) => {
     e.preventDefault();
     if (phone && !PHONE_REGEX.test(phone)) { toast('Invalid phone format', 'warning'); return; }
     if (email && !EMAIL_REGEX.test(email)) { toast('Invalid email format', 'warning'); return; }
     if (whatsappPhone && !PHONE_REGEX.test(whatsappPhone)) { toast('Invalid WhatsApp number format', 'warning'); return; }
-    updateResort.mutate({ name: resortName, currency, phone, email, address, checkInTime, checkOutTime, taxRate: Number(taxRate), whatsappPhone }, {
+    updateResort.mutate({ name: resortName, currency, phone, email, address, taxRate: Number(taxRate), whatsappPhone }, {
       onSuccess: () => {
-        initial.current = { resortName, currency, phone, email, address, checkInTime, checkOutTime, taxRate: Number(taxRate), whatsappPhone };
+        initial.current = { resortName, currency, phone, email, address, taxRate: Number(taxRate), whatsappPhone };
         setSaved(true);
         setTimeout(() => setSaved(false), 2500);
         toast('Settings saved', 'success');
@@ -106,7 +102,6 @@ export function Settings() {
           <div className="grid grid-cols-2 gap-4"><Skeleton className="h-[88px] rounded" /><Skeleton className="h-[88px] rounded" /></div>
           <div className="grid grid-cols-3 gap-4"><Skeleton className="h-[88px] rounded" /><Skeleton className="h-[88px] rounded" /><Skeleton className="h-[88px] rounded" /></div>
           <Skeleton className="h-[88px] rounded" />
-          <div className="grid grid-cols-3 gap-4"><Skeleton className="h-[88px] rounded" /><Skeleton className="h-[88px] rounded" /><Skeleton className="h-[88px] rounded" /></div>
         </div>
       </div>
     );
@@ -143,14 +138,6 @@ export function Settings() {
             <textarea rows={2} value={address} onChange={e => setAddress(e.target.value)} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50 resize-none" />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Check-in Time</label>
-              <input type="time" value={checkInTime} onChange={e => setCheckInTime(e.target.value)} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Check-out Time</label>
-              <input type="time" value={checkOutTime} onChange={e => setCheckOutTime(e.target.value)} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" />
-            </div>
             <div>
               <label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Tax Rate (%)</label>
               <input type="number" min="0" max="100" step="0.1" value={taxRate} onChange={e => setTaxRate(e.target.value)} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" />
