@@ -6,6 +6,8 @@ class Settings(BaseSettings):
     cors_origins: str = 'http://localhost:5173'
     app_name: str = 'Resort Admin API'
     admin_token: str = ''
+    rate_limit_writes: int = 30
+    rate_limit_window: int = 60
 
     @property
     def origins(self) -> list[str]:

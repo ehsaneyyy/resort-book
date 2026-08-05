@@ -5,6 +5,7 @@ from starlette.middleware.gzip import GZipMiddleware
 from sqlmodel import SQLModel
 from .database import engine
 from .auth import require_admin
+from .ratelimit import RateLimitMiddleware
 from .routers import rooms, guests, bookings, seasonal, resort, seed, stats
 
 
@@ -28,6 +29,12 @@ app.add_middleware(
 )
 
 app.add_middleware(GZipMiddleware, minimum_size=500)
+
+app.add_middleware(
+    RateLimitMiddleware,
+    limit=settings.rate_limit_writes,
+    window=settings.rate_limit_window,
+)
 
 app.include_router(rooms.router, dependencies=[Depends(require_admin)])
 app.include_router(guests.router, dependencies=[Depends(require_admin)])
