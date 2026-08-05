@@ -14,6 +14,16 @@ export function formatDate(d) {
   return `${pad(dt.getDate())}/${pad(dt.getMonth() + 1)}/${dt.getFullYear()}`;
 }
 
+export function formatTime(t) {
+  if (!t) return '';
+  const m = String(t).trim().match(/^(\d{1,2}):(\d{2})$/);
+  if (!m) return String(t);
+  let h = parseInt(m[1], 10);
+  const ap = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  return `${h}:${m[2]} ${ap}`;
+}
+
 export function today() {
   return new Date().toISOString().split('T')[0];
 }

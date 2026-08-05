@@ -1,4 +1,4 @@
-import { formatCurrency } from './utils';
+import { formatCurrency, formatTime } from './utils';
 
 function encode(t) { return encodeURIComponent(t); }
 
@@ -15,7 +15,7 @@ export function confirmationMsg(booking, guest, room, resort) {
     ``,
     `📅 ${booking.checkIn} → ${booking.checkOut} (${booking.nights} night${booking.nights > 1 ? 's' : ''})`,
     `💰 Total: ${formatCurrency(booking.total)}`,
-    `🕑 Check-in: ${resort?.checkInTime || '2PM'} · Check-out: ${resort?.checkOutTime || '11AM'}`,
+    `🕑 Check-in: ${formatTime(resort?.checkInTime) || '2:00 PM'} · Check-out: ${formatTime(resort?.checkOutTime) || '11:00 AM'}`,
   ];
   if (resort?.address) lines.push(`📍 ${resort.address}`);
   const contact = resort?.whatsappPhone || resort?.phone || 'the resort';
@@ -28,7 +28,7 @@ export function preArrivalMsg(booking, guest, room, resort) {
     `Hi ${guest?.name || 'Guest'}! See you tomorrow at ${resort?.name || 'the resort'} 😊`,
     ``,
     `A few things:`,
-    `• Check-in is at ${resort?.checkInTime || '2PM'}`,
+    `• Check-in is at ${formatTime(resort?.checkInTime) || '2:00 PM'}`,
     `• Let us know your expected arrival time`,
     `• Need pickup from the airport/station? We can arrange.`,
     `• WiFi is complimentary`,

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { formatCurrency, formatDate } from '../data/utils';
+import { formatCurrency, formatDate, formatTime } from '../data/utils';
 
 export function PrintInvoice({ booking, guest, room, resort, onClose }) {
   const printed = useRef(false);
@@ -47,8 +47,8 @@ export function PrintInvoice({ booking, guest, room, resort, onClose }) {
         <div className="mb-4">
           <h3 className="text-[10px] uppercase tracking-[1.5px] text-[#999] mb-2 pb-1 border-b border-[#eee]">Stay</h3>
           <div className="flex justify-between py-0.5 text-[12px]"><span className="text-[#888]">Room</span><span className="font-medium">{room?.name || booking.roomId}</span></div>
-          <div className="flex justify-between py-0.5 text-[12px]"><span className="text-[#888]">Check-in</span><span className="font-medium">{formatDate(booking.checkIn)} at {resort.checkInTime}</span></div>
-          <div className="flex justify-between py-0.5 text-[12px]"><span className="text-[#888]">Check-out</span><span className="font-medium">{formatDate(booking.checkOut)} at {resort.checkOutTime}</span></div>
+          <div className="flex justify-between py-0.5 text-[12px]"><span className="text-[#888]">Check-in</span><span className="font-medium">{formatDate(booking.checkIn)} at {formatTime(resort.checkInTime)}</span></div>
+          <div className="flex justify-between py-0.5 text-[12px]"><span className="text-[#888]">Check-out</span><span className="font-medium">{formatDate(booking.checkOut)} at {formatTime(resort.checkOutTime)}</span></div>
           <div className="flex justify-between py-0.5 text-[12px]"><span className="text-[#888]">Nights</span><span className="font-medium">{booking.nights}</span></div>
           <div className="flex justify-between py-0.5 text-[12px]"><span className="text-[#888]">Guests</span><span className="font-medium">{booking.adults}A{booking.children ? `, ${booking.children}C` : ''}</span></div>
         </div>
