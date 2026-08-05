@@ -4,6 +4,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..repositories import booking_repo, room_repo, resort_repo, seasonal_repo
 
 WEEKEND_WEEKDAYS = {4, 5}
+VALID_STATUSES = ('Pending', 'Confirmed', 'Checked Out', 'Cancelled')
+
+
+def validate_status(status: str) -> None:
+    if status not in VALID_STATUSES:
+        raise HTTPException(
+            status_code=400,
+            detail=f'Invalid status. Must be one of: {", ".join(VALID_STATUSES)}',
+        )
 
 
 def parse_date(value: str) -> date:

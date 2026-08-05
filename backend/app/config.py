@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     admin_token: str = ''
     rate_limit_writes: int = 30
     rate_limit_window: int = 60
+    rate_limit_auth_failures: int = 10
+    max_body_bytes: int = 1_000_000
 
     @property
     def origins(self) -> list[str]:

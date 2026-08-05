@@ -34,6 +34,8 @@ async def create_booking(data: BookingCreate, session: AsyncSession = Depends(ge
     payload = data.model_dump()
     payload['nights'] = nights
     payload['total'] = total
+    payload['status'] = 'Pending'
+    payload['payment_status'] = 'Pending'
     booking = await booking_repo.create_booking(session, payload)
     return booking
 
@@ -46,6 +48,8 @@ async def update_booking(booking_id: str, data: BookingUpdate, session: AsyncSes
     room = await room_repo.get_room_by_id(session, booking.room_id)
     payload = data.model_dump(exclude_unset=True)
     payload.pop('total', None)
+    if 'status' in payload:
+        booking_service.validate_status(payload['status'])
     dates_changed = 'check_in' in payload or 'check_out' in payload
     if dates_changed:
         check_in = payload.get('check_in', booking.check_in)
@@ -66,9 +70,7 @@ async def update_booking_status(booking_id: str, data: BookingStatusUpdate, sess
     booking = await booking_repo.get_booking_by_id(session, booking_id)
     if not booking:
         raise HTTPException(404, 'Booking not found')
-    valid = ['Pending', 'Confirmed', 'Checked Out', 'Cancelled']
-    if data.status not in valid:
-        raise HTTPException(400, f'Invalid status. Must be one of: {", ".join(valid)}')
+    booking_service.validate_status(data.status)
     updated = await booking_repo.update_booking(session, booking, {'status': data.status})
     return updated
 
