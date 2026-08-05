@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useSeasonalRules, useCreateSeasonalRule, useUpdateSeasonalRule, useDeleteSeasonalRule } from '../api/hooks';
-import { useToast } from '../components/Toast';
+import { useToast } from '../components/useToast';
 import { Modal } from '../components/Modal';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { Calendar, Plus, Edit3, Trash2 } from 'lucide-react';

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useGuests, useCreateGuest, useResort } from '../api/hooks';
 import { formatCurrency, formatDate } from '../data/utils';
-import { useToast } from '../components/Toast';
+import { useToast } from '../components/useToast';
 import { Modal } from '../components/Modal';
 import { PhoneInput } from '../components/PhoneInput';
 import { GuestTimeline } from '../components/GuestTimeline';

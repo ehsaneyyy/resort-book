@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useStats, useBookings, useRooms, useGuests, useResort, useUpdateBookingStatus } from '../api/hooks';
 import { formatCurrency, formatDate, today } from '../data/utils';
-import { useToast } from '../components/Toast';
+import { useToast } from '../components/useToast';
 import { CheckCircle, ArrowRight } from 'lucide-react';
 import { Skeleton, SkeletonStatRow, SkeletonTable } from '../components/Skeleton';
 

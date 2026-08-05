@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { setToken } from '../api/client';
-import { useToast } from '../components/Toast';
+import { useToast } from '../components/useToast';
 import { KeyRound, ArrowRight } from 'lucide-react';
 
 export function Login() {

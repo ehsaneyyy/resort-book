@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useRooms, useGuests, useResort, useSeasonalRules, useCreateBooking, useCreateGuest } from '../api/hooks';
-import { useToast } from './Toast';
+import { useToast } from './useToast';
 import { PhoneInput } from './PhoneInput';
 import { formatCurrency, today, computeBookingTotal } from '../data/utils';
 import { whatsappLink, confirmationMsg } from '../data/templates';
@@ -20,7 +20,7 @@ export function WhatsAppQuickAdd({ onClose }) {
   const [booking, setBooking] = useState(null);
   const inputRef = useRef(null);
 
-  useEffect(() => { if (rooms.length > 0 && !form.roomId) setForm(prev => ({ ...prev, roomId: rooms[0].id })); }, [rooms]);
+  useEffect(() => { if (rooms.length > 0 && !form.roomId) setForm(prev => ({ ...prev, roomId: rooms[0].id })); }, [rooms, form.roomId]);
 
   useEffect(() => { inputRef.current?.focus(); }, []);
 

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useRooms, useBookings, useCreateRoom, useUpdateRoom, useDeleteRoom, useResort } from '../api/hooks';
 import { formatCurrency, today } from '../data/utils';
-import { useToast } from '../components/Toast';
+import { useToast } from '../components/useToast';
 import { Modal } from '../components/Modal';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { Plus, Edit3, Trash2, BedDouble } from 'lucide-react';

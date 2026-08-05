@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useBookings, useRooms, useGuests, useResort, useSeasonalRules, useCreateBooking, useUpdateBooking, useUpdateBookingStatus, useDeleteBooking, useCreateGuest } from '../api/hooks';
 import { formatCurrency, formatDate, statusColor, today, computeBookingTotal } from '../data/utils';
-import { useToast } from '../components/Toast';
+import { useToast } from '../components/useToast';
 import { Modal } from '../components/Modal';
 import { PhoneInput } from '../components/PhoneInput';
 import { ConfirmDialog } from '../components/ConfirmDialog';

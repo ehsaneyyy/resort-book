@@ -1,11 +1,6 @@
-import { useState, createContext, useContext, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { CheckCircle, XCircle, Info, AlertTriangle } from 'lucide-react';
-
-const ToastContext = createContext();
-
-export function useToast() {
-  return useContext(ToastContext);
-}
+import { ToastContext } from './useToast';
 
 const icons = {
   success: CheckCircle,
