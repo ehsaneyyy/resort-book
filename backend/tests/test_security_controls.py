@@ -10,6 +10,18 @@ async def test_auth_failure_throttle(client):
     assert statuses.count(429) == 2
 
 
+async def test_auth_throttle_cannot_be_bypassed_with_spoofed_ip(client):
+    statuses = []
+    for i in range(55):
+        r = await client.get(
+            '/api/v1/rooms',
+            headers={'Authorization': 'Bearer wrong-token', 'X-Forwarded-For': f'203.0.113.{i}'},
+        )
+        statuses.append(r.status_code)
+    assert statuses.count(401) == 50
+    assert statuses.count(429) == 5
+
+
 async def test_body_size_limit_413(client):
     r = await client.post('/api/v1/rooms', headers=AUTH, json={
         'name': 'x' * 1_200_000,

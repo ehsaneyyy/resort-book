@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     rate_limit_writes: int = 30
     rate_limit_window: int = 60
     rate_limit_auth_failures: int = 10
+    rate_limit_global_auth_failures: int = 50
     max_body_bytes: int = 1_000_000
 
     @property

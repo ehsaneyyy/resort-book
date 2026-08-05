@@ -41,6 +41,7 @@ app.add_middleware(
     limit=settings.rate_limit_writes,
     window=settings.rate_limit_window,
     auth_failure_limit=settings.rate_limit_auth_failures,
+    global_auth_failure_limit=settings.rate_limit_global_auth_failures,
 )
 
 app.include_router(rooms.router, dependencies=[Depends(require_admin)])
