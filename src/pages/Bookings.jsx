@@ -3,6 +3,7 @@ import { useBookings, useRooms, useGuests, useResort, useCreateBooking, useUpdat
 import { formatCurrency, formatDate, statusColor, today, computeBookingTotal } from '../data/utils';
 import { useToast } from '../components/Toast';
 import { Modal } from '../components/Modal';
+import { PhoneInput } from '../components/PhoneInput';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { PrintInvoice } from '../components/PrintInvoice';
 import { Search, Eye, CheckCircle, XCircle, LogOut, Trash2, Printer, Plus, MessageCircle } from 'lucide-react';
@@ -313,7 +314,7 @@ export function Bookings() {
                 <div className="space-y-2">
                   <div className="grid grid-cols-2 gap-2">
                     <input required placeholder="Name" value={form.name || ''} onChange={e => setForm({ ...form, name: e.target.value })} className="px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" />
-                    <input required placeholder="Phone" value={form.phone || ''} onChange={e => setForm({ ...form, phone: e.target.value })} className="px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" />
+                    <PhoneInput required value={form.phone || ''} onChange={v => setForm({ ...form, phone: v })} placeholder="Phone" />
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <input type="email" placeholder="Email" value={form.email || ''} onChange={e => setForm({ ...form, email: e.target.value })} className="px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" />

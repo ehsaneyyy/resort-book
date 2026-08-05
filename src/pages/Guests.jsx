@@ -3,6 +3,7 @@ import { useGuests, useCreateGuest, useResort } from '../api/hooks';
 import { formatCurrency, formatDate } from '../data/utils';
 import { useToast } from '../components/Toast';
 import { Modal } from '../components/Modal';
+import { PhoneInput } from '../components/PhoneInput';
 import { GuestTimeline } from '../components/GuestTimeline';
 import { Search, Eye, Star, UserPlus, MessageCircle } from 'lucide-react';
 import { Skeleton } from '../components/Skeleton';
@@ -152,7 +153,7 @@ export function Guests() {
           <form onSubmit={save} className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Name</label><input required value={form.name || ''} onChange={e => setForm({ ...form, name: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" /></div>
-              <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Phone</label><input required value={form.phone || ''} onChange={e => setForm({ ...form, phone: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" /></div>
+              <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Phone</label><PhoneInput required value={form.phone || ''} onChange={v => setForm({ ...form, phone: v })} /></div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div><label className="block text-xs font-semibold text-slate-500 uppercase tracking-[1.5px] mb-1.5">Email</label><input type="email" value={form.email || ''} onChange={e => setForm({ ...form, email: e.target.value })} className="w-full px-3 py-2 min-h-[44px] bg-dark-700 border border-white/[0.03] rounded text-white text-sm focus:outline-none focus:border-white/10 focus-visible:ring-1 focus-visible:ring-amber-500/50" /></div>

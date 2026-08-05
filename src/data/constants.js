@@ -25,3 +25,25 @@ export const CURRENCIES = [
 ];
 export const PHONE_REGEX = /^\+?[\d\s\-()]{7,15}$/;
 export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+export const COUNTRIES = [
+  { code: '+91', label: 'India' },
+  { code: '+1', label: 'US / Canada' },
+  { code: '+44', label: 'United Kingdom' },
+  { code: '+971', label: 'UAE' },
+  { code: '+966', label: 'Saudi Arabia' },
+  { code: '+974', label: 'Qatar' },
+  { code: '+968', label: 'Oman' },
+  { code: '+965', label: 'Kuwait' },
+  { code: '+973', label: 'Bahrain' },
+  { code: '+65', label: 'Singapore' },
+  { code: '+60', label: 'Malaysia' },
+  { code: '+66', label: 'Thailand' },
+  { code: '+61', label: 'Australia' },
+  { code: '+49', label: 'Germany' },
+  { code: '+33', label: 'France' },
+  { code: '+960', label: 'Maldives' },
+  { code: '+94', label: 'Sri Lanka' },
+  { code: '+977', label: 'Nepal' },
+  { code: '+880', label: 'Bangladesh' },
+  { code: '+81', label: 'Japan' },
+];
