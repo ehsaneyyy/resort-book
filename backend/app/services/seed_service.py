@@ -7,8 +7,8 @@ from ..models.booking import Booking
 from ..models.seasonal import SeasonalRule
 from ..models.resort import Resort
 from ..repositories import room_repo, guest_repo, booking_repo, seasonal_repo, resort_repo
+from .booking_service import base_night_rate, seasonal_adjustment
 
-WEEKEND_WEEKDAYS = {4, 5}
 TAX_RATE = 5
 
 
@@ -20,14 +20,11 @@ def add_days(d, n):
     return d + timedelta(days=n)
 
 
-def compute_total(price, weekend_price, check_in, check_out):
-    base = 0
+def compute_total(room, check_in, check_out, rules):
+    base = 0.0
     for i in range((check_out - check_in).days):
         day = check_in + timedelta(days=i)
-        if weekend_price and day.weekday() in WEEKEND_WEEKDAYS:
-            base += weekend_price
-        else:
-            base += price
+        base += base_night_rate(room, day) * (1 + seasonal_adjustment(room, day, rules) / 100)
     return round(base * (1 + TAX_RATE / 100))
 
 
@@ -86,6 +83,8 @@ async def seed_demo_data(session: AsyncSession) -> dict:
         {'name': 'Weekend Premium', 'start_date': '2026-01-01', 'end_date': '2026-12-31', 'adjustment': 15, 'type': 'percentage', 'is_active': True},
     ]
 
+    rules = [SeasonalRule(**sd) for sd in seasonal_data]
+
     created_guests = []
     created_rooms = []
 
@@ -105,7 +104,7 @@ async def seed_demo_data(session: AsyncSession) -> dict:
         bd['guest_id'] = guest.id
         bd['room_id'] = room.id
         bd['nights'] = (check_out - check_in).days
-        bd['total'] = compute_total(room.price, room.weekend_price, check_in, check_out)
+        bd['total'] = compute_total(room, check_in, check_out, rules)
         bd['children'] = bd.get('children', 0)
         bd['special_requests'] = bd.get('special_requests', '')
         bd['created_at'] = datetime.fromisoformat(bd.pop('created') + 'T00:00:00+00:00').replace(tzinfo=None)

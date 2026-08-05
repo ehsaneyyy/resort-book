@@ -12,6 +12,7 @@ from sqlmodel import SQLModel
 
 from app.main import app
 from app.database import engine, async_session_factory
+from app.ratelimit import reset_rate_limits
 from app.services.seed_service import seed_demo_data
 from app.repositories import room_repo, guest_repo
 
@@ -28,6 +29,7 @@ async def _client():
 
 @pytest.fixture(autouse=True)
 async def reset_db():
+    reset_rate_limits()
     async with engine.begin() as conn:
         await conn.run_sync(SQLModel.metadata.drop_all)
         await conn.run_sync(SQLModel.metadata.create_all)

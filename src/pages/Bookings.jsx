@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useBookings, useRooms, useGuests, useResort, useCreateBooking, useUpdateBooking, useUpdateBookingStatus, useDeleteBooking, useCreateGuest } from '../api/hooks';
+import { useBookings, useRooms, useGuests, useResort, useSeasonalRules, useCreateBooking, useUpdateBooking, useUpdateBookingStatus, useDeleteBooking, useCreateGuest } from '../api/hooks';
 import { formatCurrency, formatDate, statusColor, today, computeBookingTotal } from '../data/utils';
 import { useToast } from '../components/Toast';
 import { Modal } from '../components/Modal';
@@ -16,6 +16,7 @@ export function Bookings() {
   const { data: rooms = [] } = useRooms();
   const { data: guests = [] } = useGuests();
   const { data: resort } = useResort();
+  const { data: seasonal = [] } = useSeasonalRules();
   const createBooking = useCreateBooking();
   const updateBooking = useUpdateBooking();
   const updateBookingStatus = useUpdateBookingStatus();
@@ -101,7 +102,7 @@ export function Bookings() {
       }
 
       const nights = Math.ceil((new Date(form.checkOut) - new Date(form.checkIn)) / 864e5);
-      const total = computeBookingTotal(room, form.checkIn, nights, resort?.taxRate);
+      const total = computeBookingTotal(room, form.checkIn, nights, resort?.taxRate, seasonal);
 
       await createBooking.mutateAsync({
         guestId, roomId: form.roomId, checkIn: form.checkIn, checkOut: form.checkOut,

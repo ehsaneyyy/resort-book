@@ -1,7 +1,7 @@
 from datetime import date, datetime, timedelta
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..repositories import booking_repo, room_repo, resort_repo
+from ..repositories import booking_repo, room_repo, resort_repo, seasonal_repo
 
 WEEKEND_WEEKDAYS = {4, 5}
 
@@ -17,21 +17,39 @@ def overlaps(check_in: str, check_out: str, other_in: str, other_out: str) -> bo
     return check_in < other_out and other_in < check_out
 
 
+def base_night_rate(room, day: date) -> int:
+    if room.weekend_price is not None and day.weekday() in WEEKEND_WEEKDAYS:
+        return room.weekend_price
+    return room.price
+
+
 def night_price(room, check_in: date, nights: int) -> int:
     total = 0
     for i in range(nights):
-        day = check_in + timedelta(days=i)
-        if room.weekend_price is not None and day.weekday() in WEEKEND_WEEKDAYS:
-            total += room.weekend_price
-        else:
-            total += room.price
+        total += base_night_rate(room, check_in + timedelta(days=i))
     return total
+
+
+def seasonal_adjustment(room, day: date, rules) -> int:
+    adjustment = 0
+    for rule in rules:
+        if not rule.is_active:
+            continue
+        if rule.room_types and room.type not in rule.room_types:
+            continue
+        if rule.start_date <= day.isoformat() <= rule.end_date:
+            adjustment += rule.adjustment
+    return adjustment
 
 
 async def compute_total(session: AsyncSession, room, check_in: date, nights: int) -> int:
     resort = await resort_repo.get_resort(session)
     tax_rate = resort.tax_rate if resort else 0
-    base = night_price(room, check_in, nights)
+    rules = await seasonal_repo.get_all_rules(session)
+    base = 0.0
+    for i in range(nights):
+        day = check_in + timedelta(days=i)
+        base += base_night_rate(room, day) * (1 + seasonal_adjustment(room, day, rules) / 100)
     return round(base * (1 + tax_rate / 100))
 
 

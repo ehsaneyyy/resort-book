@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { useRooms, useGuests, useResort, useCreateBooking, useCreateGuest } from '../api/hooks';
+import { useRooms, useGuests, useResort, useSeasonalRules, useCreateBooking, useCreateGuest } from '../api/hooks';
 import { useToast } from './Toast';
 import { PhoneInput } from './PhoneInput';
 import { formatCurrency, today, computeBookingTotal } from '../data/utils';
@@ -11,6 +11,7 @@ export function WhatsAppQuickAdd({ onClose }) {
   const { data: rooms = [] } = useRooms();
   const { data: guests = [] } = useGuests();
   const { data: resort } = useResort();
+  const { data: seasonal = [] } = useSeasonalRules();
   const createBooking = useCreateBooking();
   const createGuest = useCreateGuest();
   const toast = useToast();
@@ -35,7 +36,7 @@ export function WhatsAppQuickAdd({ onClose }) {
   const room = roomsById[form.roomId];
   const checkOut = calcCheckOut();
   const nights = Number(form.nights);
-  const total = room ? computeBookingTotal(room, form.checkIn, nights, resort?.taxRate) : 0;
+  const total = room ? computeBookingTotal(room, form.checkIn, nights, resort?.taxRate, seasonal) : 0;
 
   const submit = async (e) => {
     e.preventDefault();

@@ -6,6 +6,13 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 WRITE_METHODS = ('POST', 'PUT', 'PATCH', 'DELETE')
 
+_instances: list['RateLimitMiddleware'] = []
+
+
+def reset_rate_limits() -> None:
+    for instance in _instances:
+        instance.hits.clear()
+
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
     def __init__(self, app, limit: int = 30, window: int = 60):
@@ -13,6 +20,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self.limit = limit
         self.window = window
         self.hits = {}
+        _instances.append(self)
 
     async def dispatch(self, request: Request, call_next):
         if request.method in WRITE_METHODS:

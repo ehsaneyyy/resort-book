@@ -18,19 +18,41 @@ export function today() {
   return new Date().toISOString().split('T')[0];
 }
 
+function nightBase(room, d) {
+  return (d.getDay() === 5 || d.getDay() === 6) && room.weekendPrice ? room.weekendPrice : room.price;
+}
+
 export function nightPrice(room, checkIn, nights) {
   let total = 0;
   for (let i = 0; i < nights; i++) {
     const d = new Date(checkIn + 'T00:00:00');
     d.setDate(d.getDate() + i);
-    const weekend = d.getDay() === 5 || d.getDay() === 6;
-    total += weekend && room.weekendPrice ? room.weekendPrice : room.price;
+    total += nightBase(room, d);
   }
   return total;
 }
 
-export function computeBookingTotal(room, checkIn, nights, taxRate) {
-  const base = nightPrice(room, checkIn, nights);
+function ymd(d) {
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+function seasonalAdjustment(room, d, rules) {
+  let adjustment = 0;
+  for (const rule of rules) {
+    if (!rule.isActive) continue;
+    if (rule.roomTypes?.length && !rule.roomTypes.includes(room.type)) continue;
+    if (rule.startDate <= ymd(d) && ymd(d) <= rule.endDate) adjustment += Number(rule.adjustment) || 0;
+  }
+  return adjustment;
+}
+
+export function computeBookingTotal(room, checkIn, nights, taxRate, seasonal = []) {
+  let base = 0;
+  for (let i = 0; i < nights; i++) {
+    const d = new Date(checkIn + 'T00:00:00');
+    d.setDate(d.getDate() + i);
+    base += nightBase(room, d) * (1 + seasonalAdjustment(room, d, seasonal) / 100);
+  }
   return Math.round(base * (1 + (Number(taxRate) || 0) / 100));
 }
 
