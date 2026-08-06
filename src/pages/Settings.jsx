@@ -1,8 +1,8 @@
 import { useState, useRef } from 'react';
-import { useResort, useUpdateResort, useRooms, useGuests, useBookings, useSeasonalRules, useStats } from '../api/hooks';
+import { useResort, useUpdateResort, useRooms, useGuests, useBookings, useSeasonalRules, useStats, useMe, useLogout } from '../api/hooks';
 import { useToast } from '../components/useToast';
 import { CURRENCIES, PHONE_REGEX, EMAIL_REGEX } from '../data/constants';
-import { Building2, Globe, MessageCircle, Download, Check, ShieldCheck } from 'lucide-react';
+import { Building2, Globe, MessageCircle, Download, Check, ShieldCheck, UserCircle, LogOut } from 'lucide-react';
 import { Skeleton } from '../components/Skeleton';
 import { ChangePasswordForm } from '../components/ChangePasswordForm';
 
@@ -34,9 +34,17 @@ export function Settings() {
   const { data: bookings = [], isLoading: bookingsLoading } = useBookings();
   const { data: seasonal = [], isLoading: seasonalLoading } = useSeasonalRules();
   const { data: stats } = useStats();
+  const { data: me } = useMe();
   const updateResort = useUpdateResort();
+  const logout = useLogout();
   const toast = useToast();
   const [saved, setSaved] = useState(false);
+
+  const handleLogout = () => {
+    logout.mutate(undefined, {
+      onSettled: () => { window.location.href = '/login'; },
+    });
+  };
 
   const initial = useRef({ resortName: '', currency: '\u20B9', phone: '', email: '', address: '', taxRate: 0, whatsappPhone: '' });
 
@@ -179,6 +187,18 @@ export function Settings() {
 
       <SectionCard icon={ShieldCheck} title="Security" tone="emerald">
         <ChangePasswordForm />
+      </SectionCard>
+
+      <SectionCard icon={UserCircle} title="Account" tone="slate">
+        <div className="flex items-center justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-xs text-slate-500 uppercase tracking-[1.5px]">Signed in as</p>
+            <p className="text-sm text-white font-medium mt-1 truncate">{me?.email ?? '...'}</p>
+          </div>
+          <button onClick={handleLogout} disabled={logout.isPending} className="px-4 py-2 min-h-[44px] bg-dark-700 hover:bg-dark-600 disabled:opacity-50 text-red-400 text-xs font-medium rounded focus-visible:ring-1 focus-visible:ring-amber-500/50 transition-colors flex items-center gap-2 flex-shrink-0">
+            <LogOut className="w-4 h-4" /> {logout.isPending ? 'Signing out...' : 'Sign out'}
+          </button>
+        </div>
       </SectionCard>
 
       <SectionCard icon={Globe} title="System" tone="slate">

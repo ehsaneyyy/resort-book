@@ -6,7 +6,9 @@ const hooks = vi.hoisted(() => {
   const resort = { name: 'My Resort', currency: '₹', phone: '', email: '', address: '', taxRate: 5, whatsappPhone: '' }
   return {
     resort,
+    me: { email: 'admin@test.com' },
     mutate: vi.fn((_payload, callbacks) => callbacks?.onSuccess?.()),
+    logout: vi.fn((_payload, callbacks) => callbacks?.onSettled?.()),
     toast: vi.fn(),
   }
 })
@@ -20,6 +22,8 @@ vi.mock('../api/hooks', () => ({
   useSeasonalRules: () => ({ data: [], isLoading: false }),
   useStats: () => ({ data: { totalRooms: 0, totalBookings: 0, totalGuests: 0 } }),
   useChangePassword: () => ({ mutate: vi.fn(), isPending: false }),
+  useMe: () => ({ data: hooks.me }),
+  useLogout: () => ({ mutate: hooks.logout, isPending: false }),
 }))
 
 vi.mock('../components/useToast', () => ({
@@ -27,14 +31,25 @@ vi.mock('../components/useToast', () => ({
 }))
 
 describe('Settings', () => {
-  it('renders all five sections', () => {
+  it('renders all six sections', () => {
     render(<Settings />)
     expect(screen.getByText('Property Profile')).toBeInTheDocument()
     expect(screen.getByText('WhatsApp')).toBeInTheDocument()
     expect(screen.getByText('Data & Backup')).toBeInTheDocument()
     expect(screen.getByText('Security')).toBeInTheDocument()
+    expect(screen.getByText('Account')).toBeInTheDocument()
     expect(screen.getByText('System')).toBeInTheDocument()
-    expect(screen.getByText('API + Neon Postgres')).toBeInTheDocument()
+    expect(screen.getByText('admin@test.com')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Sign out' })).toBeInTheDocument()
+  })
+
+  it('signs out from the account section', () => {
+    const location = { href: '' }
+    Object.defineProperty(window, 'location', { configurable: true, value: location })
+    render(<Settings />)
+    fireEvent.click(screen.getByRole('button', { name: 'Sign out' }))
+    expect(hooks.logout).toHaveBeenCalledTimes(1)
+    expect(location.href).toBe('/login')
   })
 
   it('hides the save button until a field changes', () => {

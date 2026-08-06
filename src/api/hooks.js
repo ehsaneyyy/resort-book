@@ -342,6 +342,16 @@ export function useStats() {
   });
 }
 
+export function useMe() {
+  return useQuery({
+    queryKey: ['me'],
+    queryFn: async () => {
+      const { data } = await client.get('/api/v1/auth/me');
+      return toCamelCase(data);
+    },
+  });
+}
+
 export function useLogin() {
   return useMutation({
     mutationFn: async ({ email, password }) => {
