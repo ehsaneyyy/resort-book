@@ -341,3 +341,32 @@ export function useStats() {
     },
   });
 }
+
+export function useLogin() {
+  return useMutation({
+    mutationFn: async ({ email, password }) => {
+      const { data } = await client.post('/api/v1/auth/login', { email, password });
+      return toCamelCase(data);
+    },
+  });
+}
+
+export function useLogout() {
+  return useMutation({
+    mutationFn: async () => {
+      await client.post('/api/v1/auth/logout');
+    },
+  });
+}
+
+export function useChangePassword() {
+  return useMutation({
+    mutationFn: async ({ currentPassword, newPassword }) => {
+      const { data } = await client.post('/api/v1/auth/change-password', {
+        current_password: currentPassword,
+        new_password: newPassword,
+      });
+      return data;
+    },
+  });
+}

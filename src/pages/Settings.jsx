@@ -2,8 +2,9 @@ import { useState, useRef } from 'react';
 import { useResort, useUpdateResort, useRooms, useGuests, useBookings, useSeasonalRules, useStats } from '../api/hooks';
 import { useToast } from '../components/useToast';
 import { CURRENCIES, PHONE_REGEX, EMAIL_REGEX } from '../data/constants';
-import { Building2, Globe, MessageCircle, Download, Check } from 'lucide-react';
+import { Building2, Globe, MessageCircle, Download, Check, ShieldCheck } from 'lucide-react';
 import { Skeleton } from '../components/Skeleton';
+import { ChangePasswordForm } from '../components/ChangePasswordForm';
 
 const CURRENCY_OPTIONS = CURRENCIES;
 
@@ -174,6 +175,10 @@ export function Settings() {
             <Download className="w-4 h-4" /> {backupLoading ? 'Loading...' : 'Export Backup'}
           </button>
         </div>
+      </SectionCard>
+
+      <SectionCard icon={ShieldCheck} title="Security" tone="emerald">
+        <ChangePasswordForm />
       </SectionCard>
 
       <SectionCard icon={Globe} title="System" tone="slate">

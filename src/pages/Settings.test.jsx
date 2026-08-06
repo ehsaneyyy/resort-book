@@ -19,6 +19,7 @@ vi.mock('../api/hooks', () => ({
   useBookings: () => ({ data: [], isLoading: false }),
   useSeasonalRules: () => ({ data: [], isLoading: false }),
   useStats: () => ({ data: { totalRooms: 0, totalBookings: 0, totalGuests: 0 } }),
+  useChangePassword: () => ({ mutate: vi.fn(), isPending: false }),
 }))
 
 vi.mock('../components/useToast', () => ({
@@ -26,11 +27,12 @@ vi.mock('../components/useToast', () => ({
 }))
 
 describe('Settings', () => {
-  it('renders all four sections', () => {
+  it('renders all five sections', () => {
     render(<Settings />)
     expect(screen.getByText('Property Profile')).toBeInTheDocument()
     expect(screen.getByText('WhatsApp')).toBeInTheDocument()
     expect(screen.getByText('Data & Backup')).toBeInTheDocument()
+    expect(screen.getByText('Security')).toBeInTheDocument()
     expect(screen.getByText('System')).toBeInTheDocument()
     expect(screen.getByText('API + Neon Postgres')).toBeInTheDocument()
   })

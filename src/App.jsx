@@ -1,13 +1,14 @@
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Layout } from './components/Layout';
 import { ToastProvider } from './components/Toast';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { SkeletonCard } from './components/Skeleton';
-import client, { getToken } from './api/client';
+import client from './api/client';
 import { toCamelCase } from './api/transform';
 import { Login } from './pages/Login';
+import { ChangePassword } from './pages/ChangePassword';
 
 const Dashboard = lazy(() => import('./pages/Dashboard').then(m => ({ default: m.Dashboard })));
 const Rooms = lazy(() => import('./pages/Rooms').then(m => ({ default: m.Rooms })));
@@ -51,21 +52,60 @@ function PageFallback() {
   );
 }
 
+function AuthLoading() {
+  return (
+    <div className="min-h-screen bg-dark-900 flex items-center justify-center">
+      <div className="flex flex-col items-center gap-3">
+        <img src="/favicon.svg" alt="DoGuest" className="w-10 h-10 animate-pulse" />
+        <p className="text-xs text-slate-500">Checking session...</p>
+      </div>
+    </div>
+  );
+}
+
 export function App() {
   const location = useLocation();
-  const authed = Boolean(getToken());
+  const [authTick, setAuthTick] = useState(0);
+  const { data: me, isLoading } = useQuery({
+    queryKey: ['me', authTick],
+    queryFn: async () => {
+      const { data } = await client.get('/api/v1/auth/me');
+      return toCamelCase(data);
+    },
+    retry: false,
+  });
 
-  if (!authed && location.pathname !== '/login') {
+  const handleSessionChange = () => setAuthTick((t) => t + 1);
+
+  if (isLoading) {
+    return (
+      <ToastProvider>
+        <AuthLoading />
+      </ToastProvider>
+    );
+  }
+
+  if (!me) {
     return (
       <ErrorBoundary>
         <ToastProvider>
-          <Login />
+          <Login onLoggedIn={handleSessionChange} />
         </ToastProvider>
       </ErrorBoundary>
     );
   }
 
-  if (authed && location.pathname === '/login') {
+  if (me.mustChangePassword) {
+    return (
+      <ErrorBoundary>
+        <ToastProvider>
+          <ChangePassword onDone={handleSessionChange} />
+        </ToastProvider>
+      </ErrorBoundary>
+    );
+  }
+
+  if (location.pathname === '/login') {
     return <Navigate to="/" replace />;
   }
 

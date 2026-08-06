@@ -10,6 +10,8 @@ Four items are documented as open product/ops decisions with recommendations, no
 Backend Python dependencies are clean (`pip-audit` against `requirements.txt` + `requirements-dev.txt`: 0 known vulns).
 Frontend: 1 dev-only transitive vuln cleared with `npm audit fix`; 2 remaining `react-router` advisories are RSC-mode-only and not reachable by this SPA (see P2-4).
 
+Phase 3 (real auth) resolves all four open items except the Neon tier upgrade for PITR, which is documented as an ops step.
+
 ## Priority table
 
 | # | Priority | File:Line | Issue | Exploit / Impact | Fix (status) |
@@ -26,23 +28,41 @@ Frontend: 1 dev-only transitive vuln cleared with `npm audit fix`; 2 remaining `
 
 - **XSS sinks**: grep for `dangerouslySetInnerHTML` / `innerHTML` / `eval` / `document.write` across `src/` — zero matches. All user data (notes, requests, guest names) rendered as escaped JSX text.
 - **SQL injection**: no `text()` / f-string SQL anywhere in `backend/app`; all queries are ORM/parameter-bound (confirmed by grep).
-- **CSRF**: authentication is Bearer-header only; no cookies set; `withCredentials` never used. Nothing to CSRF.
+- **CSRF**: auth is a JWT in an HttpOnly cookie (`SameSite=Lax`, `Secure` in production) with `withCredentials`. SameSite=Lax prevents cross-site requests from carrying the cookie on POST/PUT/PATCH/DELETE (only top-level GET navigations send it), and all state-changing endpoints require JSON bodies the frontend sends with `Content-Type: application/json` — a cross-site HTML form cannot issue them. No `Access-Control-Allow-Origin: *`; CORS is pinned to configured origins.
 - **CSP**: already present in `vercel.json` — `script-src 'self'`, `connect-src` pinned to the Render API, `frame-src 'self'`.
-- **Auth fail-closed**: `ADMIN_TOKEN` empty → every request 401 (`auth.py:13`). No default/backdoor token.
+- **Auth fail-closed**: `JWT_SECRET` empty → token decode fails → every protected route 401. Login requires `ADMIN_EMAIL`/`ADMIN_PASSWORD` configured (503 otherwise). No default/backdoor credential.
 - **Session hygiene**: `database.py:18` `expire_on_commit=False`; `get_session` closes via `async with` and rolls back on error.
+- **Password storage**: Argon2 (`pwdlib[argon2]`), default recommended params, `PasswordHash.recommended()`. No plaintext or reversible storage.
+- **Token expiry & rotation**: JWTs expire (`JWT_EXPIRY_MINUTES`, default 480) and carry a `pwd` claim = `password_changed_at` timestamp; any password change invalidates every previously issued token (verified in `get_current_user`).
 - **`created_at` integrity**: not client-settable (absent from schemas; Pydantic ignores unknown fields).
 - **Pricing integrity**: `nights`/`total` always server-computed (`bookings.py:33-36`), client-sent values overwritten; frontend totals use the same `computeBookingTotal`/`compute_total` logic.
-- **IDOR (Object-Level Authorization) — NOT APPLICABLE, by design**: there is no per-user resource ownership anywhere. Every route sits behind the single `require_admin` bearer dependency (`main.py:39-45`); guests/rooms/bookings are resort-owned global resources, not user-scoped. A caller either presents the one admin token (full access) or fails auth before any object is resolved — there is no authorization boundary between two legitimate users to violate. This remains true only as long as no multi-user/authz feature is added; revisit with the JWT work (see open items).
+- **IDOR (Object-Level Authorization) — NOT APPLICABLE, by design**: there is no per-user resource ownership anywhere. Every route sits behind the single `require_admin` dependency (`main.py:39-45`); guests/rooms/bookings are resort-owned global resources, not user-scoped. A caller either presents a valid session cookie (full access) or fails auth before any object is resolved — there is no authorization boundary between two legitimate users to violate.
 - **Error responses**: 401/404/409/422 do not leak internals.
 
 ## Open items — needs a product/ops decision (NOT fixed, by design)
 
 | Area | Detail | Recommendation |
 |------|--------|----------------|
-| Multi-user auth | Single shared `ADMIN_TOKEN`, no roles, no revocation. Building JWT/accounts is a product change, not a security patch | Adopt real auth (OAuth2 + httpOnly cookies, or JWT in an httpOnly cookie) when multi-user is needed. Flagged, not bolt-on |
-| Token storage | `src/api/client.js` keeps the token in `sessionStorage`; any future XSS would read it. No XSS sink exists today | Move to httpOnly cookie once JWT path exists; keep CSP as defense-in-depth |
-| Backups | Neon free tier: no PITR / no automated backups | Upgrade Neon tier or add scheduled `pg_dump` to external storage |
-| Rate limiter persistence | In-memory sliding window — resets on restart, per-instance (Render free tier can run >1 instance) | Move to Redis/DB-backed limiter when multi-instance is provisioned |
+| Backups / PITR | Neon free tier: no PITR / no automated backups | Upgrade Neon tier or add scheduled `pg_dump` to external storage — see `PITR` section below for the exact steps |
+
+## PITR (point-in-time recovery) runbook
+
+Neon Postgres PITR requires a paid tier; enable it in the Neon console under **Project → Settings → Branching / Time travel**.
+
+1. In the Neon dashboard open the project, go to **Settings → Time Travel** (or **Branching**), and enable *Point-in-time recovery* (retention up to 7 days on paid tiers; choose the retention window you need).
+2. On Vercel, add an env var `DATABASE_URL` that targets a fixed branch name (`…/branches/<branch>/neondb`) so restores don't silently pin to a moving default branch.
+3. To restore to an earlier point in time: **Project → Branches → Restore**, pick the branch + timestamp, and confirm. This creates a new branch; promote it via **Set as primary** and redeploy Vercel with the new `DATABASE_URL`.
+4. Until PITR is enabled, keep the manual JSON Export from Settings (**Data & Backup → Export Backup**) as the fallback; it is intentionally kept client-side and covers all tables.
+
+Note: `rate_limits` and `security_events` rows are safe to lose on restore (they are ephemeral security telemetry, not bookable data).
+
+## Resolved in Phase 3 (real auth)
+
+- **Multi-user auth (open item)**: replaced the single shared `ADMIN_TOKEN` with a JWT in an HttpOnly `SameSite=Lax` cookie (`backend/app/auth.py`), Argon2 password hashing (`pwdlib[argon2]`), and a single admin account provisioned on first login from `ADMIN_EMAIL`/`ADMIN_PASSWORD` env vars with `must_change_password=True` (forced password change on first sign-in — `backend/app/routers/auth.py`). Endpoints: `POST /api/v1/auth/login`, `POST /api/v1/auth/logout`, `POST /api/v1/auth/change-password`, `GET /api/v1/auth/me`. Login returns 503 when env creds are unconfigured. Tokens expire (`JWT_EXPIRY_MINUTES`) and are invalidated on password change via the `pwd` claim. Regression tests: `tests/test_auth.py`.
+- **Token storage (open item)**: frontend no longer keeps any token in `sessionStorage`; `src/api/client.js` uses `withCredentials` and relies on the server cookie. The old `doguest_token` storage and Bearer-header interceptor were removed. Frontend tests: `src/pages/Login.test.jsx`, `src/components/ChangePasswordForm.test.jsx`.
+- **Rate limiter persistence (open item)**: `backend/app/ratelimit.py` rewritten from an in-memory dict to a Postgres-backed window (table `rate_limits`) — survives restarts and is correct across multiple instances (Render can run >1). Same semantics kept: write bucket, per-IP auth-failure bucket, global auth-failure bucket, `X-Forwarded-For` parsing, `429` + `Retry-After`. Tests: `tests/test_rate_limit.py`, `tests/test_security_controls.py`.
+- **Audit log (new, closes a review gap)**: `security_events` table records login success/failure, password changes, and logouts with user id + client IP (`backend/app/services/audit_service.py`). Written in a dedicated committed session so failed-login events survive the request's rollback. Tests: `tests/test_audit.py`.
+- **Pydantic constraints**: login/change-password schemas enforce email format (`EmailStr`) and `min_length=8` passwords (`backend/app/schemas/auth.py`).
 
 ## Resolved after this audit
 
@@ -62,4 +82,7 @@ Frontend: 1 dev-only transitive vuln cleared with `npm audit fix`; 2 remaining `
 - PUT/PATCH status validation (400 on bogus status, 200 on valid)
 - stats SQL aggregation response shape (counts, occupied, occupancy%)
 
-Suite: **41/41 passing** (36 original + 5 onboarding). Frontend `oxlint` clean, `npm run build` clean.
+`backend/tests/test_auth.py`: cookie auth required, invalid-cookie 401, login success/failure/validation, forced password change flow, token invalidation on password change, logout clears cookie, 503 when env unconfigured.
+`backend/tests/test_audit.py`: login success/failure, password change, and logout are recorded.
+
+Suite: **55/55 backend passing** (Phase 1-3), **36/36 frontend passing**. Frontend `oxlint` clean, `npm run build` clean.
