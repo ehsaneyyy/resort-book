@@ -44,6 +44,10 @@ Frontend: 1 dev-only transitive vuln cleared with `npm audit fix`; 2 remaining `
 | Backups | Neon free tier: no PITR / no automated backups | Upgrade Neon tier or add scheduled `pg_dump` to external storage |
 | Rate limiter persistence | In-memory sliding window — resets on restart, per-instance (Render free tier can run >1 instance) | Move to Redis/DB-backed limiter when multi-instance is provisioned |
 
+## Resolved after this audit
+
+- **Demo-data auto-seed footgun**: the client auto-seeded (`POST /api/v1/seed`) whenever `GET /resort` returned 404, so a brand-new production DB would silently fill with demo rooms/guests/bookings. Now: seeding is gated behind `SEED_ENABLED` (default `false`, returns 403 when off — `seed.py`), `GET /resort` returns an empty shell and `PUT /resort` upserts (`resort.py`), and the frontend auto-seed + `useSeedDemo` were removed. Owner-first-run is via Settings on a fresh DB. Regression tests: `tests/test_onboarding.py`.
+
 ## Dependency audit
 
 - Backend: `pip-audit` on `requirements.txt` + `requirements-dev.txt` → **0 known vulnerabilities**.
@@ -58,4 +62,4 @@ Frontend: 1 dev-only transitive vuln cleared with `npm audit fix`; 2 remaining `
 - PUT/PATCH status validation (400 on bogus status, 200 on valid)
 - stats SQL aggregation response shape (counts, occupied, occupancy%)
 
-Suite: **36/36 passing**. Frontend `oxlint` clean, `npm run build` clean.
+Suite: **41/41 passing** (36 original + 5 onboarding). Frontend `oxlint` clean, `npm run build` clean.

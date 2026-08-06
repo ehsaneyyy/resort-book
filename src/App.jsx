@@ -3,7 +3,6 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { Layout } from './components/Layout';
 import { ToastProvider } from './components/Toast';
-import { useToast } from './components/useToast';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { SkeletonCard } from './components/Skeleton';
 import client, { getToken } from './api/client';
@@ -28,30 +27,16 @@ const prefetch = {
 
 function Bootstrap() {
   const qc = useQueryClient();
-  const toast = useToast();
 
   useEffect(() => {
-    let cancelled = false;
     (async () => {
-      let seeded = false;
-      try {
-        await client.get('/api/v1/resort');
-      } catch (err) {
-        if (err.response?.status === 404 && !cancelled) {
-          await client.post('/api/v1/seed');
-          seeded = true;
-        }
-      }
-      if (cancelled) return;
       await Promise.all(
         Object.entries(prefetch).map(([key, fn]) =>
           qc.prefetchQuery({ queryKey: [key], queryFn: async () => toCamelCase(await fn()) })
         )
       );
-      if (seeded && !cancelled) toast('Demo data loaded', 'success');
     })();
-    return () => { cancelled = true; };
-  }, [qc, toast]);
+  }, [qc]);
 
   return null;
 }

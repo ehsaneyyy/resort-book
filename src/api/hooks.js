@@ -341,16 +341,3 @@ export function useStats() {
     },
   });
 }
-
-export function useSeedDemo() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async () => {
-      const { data } = await client.post('/api/v1/seed');
-      return data;
-    },
-    onSuccess: () => {
-      qc.invalidateQueries();
-    },
-  });
-}

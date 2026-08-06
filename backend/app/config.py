@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     rate_limit_auth_failures: int = 10
     rate_limit_global_auth_failures: int = 50
     max_body_bytes: int = 1_000_000
+    seed_enabled: bool = False
 
     @property
     def origins(self) -> list[str]:
