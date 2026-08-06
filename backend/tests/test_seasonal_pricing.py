@@ -1,4 +1,3 @@
-from conftest import AUTH
 from test_booking_rules import payload
 
 
@@ -17,11 +16,11 @@ def rule(**overrides):
 
 
 async def add_rule(client, **overrides):
-    return await client.post('/api/v1/seasonal-rules', headers=AUTH, json=rule(**overrides))
+    return await client.post('/api/v1/seasonal-rules', json=rule(**overrides))
 
 
 async def create(client, room_id, guest_id, check_in, check_out):
-    return await client.post('/api/v1/bookings', headers=AUTH, json=payload(room_id, guest_id, check_in, check_out))
+    return await client.post('/api/v1/bookings', json=payload(room_id, guest_id, check_in, check_out))
 
 
 async def test_seasonal_boost_weekend(client, test_room, test_guest):
@@ -67,6 +66,6 @@ async def test_seasonal_adjustments_combine(client, test_room, test_guest):
     assert r.json()['total'] == 9555
 
 
-async def test_seasonal_rules_require_auth(client):
-    assert (await client.post('/api/v1/seasonal-rules', json=rule())).status_code == 401
-    assert (await client.get('/api/v1/seasonal-rules')).status_code == 401
+async def test_seasonal_rules_require_auth(anon_client):
+    assert (await anon_client.post('/api/v1/seasonal-rules', json=rule())).status_code == 401
+    assert (await anon_client.get('/api/v1/seasonal-rules')).status_code == 401

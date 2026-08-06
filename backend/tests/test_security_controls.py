@@ -1,21 +1,18 @@
-from conftest import AUTH
-
-
-async def test_auth_failure_throttle(client):
+async def test_auth_failure_throttle(anon_client):
     statuses = []
     for _ in range(12):
-        r = await client.get('/api/v1/rooms', headers={'Authorization': 'Bearer wrong-token'})
+        r = await anon_client.get('/api/v1/rooms')
         statuses.append(r.status_code)
     assert statuses.count(401) == 10
     assert statuses.count(429) == 2
 
 
-async def test_auth_throttle_cannot_be_bypassed_with_spoofed_ip(client):
+async def test_auth_throttle_cannot_be_bypassed_with_spoofed_ip(anon_client):
     statuses = []
     for i in range(55):
-        r = await client.get(
+        r = await anon_client.get(
             '/api/v1/rooms',
-            headers={'Authorization': 'Bearer wrong-token', 'X-Forwarded-For': f'203.0.113.{i}'},
+            headers={'X-Forwarded-For': f'203.0.113.{i}'},
         )
         statuses.append(r.status_code)
     assert statuses.count(401) == 50
@@ -23,7 +20,7 @@ async def test_auth_throttle_cannot_be_bypassed_with_spoofed_ip(client):
 
 
 async def test_body_size_limit_413(client):
-    r = await client.post('/api/v1/rooms', headers=AUTH, json={
+    r = await client.post('/api/v1/rooms', json={
         'name': 'x' * 1_200_000,
         'type': 'Standard', 'floor': 1, 'price': 100, 'weekend_price': 120,
         'capacity': 2, 'beds': '1 Queen Bed', 'size': 280,
@@ -33,7 +30,7 @@ async def test_body_size_limit_413(client):
 
 
 async def test_create_booking_forces_pending(client, test_room, test_guest):
-    r = await client.post('/api/v1/bookings', headers=AUTH, json={
+    r = await client.post('/api/v1/bookings', json={
         'guest_id': test_guest.id,
         'room_id': test_room.id,
         'check_in': '2027-08-06', 'check_out': '2027-08-08',
@@ -47,22 +44,22 @@ async def test_create_booking_forces_pending(client, test_room, test_guest):
 
 
 async def test_update_booking_rejects_invalid_status(client, test_room, test_guest):
-    created = await client.post('/api/v1/bookings', headers=AUTH, json={
+    created = await client.post('/api/v1/bookings', json={
         'guest_id': test_guest.id,
         'room_id': test_room.id,
         'check_in': '2027-08-06', 'check_out': '2027-08-08',
         'nights': 2, 'adults': 2, 'children': 0, 'source': 'Direct',
     })
     booking_id = created.json()['id']
-    r = await client.put(f'/api/v1/bookings/{booking_id}', headers=AUTH, json={'status': 'Bogus'})
+    r = await client.put(f'/api/v1/bookings/{booking_id}', json={'status': 'Bogus'})
     assert r.status_code == 400
-    ok = await client.put(f'/api/v1/bookings/{booking_id}', headers=AUTH, json={'status': 'Checked Out', 'payment_status': 'Paid'})
+    ok = await client.put(f'/api/v1/bookings/{booking_id}', json={'status': 'Checked Out', 'payment_status': 'Paid'})
     assert ok.status_code == 200
     assert ok.json()['status'] == 'Checked Out'
 
 
 async def test_stats_aggregation(client):
-    r = await client.get('/api/v1/stats', headers=AUTH)
+    r = await client.get('/api/v1/stats')
     assert r.status_code == 200
     data = r.json()
     assert data['total_rooms'] == 6

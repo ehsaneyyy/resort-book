@@ -2,23 +2,42 @@ import time
 
 from fastapi import Request
 from fastapi.responses import JSONResponse
+from sqlalchemy import delete, select
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.middleware.base import BaseHTTPMiddleware
+
+from .database import async_session_factory
+from .models.rate_limit import RateLimit
+from .request_ip import client_ip
 
 WRITE_METHODS = ('POST', 'PUT', 'PATCH', 'DELETE')
 
-_instances: list['RateLimitMiddleware'] = []
+
+async def reset_rate_limits() -> None:
+    async with async_session_factory() as session:
+        await session.execute(delete(RateLimit))
+        await session.commit()
 
 
-def _client_ip(request: Request) -> str:
-    forwarded = request.headers.get('x-forwarded-for')
-    if forwarded:
-        return forwarded.split(',')[0].strip()
-    return request.client.host if request.client else 'unknown'
-
-
-def reset_rate_limits() -> None:
-    for instance in _instances:
-        instance.hits.clear()
+async def _hit(bucket: str, window: int, limit: int) -> int:
+    now = int(time.time())
+    async with async_session_factory() as session:
+        await session.execute(delete(RateLimit).where(RateLimit.window_start < now - window))
+        result = await session.execute(
+            select(RateLimit)
+            .where(RateLimit.bucket == bucket, RateLimit.window_start >= now - window)
+            .order_by(RateLimit.window_start.desc())
+            .limit(1)
+        )
+        row = result.scalar_one_or_none()
+        if row:
+            row.hits += 1
+            hits = row.hits
+        else:
+            session.add(RateLimit(bucket=bucket, window_start=now, hits=1, limit=limit))
+            hits = 1
+        await session.commit()
+    return hits
 
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
@@ -28,37 +47,25 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self.window = window
         self.auth_failure_limit = auth_failure_limit
         self.global_auth_failure_limit = global_auth_failure_limit
-        self.hits = {}
-        _instances.append(self)
 
     async def dispatch(self, request: Request, call_next):
-        ip = _client_ip(request)
-        now = time.monotonic()
+        ip = client_ip(request)
         if request.method in WRITE_METHODS:
-            key = (ip, request.method)
-            bucket = self.hits.setdefault(key, [])
-            bucket[:] = [t for t in bucket if now - t < self.window]
-            if len(bucket) >= self.limit:
+            hits = await _hit(f'write:{ip}:{request.method}', self.window, self.limit)
+            if hits > self.limit:
                 return JSONResponse(
                     status_code=429,
                     content={'detail': 'Rate limit exceeded. Try again later.'},
                     headers={'Retry-After': str(int(self.window))},
                 )
-            bucket.append(now)
         response = await call_next(request)
         if response.status_code == 401:
-            key = (ip, 'auth-failure')
-            bucket = self.hits.setdefault(key, [])
-            bucket[:] = [t for t in bucket if now - t < self.window]
-            global_key = ('global', 'auth-failure')
-            global_bucket = self.hits.setdefault(global_key, [])
-            global_bucket[:] = [t for t in global_bucket if now - t < self.window]
-            if len(bucket) >= self.auth_failure_limit or len(global_bucket) >= self.global_auth_failure_limit:
+            hits = await _hit(f'auth:{ip}', self.window, self.auth_failure_limit)
+            global_hits = await _hit('auth:global', self.window, self.global_auth_failure_limit)
+            if hits > self.auth_failure_limit or global_hits > self.global_auth_failure_limit:
                 return JSONResponse(
                     status_code=429,
                     content={'detail': 'Too many failed attempts. Try again later.'},
                     headers={'Retry-After': str(int(self.window))},
                 )
-            bucket.append(now)
-            global_bucket.append(now)
         return response

@@ -1,8 +1,11 @@
 import os
 
 os.environ['DATABASE_URL'] = 'sqlite+aiosqlite:///./test_resort.db'
-os.environ['ADMIN_TOKEN'] = 'test-token'
 os.environ['CORS_ORIGINS'] = 'http://localhost'
+os.environ['JWT_SECRET'] = 'test-secret-that-is-longer-than-thirty-two-bytes'
+os.environ['JWT_EXPIRY_MINUTES'] = '60'
+os.environ['ADMIN_EMAIL'] = 'admin@test.com'
+os.environ['ADMIN_PASSWORD'] = 'test-password-123'
 
 from contextlib import asynccontextmanager
 
@@ -16,7 +19,8 @@ from app.ratelimit import reset_rate_limits
 from app.services.seed_service import seed_demo_data
 from app.repositories import room_repo, guest_repo
 
-AUTH = {'Authorization': 'Bearer test-token'}
+ADMIN_EMAIL = 'admin@test.com'
+ADMIN_PASSWORD = 'test-password-123'
 
 
 @asynccontextmanager
@@ -29,10 +33,10 @@ async def _client():
 
 @pytest.fixture(autouse=True)
 async def reset_db():
-    reset_rate_limits()
     async with engine.begin() as conn:
         await conn.run_sync(SQLModel.metadata.drop_all)
         await conn.run_sync(SQLModel.metadata.create_all)
+    await reset_rate_limits()
     async with async_session_factory() as s:
         await seed_demo_data(s)
         await s.commit()
@@ -40,8 +44,16 @@ async def reset_db():
 
 
 @pytest.fixture
+async def anon_client():
+    async with _client() as c:
+        yield c
+
+
+@pytest.fixture
 async def client():
     async with _client() as c:
+        r = await c.post('/api/v1/auth/login', json={'email': ADMIN_EMAIL, 'password': ADMIN_PASSWORD})
+        assert r.status_code == 200
         yield c
 
 

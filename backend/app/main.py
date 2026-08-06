@@ -7,7 +7,7 @@ from .database import engine
 from .auth import require_admin
 from .body_limit import MaxBodySizeMiddleware
 from .ratelimit import RateLimitMiddleware
-from .routers import rooms, guests, bookings, seasonal, resort, seed, stats
+from .routers import rooms, guests, bookings, seasonal, resort, seed, stats, auth
 
 
 @asynccontextmanager
@@ -51,6 +51,7 @@ app.include_router(seasonal.router, dependencies=[Depends(require_admin)])
 app.include_router(resort.router, dependencies=[Depends(require_admin)])
 app.include_router(seed.router, dependencies=[Depends(require_admin)])
 app.include_router(stats.router, dependencies=[Depends(require_admin)])
+app.include_router(auth.router)
 
 
 @app.get('/api/v1/health')

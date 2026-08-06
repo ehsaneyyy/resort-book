@@ -1,4 +1,3 @@
-from conftest import AUTH
 
 
 def payload(room_id, guest_id, check_in, check_out, total=1):
@@ -21,7 +20,7 @@ def payload(room_id, guest_id, check_in, check_out, total=1):
 
 
 async def create(client, room_id, guest_id, check_in, check_out, total=1):
-    return await client.post('/api/v1/bookings', headers=AUTH, json=payload(room_id, guest_id, check_in, check_out, total))
+    return await client.post('/api/v1/bookings', json=payload(room_id, guest_id, check_in, check_out, total))
 
 
 async def test_server_prices_weekend_nights(client, test_room, test_guest):
@@ -78,7 +77,7 @@ async def test_cancelled_does_not_block(client, test_room, test_guest):
     created = await create(client, test_room.id, test_guest.id, '2027-08-06', '2027-08-08')
     assert created.status_code == 201
     bid = created.json()['id']
-    cancel = await client.patch(f'/api/v1/bookings/{bid}/status', headers=AUTH, json={'status': 'Cancelled'})
+    cancel = await client.patch(f'/api/v1/bookings/{bid}/status', json={'status': 'Cancelled'})
     assert cancel.status_code == 200
     r = await create(client, test_room.id, test_guest.id, '2027-08-06', '2027-08-08')
     assert r.status_code == 201
@@ -99,7 +98,7 @@ async def test_update_overlap_409(client, test_room, test_guest):
     b = await create(client, test_room.id, test_guest.id, '2027-08-10', '2027-08-12')
     bid = b.json()['id']
     r = await client.put(
-        f'/api/v1/bookings/{bid}', headers=AUTH,
+        f'/api/v1/bookings/{bid}',
         json={'check_in': '2027-08-07', 'check_out': '2027-08-09'},
     )
     assert r.status_code == 409
@@ -111,7 +110,7 @@ async def test_update_recomputes_total(client, test_room, test_guest):
     assert created.json()['total'] == 7350
     bid = created.json()['id']
     r = await client.put(
-        f'/api/v1/bookings/{bid}', headers=AUTH,
+        f'/api/v1/bookings/{bid}',
         json={'check_in': '2027-08-06', 'check_out': '2027-08-08', 'total': 5},
     )
     assert r.status_code == 200
@@ -121,7 +120,7 @@ async def test_update_recomputes_total(client, test_room, test_guest):
 async def test_update_total_only_ignored(client, test_room, test_guest):
     created = await create(client, test_room.id, test_guest.id, '2027-08-02', '2027-08-04')
     bid = created.json()['id']
-    r = await client.put(f'/api/v1/bookings/{bid}', headers=AUTH, json={'total': 5})
+    r = await client.put(f'/api/v1/bookings/{bid}', json={'total': 5})
     assert r.status_code == 200
     assert r.json()['total'] == 7350
 
@@ -134,5 +133,5 @@ async def test_create_missing_room_400(client, test_guest):
 async def test_invalid_status_400(client, test_room, test_guest):
     created = await create(client, test_room.id, test_guest.id, '2027-08-02', '2027-08-04')
     bid = created.json()['id']
-    r = await client.patch(f'/api/v1/bookings/{bid}/status', headers=AUTH, json={'status': 'Nope'})
+    r = await client.patch(f'/api/v1/bookings/{bid}/status', json={'status': 'Nope'})
     assert r.status_code == 400

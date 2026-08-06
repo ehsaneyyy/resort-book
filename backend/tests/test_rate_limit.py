@@ -1,11 +1,10 @@
-from conftest import AUTH
 
 
 async def test_write_rate_limit_429(client, test_room, test_guest):
     responses = []
     for i in range(35):
         r = await client.post(
-            '/api/v1/bookings', headers=AUTH,
+            '/api/v1/bookings',
             json={
                 'guest_id': test_guest.id,
                 'room_id': test_room.id,
