@@ -59,7 +59,7 @@ async def login(
             await log_event('login_failed', user.id, ip)
             raise HTTPException(status_code=401, detail='Invalid credentials')
 
-    set_auth_cookie(response, create_access_token(user))
+    set_auth_cookie(request, response, create_access_token(user))
     await log_event('login_success', user.id, ip)
     return user
 
@@ -83,7 +83,7 @@ async def change_password(
     user.must_change_password = False
     user.password_changed_at = utcnow()
     await session.commit()
-    set_auth_cookie(response, create_access_token(user))
+    set_auth_cookie(request, response, create_access_token(user))
     await log_event('password_changed', user.id, ip)
     return {'ok': True}
 
@@ -93,7 +93,7 @@ async def logout(
     request: Request,
     response: Response,
 ):
-    clear_auth_cookie(response)
+    clear_auth_cookie(request, response)
     await log_event('logout', None, client_ip(request))
     return {'ok': True}
 

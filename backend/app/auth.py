@@ -45,20 +45,24 @@ def create_access_token(user: User) -> str:
     return jwt.encode(payload, settings.jwt_secret, algorithm='HS256')
 
 
-def set_auth_cookie(response: Response, token: str) -> None:
+def _cookie_attrs(request: Request) -> dict:
+    secure = settings.is_production or request.url.scheme == 'https'
+    return {'samesite': 'none' if secure else 'lax', 'secure': secure}
+
+
+def set_auth_cookie(request: Request, response: Response, token: str) -> None:
     response.set_cookie(
         key=TOKEN_COOKIE,
         value=token,
         httponly=True,
-        samesite='lax',
-        secure=settings.is_production,
         max_age=settings.jwt_expiry_minutes * 60,
         path='/',
+        **_cookie_attrs(request),
     )
 
 
-def clear_auth_cookie(response: Response) -> None:
-    response.delete_cookie(key=TOKEN_COOKIE, path='/')
+def clear_auth_cookie(request: Request, response: Response) -> None:
+    response.delete_cookie(key=TOKEN_COOKIE, path='/', **_cookie_attrs(request))
 
 
 async def get_current_user(
