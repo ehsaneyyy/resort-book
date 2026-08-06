@@ -41,7 +41,7 @@ async def test_login_sets_http_only_cookie(anon_client):
         json={'email': ADMIN_EMAIL, 'password': ADMIN_PASSWORD},
     )
     assert r.status_code == 200
-    assert r.json()['must_change_password'] is True
+    assert r.json()['must_change_password'] is False
 
 
 async def test_rooms_ok_with_auth(client):
@@ -61,7 +61,7 @@ async def test_me_returns_admin(client):
     assert r.status_code == 200
     body = r.json()
     assert body['email'] == ADMIN_EMAIL
-    assert body['must_change_password'] is True
+    assert body['must_change_password'] is False
 
 
 async def test_change_password_flow(client):

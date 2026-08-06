@@ -8,7 +8,6 @@ import { SkeletonCard } from './components/Skeleton';
 import client from './api/client';
 import { toCamelCase } from './api/transform';
 import { Login } from './pages/Login';
-import { ChangePassword } from './pages/ChangePassword';
 
 const Dashboard = lazy(() => import('./pages/Dashboard').then(m => ({ default: m.Dashboard })));
 const Rooms = lazy(() => import('./pages/Rooms').then(m => ({ default: m.Rooms })));
@@ -90,16 +89,6 @@ export function App() {
       <ErrorBoundary>
         <ToastProvider>
           <Login onLoggedIn={handleSessionChange} />
-        </ToastProvider>
-      </ErrorBoundary>
-    );
-  }
-
-  if (me.mustChangePassword) {
-    return (
-      <ErrorBoundary>
-        <ToastProvider>
-          <ChangePassword onDone={handleSessionChange} />
         </ToastProvider>
       </ErrorBoundary>
     );

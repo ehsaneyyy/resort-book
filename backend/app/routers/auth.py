@@ -46,7 +46,7 @@ async def login(
         user = User(
             email=email,
             password_hash=hash_password(data.password),
-            must_change_password=True,
+            must_change_password=False,
         )
         session.add(user)
         await session.commit()
@@ -55,18 +55,9 @@ async def login(
         if not user.is_active:
             await log_event('login_failed', user.id, ip, 'inactive')
             raise HTTPException(status_code=401, detail='Invalid credentials')
-        if user.must_change_password:
-            if not compare_digest(data.password.encode(), settings.admin_password.encode()):
-                await log_event('login_failed', user.id, ip, 'bootstrap secret mismatch')
-                raise HTTPException(status_code=401, detail='Invalid credentials')
-            if not verify_password(data.password, user.password_hash):
-                user.password_hash = hash_password(data.password)
-                user.password_changed_at = utcnow()
-                await session.commit()
-        else:
-            if not verify_password(data.password, user.password_hash):
-                await log_event('login_failed', user.id, ip)
-                raise HTTPException(status_code=401, detail='Invalid credentials')
+        if not verify_password(data.password, user.password_hash):
+            await log_event('login_failed', user.id, ip)
+            raise HTTPException(status_code=401, detail='Invalid credentials')
 
     set_auth_cookie(response, create_access_token(user))
     await log_event('login_success', user.id, ip)
